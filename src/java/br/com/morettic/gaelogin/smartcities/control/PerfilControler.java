@@ -19,6 +19,10 @@ import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.images.Image;
+import com.google.appengine.api.images.ImagesService;
+import com.google.appengine.api.images.ImagesServiceFactory;
+import com.google.appengine.api.images.Transform;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.sun.media.jfxmedia.logging.Logger;
 import com.sun.org.apache.bcel.internal.generic.L2D;
@@ -230,10 +234,24 @@ public class PerfilControler {
 
         return js;
     }
-
+    /*
+    http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=AMIfv96deP5CQMlfG4sGdMKnSQSnBxz0AMSjALVRxpNn6XdYycaNR7UTUpRrbJxCpudfMAt3YRX2sWCXF_d8MJwGUOeeenlars60ba_FrAuHeXzsA1Ch6la1IZeAQ2v8x9r36PHC5EcfGiNw-gIDhr9LI9KTwnr_NJeciMwJCahWgVYrccqRhvE
+    */
     public static void showImageById(HttpServletRequest request, HttpServletResponse response) throws IOException {
         BlobKey blobKey = new BlobKey(request.getParameter("blob-key"));
+        
+        /*ImagesService imagesService = ImagesServiceFactory.getImagesService();
+
+        Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
+        Transform resize = ImagesServiceFactory.makeResize(150, 150);
+        
+        Image newImage = imagesService.applyTransform(resize, oldImage);
+
+        byte[] newImageData = newImage.;*/
+        
+        blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         blobstoreService.serve(blobKey, response);
+
     }
 
 }
