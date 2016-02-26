@@ -43,8 +43,9 @@ public class InfoSegController extends HttpServlet {
 
             String action = request.getParameter("action");
             Integer actionNumber = -1;
-            if(action!=null)
+            if (action != null) {
                 actionNumber = new Integer(action);
+            }
 
             switch (actionNumber) {
                 case 1://Cadastra uma ocorrência;
@@ -57,15 +58,21 @@ public class InfoSegController extends HttpServlet {
                     retJSon = PerfilControler.savePerfil(request, response);
                     break;
                 case 4:
-                   
+                    retJSon = PerfilControler.findPerfilByIdOrEmail(request, response);
+                    break;
+                case 5:
+                    response.setContentType("image/jpeg");
+                    out = response.getWriter();
+                    PerfilControler.showImageById(request, response);
                 default:
                     ;
                     break;
             }
 
         } finally {
-            if(retJSon!=null)
+            if (retJSon != null) {
                 out.print(retJSon);
+            }
             out.close();
         }
     }

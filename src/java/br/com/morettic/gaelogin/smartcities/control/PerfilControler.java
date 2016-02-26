@@ -37,6 +37,7 @@ import mediautil.gen.Log;
  */
 public class PerfilControler {
 
+    private static PersistenceManager pm = null;
     private static BlobstoreService blobstoreService;
 
     /**
@@ -47,7 +48,7 @@ public class PerfilControler {
     public static JSONObject saveOcorrencia(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
 
-        PersistenceManager pm = PMF.get().getPersistenceManager();
+        pm = PMF.get().getPersistenceManager();
 
         Perfil p1 = pm.getObjectById(Perfil.class, new Long(req.getParameter("idProfile")));
 
@@ -90,6 +91,10 @@ public class PerfilControler {
         return js;
     }
 
+    /**
+     *
+     * http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=2&iName=malacma@gmail.com.br&iToken=1
+     */
     public static JSONObject saveImagem(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         JSONObject js = new JSONObject();
 
@@ -98,7 +103,6 @@ public class PerfilControler {
         i.setPath(request.getParameter("iName"));
         i.setImage(request.getParameter("iToken"));
 
-        PersistenceManager pm = null;
         try {
             pm = PMF.get().getPersistenceManager();
             pm.makePersistent(i);
@@ -150,7 +154,6 @@ public class PerfilControler {
             p.setBairro(address.getString("bairro"));
         }
         //persiste objeto
-        PersistenceManager pm = null;
         try {
             pm = PMF.get().getPersistenceManager();
             pm.makePersistent(p);
@@ -182,15 +185,13 @@ public class PerfilControler {
         Map<String, List<BlobKey>> blobs = blobstoreService.getUploads(req);
 
         /*Logger.logMsg(Log.LEVEL_WARNING, "IS EMPTY??" + blobs.isEmpty());
-        System.out.print("IS EMPTY??" + blobs.isEmpty());*/
-        
+         System.out.print("IS EMPTY??" + blobs.isEmpty());*/
         //Set< String > set = blobs.keySet( );
         //Utils.log.log( Level.SEVERE, "UploadBlobHandler.doPost() size::"+set.size( ));
         // Iterator< String > iterator = set.iterator( );
         /*while ( iterator.hasNext( )) {
          Utils.log.log( Level.SEVERE, "UploadBlobHandler.doPost(): Blobstore key: "+iterator.next( ));
          }*/
-
         JSONArray ja = new JSONArray();
         List< BlobKey> list = blobs.get("myFile");
 
@@ -200,6 +201,39 @@ public class PerfilControler {
             ja.put(key.getKeyString());
         }
         return ja;
+    }
+
+    /**
+     *
+     * http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=4&id=5119667588825088
+     *
+     *
+     */
+    public static JSONObject findPerfilByIdOrEmail(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        JSONObject js = new JSONObject();
+
+        String id = request.getParameter("id");
+
+        pm = PMF.get().getPersistenceManager();
+        Perfil p = pm.getObjectById(Perfil.class, new Long(id));
+
+        js.put("avatar", p.getAvatar());
+        js.put("cep", p.getCep());
+        js.put("complemento", p.getComplemento());
+        js.put("cpfCnpj", p.getCpfCnpj());
+        js.put("email", p.getEmail());
+        js.put("key", p.getKey());
+        js.put("nasc", p.getNascimento());
+        js.put("nome", p.getNome());
+        js.put("pass", p.getPassWd());
+        js.put("configId", p.getConfig());
+
+        return js;
+    }
+
+    public static void showImageById(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        BlobKey blobKey = new BlobKey(request.getParameter("blob-key"));
+        blobstoreService.serve(blobKey, response);
     }
 
 }

@@ -24,7 +24,7 @@ public class Imagem {
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long key;
 
-    @Persistent(name = "img_path")
+    @Persistent
     private String path;
 
     @Persistent
