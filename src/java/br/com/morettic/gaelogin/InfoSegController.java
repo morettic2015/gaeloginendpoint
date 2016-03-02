@@ -64,6 +64,16 @@ public class InfoSegController extends HttpServlet {
                     response.setContentType("image/jpeg");
                     out = response.getWriter();
                     PerfilControler.showImageById(request, response);
+                    break;
+                case 6:
+                    retJSon = PerfilControler.findOcorrencias(request, response);
+                    break;
+                case 7:
+                    retJSon = PerfilControler.autenticaUsuario(request, response);
+                    break;
+                case 8:
+                    retJSon = PerfilControler.findImagemTokenById(request, response);
+                    break;
                 default:
                     ;
                     break;

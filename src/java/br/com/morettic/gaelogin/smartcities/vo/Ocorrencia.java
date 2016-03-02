@@ -73,19 +73,19 @@ public class Ocorrencia {
     }
 
     public String getTitulo() {
-        return titulo;
+        return titulo.toUpperCase();
     }
 
     public void setTitulo(String titulo) {
-        this.titulo = titulo;
+        this.titulo = titulo.toUpperCase();
     }
 
     public String getDescricao() {
-        return descricao;
+        return descricao.toUpperCase();
     }
 
     public void setDescricao(String descricao) {
-        this.descricao = descricao;
+        this.descricao = descricao.toUpperCase();
     }
 
     public String getLatitude() {

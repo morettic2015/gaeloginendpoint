@@ -28,11 +28,13 @@ import com.sun.media.jfxmedia.logging.Logger;
 import com.sun.org.apache.bcel.internal.generic.L2D;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
+import javax.jdo.Query;
 import mediautil.gen.Log;
 
 /**
@@ -43,6 +45,7 @@ public class PerfilControler {
 
     private static PersistenceManager pm = null;
     private static BlobstoreService blobstoreService;
+    private static final Double UMK = 0.1570d;
 
     /**
      *
@@ -235,23 +238,198 @@ public class PerfilControler {
         return js;
     }
     /*
-    http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=AMIfv96deP5CQMlfG4sGdMKnSQSnBxz0AMSjALVRxpNn6XdYycaNR7UTUpRrbJxCpudfMAt3YRX2sWCXF_d8MJwGUOeeenlars60ba_FrAuHeXzsA1Ch6la1IZeAQ2v8x9r36PHC5EcfGiNw-gIDhr9LI9KTwnr_NJeciMwJCahWgVYrccqRhvE
-    */
+     http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=AMIfv96deP5CQMlfG4sGdMKnSQSnBxz0AMSjALVRxpNn6XdYycaNR7UTUpRrbJxCpudfMAt3YRX2sWCXF_d8MJwGUOeeenlars60ba_FrAuHeXzsA1Ch6la1IZeAQ2v8x9r36PHC5EcfGiNw-gIDhr9LI9KTwnr_NJeciMwJCahWgVYrccqRhvE
+     */
+
     public static void showImageById(HttpServletRequest request, HttpServletResponse response) throws IOException {
         BlobKey blobKey = new BlobKey(request.getParameter("blob-key"));
-        
+
         /*ImagesService imagesService = ImagesServiceFactory.getImagesService();
 
-        Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
-        Transform resize = ImagesServiceFactory.makeResize(150, 150);
+         Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
+         Transform resize = ImagesServiceFactory.makeResize(150, 150);
         
-        Image newImage = imagesService.applyTransform(resize, oldImage);
+         Image newImage = imagesService.applyTransform(resize, oldImage);
 
-        byte[] newImageData = newImage.;*/
-        
+         byte[] newImageData = newImage.;*/
         blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
         blobstoreService.serve(blobKey, response);
 
+    }
+
+    /**
+     * Query q = pm.newQuery(Person.class); q.setFilter("lastName ==
+     * lastNameParam"); q.setOrdering("height desc");
+     * q.declareParameters("String lastNameParam");
+     *
+     * try { List<Person> results = (List<Person>) q.execute("Smith"); if
+     * (!results.isEmpty()) { for (Person p : results) { // Process result p } }
+     * else { // Handle "no results" case } } finally { q.closeAll(); }
+     *
+     * q.setFilter("lastName == 'Smith' && height < maxHeight");
+     */
+    public static JSONObject findOcorrencias(HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
+        JSONObject js = new JSONObject();
+        pm = PMF.get().getPersistenceManager();
+        List<Long> lOcorrencias;
+        List<Ocorrencia> lSOcorrencias = new ArrayList<Ocorrencia>();
+        String id = request.getParameter("id");
+
+        double lat = Double.parseDouble(request.getParameter("lat"));
+
+        pm = PMF.get().getPersistenceManager();
+        Perfil p = pm.getObjectById(Perfil.class, new Long(id));
+        if (request.getParameter("mine") != null) {//
+            lOcorrencias = p.getlOcorrencias();
+            for (Long idOcorrencia : lOcorrencias) {
+                Ocorrencia e = pm.getObjectById(Ocorrencia.class, idOcorrencia);
+                lSOcorrencias.add(e);
+            }
+        }
+
+        double q1 = 0.0d;
+
+        if (request.getParameter("d").equals("50")) {
+            q1 = (50 * UMK / 1000);
+        } else if (request.getParameter("d").equals("20")) {
+            q1 = (20 * UMK / 1000);
+        } else if (request.getParameter("d").equals("10")) {
+            q1 = (10 * UMK / 1000);
+        } else {
+            q1 = (100 * UMK / 1000);
+        }
+        double latMax, latMin;
+
+        latMax = (lat + q1);
+        latMin = (lat - q1);
+
+        /**
+         *
+         * final Query query = pm.newQuery("SELECT FROM model.Strip WHERE
+         * publishOn <= startDate
+         * && endDate >= publishOn PARAMETERS Date startDate, Date endDate
+         * import java.util.Date"); changed to
+         *
+         * final Query query = pm.newQuery("SELECT FROM model.Strip WHERE
+         * this.publishOn >= startDate && this.publishOn <= endDate PARAMETERS
+         * java.util.Date startDate, java.util.Date endDate")
+         */
+        //response.getWriter().println("\"latitude <= \" + latMax + \" && latitude >= \" + latMin");
+        //@todo filter tipo
+        // String query1 = "latitude >= '" + latMin + "' AND latitude <= '"+latMax +"'";
+        //@todo filter tipo
+        if (request.getParameter("type") != null) {
+
+        }
+        Query q = pm.newQuery(Ocorrencia.class);
+
+        /* String pQuery = "latitude >= :lMin && latitude <= :lMax";
+         q.setFilter(pQuery);*/
+        //q.setFilter(query1);
+        lSOcorrencias.addAll((List<Ocorrencia>) q.execute(latMin, latMax));
+
+        JSONArray ja = new JSONArray();
+
+        for (Ocorrencia o : lSOcorrencias) {
+
+            JSONObject js1 = new JSONObject();
+            js1.put("id", o.getKey());
+            js1.put("ip", o.getIp());
+            js1.put("lat", o.getLatitude());
+            js1.put("lon", o.getLongitude());
+            js1.put("tit", o.getTitulo());
+            js1.put("desc", o.getDescricao());
+            js1.put("tipo", o.getTipo().toString());
+
+            //Recupera a imagem para associar o token do blob
+            Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
+            js1.put("token", m.getImage());
+
+            //Recupera o perfil
+            Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
+            js1.put("author", pOcorencia.getNome());
+            js1.put("email", pOcorencia.getEmail());
+
+            //Recupera o avatar do usuario
+            m = pm.getObjectById(Imagem.class, pOcorencia.getAvatar());
+            js1.put("avatar", m.getImage());
+
+            ja.put(js1);
+        }
+
+        js.put("rList", ja);
+
+        return js;
+    }
+
+    /**
+     * http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=7&email=malacma@hotmail.com&pass=jsjsjssss
+     */
+    public static JSONObject autenticaUsuario(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        JSONObject js = new JSONObject();
+        Perfil retorno = null;
+        Perfil pNovo = null;
+        String email = request.getParameter("email").toUpperCase();
+        String pass = request.getParameter("pass");
+        pm = PMF.get().getPersistenceManager();
+        Query q = pm.newQuery(Perfil.class);
+        String pQuery = "email >= :pEmail";
+        q.setFilter(pQuery);
+        boolean autenticado = false;
+        List<Perfil> p = (List<Perfil>) q.execute(email);
+        for (Perfil p1 : p) {
+            if (p1.getPassWd().equalsIgnoreCase(pass)) {
+                retorno = p1;
+                autenticado = true;
+                break;
+            }
+        }
+
+        //Cria um perfil default.....
+        if (p.size() < 1) {
+            pNovo = new Perfil();
+            pNovo.setEmail(email);
+            pNovo.setPassWd(pass);
+            pNovo.setEhPessoaFisica("true");
+
+            pm.makePersistent(pNovo);
+        }
+
+        if (pNovo != null) {
+            retorno = pNovo;
+        } else if (retorno == null) {
+            js.put("erro", "Usuário ou senha inválidos!");
+
+            return js;
+        }
+
+        js.put("avatar", retorno.getAvatar());
+        js.put("cep", retorno.getCep());
+        js.put("complemento", retorno.getComplemento());
+        js.put("cpfCnpj", retorno.getCpfCnpj());
+        js.put("email", retorno.getEmail());
+        js.put("key", retorno.getKey());
+        js.put("nasc", retorno.getNascimento());
+        js.put("nome", retorno.getNome());
+        js.put("pass", retorno.getPassWd());
+        js.put("configId", retorno.getConfig());
+        js.put("pjf", retorno.isEhPessoaFisica());
+
+        return js;
+    }
+
+    public static JSONObject findImagemTokenById(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        String id = request.getParameter("id");
+        pm = PMF.get().getPersistenceManager();
+        Imagem m = pm.getObjectById(Imagem.class, new Long(id));
+        
+        
+        
+        JSONObject js = new JSONObject();
+        
+        js.put("token",m.getImage());
+        
+        return js;
     }
 
 }

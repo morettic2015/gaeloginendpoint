@@ -91,19 +91,19 @@ public class Perfil {
     }
 
     public String getNome() {
-        return nome;
+        return nome.toUpperCase();
     }
 
     public void setNome(String nome) {
-        this.nome = nome;
+        this.nome = nome.toUpperCase();
     }
 
     public String getEmail() {
-        return email;
+        return email.toUpperCase();
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toUpperCase();
     }
 
     public String getNascimento() {
@@ -135,7 +135,7 @@ public class Perfil {
     }
 
     public void setCidade(String cidade) {
-        this.cidade = cidade;
+        this.cidade = cidade.toUpperCase();
     }
 
     public String getRua() {
