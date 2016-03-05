@@ -27,6 +27,7 @@ import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.sun.media.jfxmedia.logging.Logger;
 import com.sun.org.apache.bcel.internal.generic.L2D;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -276,7 +277,7 @@ public class PerfilControler {
         String id = request.getParameter("id");
 
         double lat = Double.parseDouble(request.getParameter("lat"));
-
+        
         pm = PMF.get().getPersistenceManager();
         Perfil p = pm.getObjectById(Perfil.class, new Long(id));
         if (request.getParameter("mine") != null) {//
@@ -329,7 +330,7 @@ public class PerfilControler {
         lSOcorrencias.addAll((List<Ocorrencia>) q.execute(latMin, latMax));
 
         JSONArray ja = new JSONArray();
-
+        DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         for (Ocorrencia o : lSOcorrencias) {
 
             JSONObject js1 = new JSONObject();
@@ -340,10 +341,11 @@ public class PerfilControler {
             js1.put("tit", o.getTitulo());
             js1.put("desc", o.getDescricao());
             js1.put("tipo", o.getTipo().toString());
+            js1.put("date", dt.format(o.getDtOcorrencia()));
 
             //Recupera a imagem para associar o token do blob
             Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
-            js1.put("token", m.getImage());
+            js1.put("token", m.getKey());
 
             //Recupera o perfil
             Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
@@ -352,7 +354,7 @@ public class PerfilControler {
 
             //Recupera o avatar do usuario
             m = pm.getObjectById(Imagem.class, pOcorencia.getAvatar());
-            js1.put("avatar", m.getImage());
+            js1.put("avatar", p.getAvatar());
 
             ja.put(js1);
         }
@@ -373,7 +375,7 @@ public class PerfilControler {
         String pass = request.getParameter("pass");
         pm = PMF.get().getPersistenceManager();
         Query q = pm.newQuery(Perfil.class);
-        String pQuery = "email >= :pEmail";
+        String pQuery = "email == :pEmail";
         q.setFilter(pQuery);
         boolean autenticado = false;
         List<Perfil> p = (List<Perfil>) q.execute(email);
@@ -386,14 +388,19 @@ public class PerfilControler {
         }
 
         //Cria um perfil default.....
-        if (p.size() < 1) {
+     /*   if (p.size() < 1) {
             pNovo = new Perfil();
             pNovo.setEmail(email);
             pNovo.setPassWd(pass);
             pNovo.setEhPessoaFisica("true");
-
+            pNovo.setNome("");
+            pNovo.setNascimento("");
+            pNovo.setCpfCnpj("");
+            pNovo.setComplemento("");
+            pNovo.setConfig(-1l);
+            pNovo.setCep("");
             pm.makePersistent(pNovo);
-        }
+        }*/
 
         if (pNovo != null) {
             retorno = pNovo;
@@ -418,18 +425,15 @@ public class PerfilControler {
         return js;
     }
 
-    public static JSONObject findImagemTokenById(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+    public static void findImagemTokenById(HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
         String id = request.getParameter("id");
         pm = PMF.get().getPersistenceManager();
         Imagem m = pm.getObjectById(Imagem.class, new Long(id));
         
-        
-        
-        JSONObject js = new JSONObject();
-        
-        js.put("token",m.getImage());
-        
-        return js;
+        String imgToken = m.getImage().substring(0, m.getImage().length()-2);
+        imgToken = imgToken.substring(2);
+        response.sendRedirect("infosegcontroller.exec?action=5&blob-key=" + imgToken);
+
     }
 
 }

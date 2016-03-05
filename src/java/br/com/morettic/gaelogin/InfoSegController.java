@@ -72,7 +72,8 @@ public class InfoSegController extends HttpServlet {
                     retJSon = PerfilControler.autenticaUsuario(request, response);
                     break;
                 case 8:
-                    retJSon = PerfilControler.findImagemTokenById(request, response);
+                    out = response.getWriter();
+                    PerfilControler.findImagemTokenById(request, response);
                     break;
                 default:
                     ;

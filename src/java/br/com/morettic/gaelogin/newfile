@@ -1,0 +1,6 @@
+//Lista de equipes de saude
+http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=acs_equipes&outputFormat=JSON
+//Estabelecimentos de saude 
+http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=cnes&outputFormat=JSON
+//Unidades basicas de saude
+http://repositorio.dados.gov.br/saude/unidades-saude/unidade-basica-saude/ubs.csv

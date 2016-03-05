@@ -5,6 +5,7 @@
  */
 package br.com.morettic.gaelogin.smartcities.vo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +16,7 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
+import javax.persistence.PrePersist;
 
 /**
  *
@@ -25,12 +27,11 @@ import javax.jdo.annotations.Unique;
         name="EMAIL_AK", 
         members={"email"}
 )
-public class Perfil {
+public class Perfil implements Serializable{
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long key;
-
     @Persistent(name = "email")
     private String email;
     @Persistent(name = "nome")
@@ -52,17 +53,13 @@ public class Perfil {
     @Persistent(name = "complemento")
     private String complemento;
     @Persistent(name = "avatar")
-    private Long avatar;
-    
+    private Long avatar;    
     @Persistent(name = "passwd")
     private String passWd;
-
     @Persistent
     private Long config;
-
     @Persistent(name = "eh_pessoa_fisica")
     private String ehPessoaFisica;
-
     @Persistent(mappedBy = "perfilUsuario")
     private List<Long> lIDsOcorrencias = new ArrayList<Long>();
 
@@ -192,6 +189,49 @@ public class Perfil {
 
     public void setPassWd(String passWd) {
         this.passWd = passWd;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.key != null ? this.key.hashCode() : 0);
+        hash = 59 * hash + (this.email != null ? this.email.hashCode() : 0);
+        hash = 59 * hash + (this.cpfCnpj != null ? this.cpfCnpj.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Perfil other = (Perfil) obj;
+        if (this.key != other.key && (this.key == null || !this.key.equals(other.key))) {
+            return false;
+        }
+        if ((this.email == null) ? (other.email != null) : !this.email.equals(other.email)) {
+            return false;
+        }
+        if ((this.cpfCnpj == null) ? (other.cpfCnpj != null) : !this.cpfCnpj.equals(other.cpfCnpj)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "Perfil{" + "key=" + key + ", email=" + email + ", nome=" + nome + ", nascimento=" + nascimento + ", cpfCnpj=" + cpfCnpj + ", cep=" + cep + ", cidade=" + cidade + ", rua=" + rua + ", bairro=" + bairro + ", pais=" + pais + ", complemento=" + complemento + ", avatar=" + avatar + ", passWd=" + passWd + ", config=" + config + ", ehPessoaFisica=" + ehPessoaFisica + ", lIDsOcorrencias=" + lIDsOcorrencias + '}';
+    }
+
+    public List<Long> getlIDsOcorrencias() {
+        return lIDsOcorrencias;
+    }
+
+    public void setlIDsOcorrencias(List<Long> lIDsOcorrencias) {
+        this.lIDsOcorrencias = lIDsOcorrencias;
     }
 
 }
