@@ -83,7 +83,7 @@ public class PerfilControler {
         }//Atualiza o endereço do usuario
         if (req.getParameter("address") != null) {
             ocorrencia.setAdress(req.getParameter("address"));
-        }//SEgmento de dados para comaprtilhar apenas os publicos
+        }//SEgmento de dados para comaprtilhar apenas os publicos EX: cada prefeitura tem um token.... no sistema publico apenas os ALL....
         if (req.getParameter("segment") != null) {
             ocorrencia.setAdress(req.getParameter("segment"));
         }
