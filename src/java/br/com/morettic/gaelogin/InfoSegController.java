@@ -75,6 +75,8 @@ public class InfoSegController extends HttpServlet {
                     out = response.getWriter();
                     PerfilControler.findImagemTokenById(request, response);
                     break;
+                case 9:
+                    retJSon = PerfilControler.getProfileFromLDAP(request,response);
                 default:
                     ;
                     break;

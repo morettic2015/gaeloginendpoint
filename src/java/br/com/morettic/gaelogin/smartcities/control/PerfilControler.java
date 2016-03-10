@@ -30,12 +30,17 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.jdo.Query;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
 import mediautil.gen.Log;;
 
 /**
@@ -76,10 +81,10 @@ public class PerfilControler {
             ocorrencia.setAvatar1(new Long(req.getParameter("idPic1")));
         }//Foto 2 opcional
         if (req.getParameter("idPic2") != null) {
-            ocorrencia.setAvatar1(new Long(req.getParameter("idPic2")));
+            ocorrencia.setAvatar2(new Long(req.getParameter("idPic2")));
         }//Foto 3 opcional
         if (req.getParameter("idPic3") != null) {
-            ocorrencia.setAvatar1(new Long(req.getParameter("idPic3")));
+            ocorrencia.setAvatar3(new Long(req.getParameter("idPic3")));
         }//Atualiza o endereço do usuario
         if (req.getParameter("address") != null) {
             ocorrencia.setAdress(req.getParameter("address"));
@@ -92,24 +97,7 @@ public class PerfilControler {
         TipoOcorrencia tp = TipoOcorrencia.valueOf(req.getParameter("tipo"));
         ocorrencia.setTipo(tp);
 
-        //http://maps.googleapis.com/maps/api/geocode/json?latlng=-27.35,-48.32&sensor=true @todo ler dados e setar pais e cidade....
-        /*ocorrencia.setCidade(null);
-         ocorrencia.setState(null);
-         ocorrencia.setCountry("PT_BR");*/
-       /* JSONObject address = new JSONObject();
-       // try {
-            String ADDR_URL = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDPnUF-hI3y6zpQS-dnR-VPKkaPetWLEG4&latlng=" + req.getParameter("lat").replaceAll(",", ".") + "," + req.getParameter("lon").replaceAll(",", ".") + "&sensor=false";
-
-            address = readJSONUrl(ADDR_URL);
-            //String myAddress = address.getJSONArray("results").getJSONObject(0).getString("formatted_address");
-            ocorrencia.setAdress(address.toString());
-            //return address;
-
-        /*} catch (JSONException jSONException) {
-            jSONException.printStackTrace();
-            System.out.println(address.toString());
-            ocorrencia.setAdress("Not Found");
-        }*/
+     
 
         try {
             //Salva ocorrencia
@@ -466,6 +454,13 @@ public class PerfilControler {
         imgToken = imgToken.substring(2);
         response.sendRedirect("infosegcontroller.exec?action=5&blob-key=" + imgToken);
 
+    }
+
+    public static JSONObject getProfileFromLDAP(HttpServletRequest request, HttpServletResponse response) {
+        // Set up environment for creating initial context
+	
+        
+        return new JSONObject();
     }
 
 }
