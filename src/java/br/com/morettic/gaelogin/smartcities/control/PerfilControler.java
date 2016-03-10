@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import javax.jdo.Query;
-import mediautil.gen.Log;
+import mediautil.gen.Log;;
 
 /**
  *
@@ -55,11 +55,11 @@ public class PerfilControler {
      */
     public static JSONObject saveOcorrencia(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
-
+        //Recupera o controle de transacao JDO
         pm = PMF.get().getPersistenceManager();
-
+        //Recupera o perfil
         Perfil p1 = pm.getObjectById(Perfil.class, new Long(req.getParameter("idProfile")));
-
+        //Cria nova ocorrencia
         Ocorrencia ocorrencia = new Ocorrencia();
         //SEt attrs
         ocorrencia.setTitulo(req.getParameter("titulo"));
@@ -71,14 +71,45 @@ public class PerfilControler {
         ocorrencia.setIp(getClientIpAddress(req));
         ocorrencia.setAvatar(new Long(req.getParameter("idPic")));
 
+        //Outras fotos da ocorrência
+        if (req.getParameter("idPic1") != null) {
+            ocorrencia.setAvatar1(new Long(req.getParameter("idPic1")));
+        }//Foto 2 opcional
+        if (req.getParameter("idPic2") != null) {
+            ocorrencia.setAvatar1(new Long(req.getParameter("idPic2")));
+        }//Foto 3 opcional
+        if (req.getParameter("idPic3") != null) {
+            ocorrencia.setAvatar1(new Long(req.getParameter("idPic3")));
+        }//Atualiza o endereço do usuario
+        if (req.getParameter("address") != null) {
+            ocorrencia.setAdress(req.getParameter("address"));
+        }//SEgmento de dados para comaprtilhar apenas os publicos
+        if (req.getParameter("segment") != null) {
+            ocorrencia.setAdress(req.getParameter("segment"));
+        }
+
         //Enum
         TipoOcorrencia tp = TipoOcorrencia.valueOf(req.getParameter("tipo"));
         ocorrencia.setTipo(tp);
 
         //http://maps.googleapis.com/maps/api/geocode/json?latlng=-27.35,-48.32&sensor=true @todo ler dados e setar pais e cidade....
-        ocorrencia.setCidade(null);
-        ocorrencia.setState(null);
-        ocorrencia.setCountry("PT_BR");
+        /*ocorrencia.setCidade(null);
+         ocorrencia.setState(null);
+         ocorrencia.setCountry("PT_BR");*/
+       /* JSONObject address = new JSONObject();
+       // try {
+            String ADDR_URL = "https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyDPnUF-hI3y6zpQS-dnR-VPKkaPetWLEG4&latlng=" + req.getParameter("lat").replaceAll(",", ".") + "," + req.getParameter("lon").replaceAll(",", ".") + "&sensor=false";
+
+            address = readJSONUrl(ADDR_URL);
+            //String myAddress = address.getJSONArray("results").getJSONObject(0).getString("formatted_address");
+            ocorrencia.setAdress(address.toString());
+            //return address;
+
+        /*} catch (JSONException jSONException) {
+            jSONException.printStackTrace();
+            System.out.println(address.toString());
+            ocorrencia.setAdress("Not Found");
+        }*/
 
         try {
             //Salva ocorrencia
@@ -153,7 +184,7 @@ public class PerfilControler {
         p.setNascimento(request.getParameter("nasc"));
 
         //ABre dados do endereço baseado no cep
-        JSONObject address = readJSONUrl("https://viacep.com.br/ws/" + request.getParameter("cep") + "/json/");
+        JSONObject address = readJSONUrl(HTTPSVIACEPCOMBRWS + request.getParameter("cep") + "/json/");
 
         //Se tem o attr logradouro retornou o endereço baseado no cep....
         if (address.has("logradouro")) {
@@ -176,6 +207,7 @@ public class PerfilControler {
 
         return js;
     }
+    public static final String HTTPSVIACEPCOMBRWS = "https://viacep.com.br/ws/";
 
     public static JSONObject getUploadPath(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
@@ -277,7 +309,7 @@ public class PerfilControler {
         String id = request.getParameter("id");
 
         double lat = Double.parseDouble(request.getParameter("lat"));
-        
+
         pm = PMF.get().getPersistenceManager();
         Perfil p = pm.getObjectById(Perfil.class, new Long(id));
         if (request.getParameter("mine") != null) {//
@@ -343,6 +375,7 @@ public class PerfilControler {
             js1.put("tipo", o.getTipo().toString());
             js1.put("date", dt.format(o.getDtOcorrencia()));
 
+            //Validar se nao tiver o avatar....
             //Recupera a imagem para associar o token do blob
             Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
             js1.put("token", m.getKey());
@@ -389,19 +422,18 @@ public class PerfilControler {
 
         //Cria um perfil default.....
      /*   if (p.size() < 1) {
-            pNovo = new Perfil();
-            pNovo.setEmail(email);
-            pNovo.setPassWd(pass);
-            pNovo.setEhPessoaFisica("true");
-            pNovo.setNome("");
-            pNovo.setNascimento("");
-            pNovo.setCpfCnpj("");
-            pNovo.setComplemento("");
-            pNovo.setConfig(-1l);
-            pNovo.setCep("");
-            pm.makePersistent(pNovo);
-        }*/
-
+         pNovo = new Perfil();
+         pNovo.setEmail(email);
+         pNovo.setPassWd(pass);
+         pNovo.setEhPessoaFisica("true");
+         pNovo.setNome("");
+         pNovo.setNascimento("");
+         pNovo.setCpfCnpj("");
+         pNovo.setComplemento("");
+         pNovo.setConfig(-1l);
+         pNovo.setCep("");
+         pm.makePersistent(pNovo);
+         }*/
         if (pNovo != null) {
             retorno = pNovo;
         } else if (retorno == null) {
@@ -429,8 +461,8 @@ public class PerfilControler {
         String id = request.getParameter("id");
         pm = PMF.get().getPersistenceManager();
         Imagem m = pm.getObjectById(Imagem.class, new Long(id));
-        
-        String imgToken = m.getImage().substring(0, m.getImage().length()-2);
+
+        String imgToken = m.getImage().substring(0, m.getImage().length() - 2);
         imgToken = imgToken.substring(2);
         response.sendRedirect("infosegcontroller.exec?action=5&blob-key=" + imgToken);
 

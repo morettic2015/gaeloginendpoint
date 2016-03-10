@@ -35,18 +35,43 @@ public class Ocorrencia {
     private String longitude;
     @Persistent(name = "user_ip")
     private String ip;
-    @Persistent(name = "city")
-    private String cidade;
-    @Persistent(name = "state_c")
-    private String state;
-    @Persistent(name = "country")
-    private String country;
+    @Persistent(name = "adress")
+    private String adress;
     @Persistent
     private Long perfilUsuario;
     @Persistent
     private TipoOcorrencia tipo;
     @Persistent(name = "avatar")
     private Long avatar;
+
+    @Persistent(name = "avatar1")
+    private Long avatar1;
+
+    @Persistent(name = "avatar2")
+    private Long avatar2;
+
+    @Persistent(name = "avatar3")
+    private Long avatar3;
+    
+    @Persistent
+    private boolean enabledData;
+    
+    @Persistent
+    private String segment;
+
+    public Ocorrencia() {
+        this.enabledData = true;
+        this.dtOcorrencia = new Date();
+        this.segment = "ALL";
+    }
+
+    public boolean isEnabledData() {
+        return enabledData;
+    }
+
+    public void setEnabledData(boolean enabledData) {
+        this.enabledData = enabledData;
+    }
 
     public Long getKey() {
         return key;
@@ -59,7 +84,7 @@ public class Ocorrencia {
     public void setTipo(TipoOcorrencia tipo) {
         this.tipo = tipo;
     }
-    
+
     public void setKey(Long key) {
         this.key = key;
     }
@@ -112,30 +137,15 @@ public class Ocorrencia {
         this.ip = ip;
     }
 
-    public String getCidade() {
-        return cidade;
+    public String getSegment() {
+        return segment;
     }
 
-    public void setCidade(String cidade) {
-        this.cidade = cidade;
+    public void setSegment(String segment) {
+        this.segment = segment;
     }
 
-    public String getState() {
-        return state;
-    }
-
-    public void setState(String state) {
-        this.state = state;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
+   
     public Long getPerfil() {
         return perfilUsuario;
     }
@@ -144,14 +154,84 @@ public class Ocorrencia {
         this.perfilUsuario = perfil;
     }
 
-    
-
     public Long getAvatar() {
         return avatar;
     }
 
     public void setAvatar(Long avatar) {
         this.avatar = avatar;
+    }
+
+    public Long getPerfilUsuario() {
+        return perfilUsuario;
+    }
+
+    public void setPerfilUsuario(Long perfilUsuario) {
+        this.perfilUsuario = perfilUsuario;
+    }
+
+    public Long getAvatar1() {
+        return avatar1;
+    }
+
+    public void setAvatar1(Long avatar1) {
+        this.avatar1 = avatar1;
+    }
+
+    public Long getAvatar2() {
+        return avatar2;
+    }
+
+    public void setAvatar2(Long avatar2) {
+        this.avatar2 = avatar2;
+    }
+
+    public Long getAvatar3() {
+        return avatar3;
+    }
+
+    public void setAvatar3(Long avatar3) {
+        this.avatar3 = avatar3;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        return hash;
+    }
+
+    public String getAdress() {
+        return adress.toUpperCase();
+    }
+
+    public void setAdress(String adress) {
+        this.adress = adress.toUpperCase();
+    }
+
+    @Override
+    public String toString() {
+        return "Ocorrencia{" + "key=" + key + ", dtOcorrencia=" + dtOcorrencia + ", titulo=" + titulo + ", descricao=" + descricao + ", latitude=" + latitude + ", longitude=" + longitude + ", ip=" + ip + ", cidade=" + adress + ", perfilUsuario=" + perfilUsuario + ", tipo=" + tipo + ", avatar=" + avatar + ", avatar1=" + avatar1 + ", avatar2=" + avatar2 + ", avatar3=" + avatar3 + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Ocorrencia other = (Ocorrencia) obj;
+        if (this.key != other.key && (this.key == null || !this.key.equals(other.key))) {
+            return false;
+        }
+        if (this.dtOcorrencia != other.dtOcorrencia && (this.dtOcorrencia == null || !this.dtOcorrencia.equals(other.dtOcorrencia))) {
+            return false;
+        }
+        if (this.tipo != other.tipo) {
+            return false;
+        }
+        return true;
     }
 
 }
