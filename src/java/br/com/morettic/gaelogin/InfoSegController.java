@@ -77,6 +77,9 @@ public class InfoSegController extends HttpServlet {
                     break;
                 case 9:
                     retJSon = PerfilControler.getProfileFromLDAP(request,response);
+                    break;
+                case 10:
+                    retJSon = PerfilControler.getWeatherInfoByLatLon(request,response);
                 default:
                     ;
                     break;

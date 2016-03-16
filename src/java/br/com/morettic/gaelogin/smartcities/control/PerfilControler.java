@@ -19,29 +19,18 @@ import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.images.Image;
-import com.google.appengine.api.images.ImagesService;
-import com.google.appengine.api.images.ImagesServiceFactory;
-import com.google.appengine.api.images.Transform;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.sun.media.jfxmedia.logging.Logger;
-import com.sun.org.apache.bcel.internal.generic.L2D;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import javax.jdo.Query;
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import mediautil.gen.Log;;
+
+;
 
 /**
  *
@@ -97,8 +86,6 @@ public class PerfilControler {
         TipoOcorrencia tp = TipoOcorrencia.valueOf(req.getParameter("tipo"));
         ocorrencia.setTipo(tp);
 
-     
-
         try {
             //Salva ocorrencia
             pm.makePersistent(ocorrencia);
@@ -114,6 +101,7 @@ public class PerfilControler {
 
         js.put("key", ocorrencia.getKey());
         js.put("titulo", ocorrencia.getTitulo());
+        js.put("mine", p1.getEmail());
 
         return js;
     }
@@ -149,10 +137,15 @@ public class PerfilControler {
     /**
      *
      * http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=3&email=malacma@gmail.com.br&avatar=1&nome=Moretto&cpfCnpj=028.923.629-14&cep=88020100&passwd=1234&complemento=123&pjf=false&nasc=29/04/1979&id=-1
+     *
+     * @param request
+     * @param response
+     * @return JSONObject
+     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
      */
     public static JSONObject savePerfil(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         JSONObject js = new JSONObject();
-
+        pm = PMF.get().getPersistenceManager();
         //Set fields
         Perfil p = new Perfil();
         String id = request.getParameter("id");
@@ -182,7 +175,7 @@ public class PerfilControler {
         }
         //persiste objeto
         try {
-            pm = PMF.get().getPersistenceManager();
+
             pm.makePersistent(p);
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,6 +188,9 @@ public class PerfilControler {
 
         return js;
     }
+    public static final String ERROR = "error";
+    public static final String EMAIL_JÁ_EXISTE_NA_BASE_DE_DADOS = "email já existe na base de dados!";
+    public static final String UM_FILHO_DA_PUTA_TENTOU_HACKER_OU_BUG_DE_ = "Um filho da puta tentou hacker ou bug de uma client maldito. Email ja existente porra!!!!";
     public static final String HTTPSVIACEPCOMBRWS = "https://viacep.com.br/ws/";
 
     public static JSONObject getUploadPath(HttpServletRequest req, HttpServletResponse res) throws JSONException {
@@ -293,7 +289,7 @@ public class PerfilControler {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
         List<Long> lOcorrencias;
-        List<Ocorrencia> lSOcorrencias = new ArrayList<Ocorrencia>();
+        Set<Ocorrencia> lSOcorrencias = new HashSet<Ocorrencia>();
         String id = request.getParameter("id");
 
         double lat = Double.parseDouble(request.getParameter("lat"));
@@ -325,59 +321,78 @@ public class PerfilControler {
         latMin = (lat - q1);
 
         /**
-         *
-         * final Query query = pm.newQuery("SELECT FROM model.Strip WHERE
-         * publishOn <= startDate
-         * && endDate >= publishOn PARAMETERS Date startDate, Date endDate
-         * import java.util.Date"); changed to
-         *
-         * final Query query = pm.newQuery("SELECT FROM model.Strip WHERE
-         * this.publishOn >= startDate && this.publishOn <= endDate PARAMETERS
-         * java.util.Date startDate, java.util.Date endDate")
+         * Query q = pm.newQuery(Person.class, "(lastName == 'Smith' || lastName
+         * == 'Jones')" + " && firstName == 'Harold'");
          */
-        //response.getWriter().println("\"latitude <= \" + latMax + \" && latitude >= \" + latMin");
-        //@todo filter tipo
-        // String query1 = "latitude >= '" + latMin + "' AND latitude <= '"+latMax +"'";
-        //@todo filter tipo
+        HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
+            String[] types = request.getParameter("type").split(",");
 
+            for (String tp : types) {
+                mapaChaves.put(tp, tp);
+            }
         }
         Query q = pm.newQuery(Ocorrencia.class);
-
-        /* String pQuery = "latitude >= :lMin && latitude <= :lMax";
-         q.setFilter(pQuery);*/
-        //q.setFilter(query1);
-        lSOcorrencias.addAll((List<Ocorrencia>) q.execute(latMin, latMax));
+        lSOcorrencias.addAll((List<Ocorrencia>) q.execute());
 
         JSONArray ja = new JSONArray();
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         for (Ocorrencia o : lSOcorrencias) {
+            //Latitude da ocorrencia
+            Float mLatitude = Float.parseFloat(o.getLatitude());
+            //Verifica se o tipo da ocorrencia está no mapa de chaves de tipo.
+            //Se o mapa de chaves estiver vazio e nao tiver a chave nao faz nada 
+            if(!mapaChaves.isEmpty()&&!mapaChaves.containsValue(o.getTipo().name())){
+                continue;//Não e do tipo pesquisado
+            }
+            if (mLatitude >= latMin && mLatitude <= latMax) {
+                //Monta o JSON
+                JSONObject js1 = new JSONObject();
+                js1.put("id", o.getKey());
+                js1.put("ip", o.getIp());
+                js1.put("lat", o.getLatitude());
+                js1.put("lon", o.getLongitude());
+                js1.put("tit", o.getTitulo());
+                js1.put("desc", o.getDescricao());
+                js1.put("tipo", o.getTipo().toString());
+                js1.put("date", dt.format(o.getDtOcorrencia()));
 
-            JSONObject js1 = new JSONObject();
-            js1.put("id", o.getKey());
-            js1.put("ip", o.getIp());
-            js1.put("lat", o.getLatitude());
-            js1.put("lon", o.getLongitude());
-            js1.put("tit", o.getTitulo());
-            js1.put("desc", o.getDescricao());
-            js1.put("tipo", o.getTipo().toString());
-            js1.put("date", dt.format(o.getDtOcorrencia()));
+                //Validar se nao tiver o avatar....
+                //Recupera a imagem para associar o token do blob
+                Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
+                js1.put("token", m.getKey());
 
-            //Validar se nao tiver o avatar....
-            //Recupera a imagem para associar o token do blob
-            Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
-            js1.put("token", m.getKey());
+                //Imagens opcionais da ocorrência
+                if (o.getAvatar1() != null) {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar1());
+                    js1.put("token1", m.getKey());
+                } else {
+                    js1.put("token1", "null");
+                }
+                if (o.getAvatar2() != null) {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar2());
+                    js1.put("token2", m.getKey());
+                } else {
+                    js1.put("token2", "null");
+                }
+                if (o.getAvatar3() != null) {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar3());
+                    js1.put("token3", m.getKey());
+                } else {
+                    js1.put("token3", "null");
+                }
 
-            //Recupera o perfil
-            Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
-            js1.put("author", pOcorencia.getNome());
-            js1.put("email", pOcorencia.getEmail());
+                //Recupera o perfil
+                Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
+                js1.put("author", pOcorencia.getNome());
+                js1.put("email", pOcorencia.getEmail());
 
-            //Recupera o avatar do usuario
-            m = pm.getObjectById(Imagem.class, pOcorencia.getAvatar());
-            js1.put("avatar", p.getAvatar());
+                //Recupera o avatar do usuario
+                m = pm.getObjectById(Imagem.class, pOcorencia.getAvatar());
+                js1.put("avatar", p.getAvatar());
 
-            ja.put(js1);
+                ja.put(js1);
+            }
         }
 
         js.put("rList", ja);
@@ -458,9 +473,16 @@ public class PerfilControler {
 
     public static JSONObject getProfileFromLDAP(HttpServletRequest request, HttpServletResponse response) {
         // Set up environment for creating initial context
-	
-        
+
         return new JSONObject();
+    }
+
+    /**
+     *
+     * http://api.openweathermap.org/data/2.5/weather?lat=-25&lon=-48&appid=0ac7c5066f0cba6f5bd7ceffb8cec5a0
+     */
+    public static JSONObject getWeatherInfoByLatLon(HttpServletRequest request, HttpServletResponse response) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

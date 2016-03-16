@@ -6,6 +6,7 @@
 package br.com.morettic.gaelogin.smartcities.vo;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Key;
@@ -30,9 +31,9 @@ public class Ocorrencia {
     @Persistent(name = "descricao")
     private String descricao;
     @Persistent(name = "latitude")
-    private String latitude;
+    private Float latitude;
     @Persistent(name = "longitude")
-    private String longitude;
+    private Float longitude;
     @Persistent(name = "user_ip")
     private String ip;
     @Persistent(name = "adress")
@@ -114,19 +115,19 @@ public class Ocorrencia {
     }
 
     public String getLatitude() {
-        return latitude;
+        return latitude.toString();
     }
 
     public void setLatitude(String latitude) {
-        this.latitude = latitude;
+        this.latitude = new Float(latitude);
     }
 
     public String getLongitude() {
-        return longitude;
+        return longitude.toString();
     }
 
     public void setLongitude(String longitude) {
-        this.longitude = longitude;
+        this.longitude = new Float(longitude);
     }
 
     public String getIp() {
@@ -194,11 +195,7 @@ public class Ocorrencia {
         this.avatar3 = avatar3;
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
-    }
+   
 
     public String getAdress() {
         return adress.toUpperCase();
@@ -234,4 +231,13 @@ public class Ocorrencia {
         return true;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 59 * hash + Objects.hashCode(this.key);
+        hash = 59 * hash + Objects.hashCode(this.tipo);
+        return hash;
+    }
+    
+    
 }
