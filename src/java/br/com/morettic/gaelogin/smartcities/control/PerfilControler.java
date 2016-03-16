@@ -19,8 +19,13 @@ import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import static com.google.appengine.api.users.UserServiceFactory.getUserService;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
@@ -41,6 +46,8 @@ public class PerfilControler {
     private static PersistenceManager pm = null;
     private static BlobstoreService blobstoreService;
     private static final Double UMK = 0.1570d;
+    private static UserService userService;
+    private static User user;
 
     /**
      *
@@ -342,7 +349,7 @@ public class PerfilControler {
             Float mLatitude = Float.parseFloat(o.getLatitude());
             //Verifica se o tipo da ocorrencia está no mapa de chaves de tipo.
             //Se o mapa de chaves estiver vazio e nao tiver a chave nao faz nada 
-            if(!mapaChaves.isEmpty()&&!mapaChaves.containsValue(o.getTipo().name())){
+            if (!mapaChaves.isEmpty() && !mapaChaves.containsValue(o.getTipo().name())) {
                 continue;//Não e do tipo pesquisado
             }
             if (mLatitude >= latMin && mLatitude <= latMax) {
@@ -483,6 +490,52 @@ public class PerfilControler {
      */
     public static JSONObject getWeatherInfoByLatLon(HttpServletRequest request, HttpServletResponse response) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * Cria uma conta com base na conta do google
+     */
+    public static void autenticaUsuarioGoogle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        PrintWriter out = response.getWriter();
+
+        try {
+            userService = UserServiceFactory.getUserService();
+            user = userService.getCurrentUser();
+            if (user == null) {
+                response.sendRedirect(getUserService().createLoginURL(request.getRequestURI()));
+            } else {
+                pm = PMF.get().getPersistenceManager();
+                //Set fields
+
+                Query q = pm.newQuery(Perfil.class);
+                String pQuery = "email == :pEmail";
+                q.setFilter(pQuery);
+                List<Perfil> lRet = (List<Perfil>) q.execute(user.getEmail().toUpperCase());
+                //Nao tem nenhum com o email pesquisado....
+                if ((lRet.size() <1)) {
+
+                    Perfil p = new Perfil();
+                    p.setEmail(user.getEmail());
+                    p.setNome(user.getNickname());
+                    p.setCpfCnpj("xxx.xxx.xxx-xx");
+                    p.setAvatar(null);
+                    p.setCep("88000-000");
+                    p.setPassWd(user.getEmail());
+                    p.setComplemento("N/I");
+                    p.setPais("PT_BR");
+                    p.setEhPessoaFisica("true");
+                    p.setNascimento("dd/MM/YYYY");
+                    p.setOrigem("GOOGLE");
+                    //SALVA O NOVO USUARIO NA BASE.....
+                    pm.makePersistent(p);
+                }
+                out.print("<h1>Sucesso</h1>");
+                out.print("<p>Sua conta foi criada com sucesso. <br>Utilize seu email como senha no primeiro login e edite seu perfil.<br>Bem vindo a comunidade <b>SmartcitiesAPP</b> </p>");
+            }
+        } finally {
+            out.close();
+
+        }
     }
 
 }

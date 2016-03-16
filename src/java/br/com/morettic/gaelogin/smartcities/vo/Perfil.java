@@ -24,10 +24,10 @@ import javax.persistence.PrePersist;
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 @Unique(
-        name="EMAIL_AK", 
-        members={"email"}
+        name = "EMAIL_AK",
+        members = {"email"}
 )
-public class Perfil implements Serializable{
+public class Perfil implements Serializable {
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -53,9 +53,13 @@ public class Perfil implements Serializable{
     @Persistent(name = "complemento")
     private String complemento;
     @Persistent(name = "avatar")
-    private Long avatar;    
+    private Long avatar;
     @Persistent(name = "passwd")
     private String passWd;
+
+    @Persistent(name = "origem")
+    private String origem = "DEFAULT";
+
     @Persistent
     private Long config;
     @Persistent(name = "eh_pessoa_fisica")
@@ -149,6 +153,14 @@ public class Perfil implements Serializable{
 
     public void setBairro(String bairro) {
         this.bairro = bairro;
+    }
+
+    public String getOrigem() {
+        return origem;
+    }
+
+    public void setOrigem(String origem) {
+        this.origem = origem;
     }
 
     public String getPais() {

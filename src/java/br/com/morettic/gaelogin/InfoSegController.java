@@ -76,12 +76,14 @@ public class InfoSegController extends HttpServlet {
                     PerfilControler.findImagemTokenById(request, response);
                     break;
                 case 9:
-                    retJSon = PerfilControler.getProfileFromLDAP(request,response);
+                    retJSon = PerfilControler.getProfileFromLDAP(request, response);
                     break;
                 case 10:
-                    retJSon = PerfilControler.getWeatherInfoByLatLon(request,response);
-                default:
-                    ;
+                    retJSon = PerfilControler.getWeatherInfoByLatLon(request, response);
+                    break;
+                default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
+                    response.setContentType("text/html; charset=UTF-8");
+                    PerfilControler.autenticaUsuarioGoogle(request, response);
                     break;
             }
 
