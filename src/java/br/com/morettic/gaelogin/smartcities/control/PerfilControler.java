@@ -605,7 +605,9 @@ public class PerfilControler {
      * @Param idPerfil:Long
      * @Param rating:Double
      * @Todo Criar indices no gae....
-     @ https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=13&idPerfil=5142768607297536&idOcorrencia=4822398406754304&rating=5.5
+     * @Code 200 = Sucesso
+     * @Code 404 = Perfil ou Ocorrencia nao encontrados....
+     * @Url request https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=13&idPerfil=5142768607297536&idOcorrencia=4822398406754304&rating=5.5
      */
     public static final JSONObject ocorrenciaRating(HttpServletRequest request, HttpServletResponse response) throws JSONException {
 
