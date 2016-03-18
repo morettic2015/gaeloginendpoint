@@ -82,6 +82,9 @@ public class InfoSegController extends HttpServlet {
                 case 11:
                     retJSon = PerfilControler.hasEmailIntoDataStore(request,response);
                     break;
+                case 12:
+                    retJSon = PerfilControler.sendGMail(request,response);
+                    break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
                     PerfilControler.autenticaUsuarioGoogle(request, response);

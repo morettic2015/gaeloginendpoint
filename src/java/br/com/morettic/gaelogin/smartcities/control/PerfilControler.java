@@ -32,8 +32,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import javax.jdo.Query;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 ;
 
@@ -504,14 +510,15 @@ public class PerfilControler {
         //Nao tem nenhum com o email pesquisado....
         if ((lRet.size() < 1)) {
             js.put("total", 0);
-        }else{
+        } else {
             js.put("total", 1);
         }
         return js;
     }
-        /**
-         * Cria uma conta com base na conta do google
-         */
+
+    /**
+     * Cria uma conta com base na conta do google
+     */
     public static void autenticaUsuarioGoogle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         PrintWriter out = response.getWriter();
 
@@ -554,6 +561,26 @@ public class PerfilControler {
             out.close();
 
         }
+    }
+
+    public static JSONObject sendGMail(HttpServletRequest request, HttpServletResponse response) {
+        String msgBody = "TESTE TESTE TESTE TESTE";
+        Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+        try {
+            Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress("malacma@gmail.com","MORETTIC - Tecnologia da Informação e Comunicação"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
+                    "malacma@gmail.com", "TESTE"));
+            msg.setSubject("Feedback");
+            msg.setText(msgBody);
+            Transport.send(msg);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        
+        return new JSONObject();
     }
 
 }
