@@ -157,7 +157,8 @@ public class PerfilControler {
         Perfil p = new Perfil();
         String id = request.getParameter("id");
         if (!id.equals("-1")) {
-            p.setKey(Long.parseLong(id));
+            p = pm.getObjectById(Perfil.class, Long.parseLong(id));
+            //p.setKey();
         }
 
         p.setEmail(request.getParameter("email"));
@@ -492,9 +493,25 @@ public class PerfilControler {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /**
-     * Cria uma conta com base na conta do google
-     */
+    public static JSONObject hasEmailIntoDataStore(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        JSONObject js = new JSONObject();
+        pm = PMF.get().getPersistenceManager();
+        Query q = pm.newQuery(Perfil.class);
+        String pQuery = "email == :pEmail";
+        q.setFilter(pQuery);
+        String email = request.getParameter("email");
+        List<Perfil> lRet = (List<Perfil>) q.execute(email.toUpperCase());
+        //Nao tem nenhum com o email pesquisado....
+        if ((lRet.size() < 1)) {
+            js.put("total", 0);
+        }else{
+            js.put("total", 1);
+        }
+        return js;
+    }
+        /**
+         * Cria uma conta com base na conta do google
+         */
     public static void autenticaUsuarioGoogle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         PrintWriter out = response.getWriter();
 
@@ -512,7 +529,7 @@ public class PerfilControler {
                 q.setFilter(pQuery);
                 List<Perfil> lRet = (List<Perfil>) q.execute(user.getEmail().toUpperCase());
                 //Nao tem nenhum com o email pesquisado....
-                if ((lRet.size() <1)) {
+                if ((lRet.size() < 1)) {
 
                     Perfil p = new Perfil();
                     p.setEmail(user.getEmail());
@@ -529,6 +546,7 @@ public class PerfilControler {
                     //SALVA O NOVO USUARIO NA BASE.....
                     pm.makePersistent(p);
                 }
+                out.print("https://www.googleapis.com/plus/v1/people/" + user.getUserId());
                 out.print("<h1>Sucesso</h1>");
                 out.print("<p>Sua conta foi criada com sucesso. <br>Utilize seu email como senha no primeiro login e edite seu perfil.<br>Bem vindo a comunidade <b>SmartcitiesAPP</b> </p>");
             }

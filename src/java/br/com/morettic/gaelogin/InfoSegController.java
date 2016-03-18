@@ -46,7 +46,7 @@ public class InfoSegController extends HttpServlet {
             if (action != null) {
                 actionNumber = new Integer(action);
             }
-
+            out = response.getWriter();
             switch (actionNumber) {
                 case 1://Cadastra uma ocorrência;
                     retJSon = PerfilControler.saveOcorrencia(request, response);
@@ -61,8 +61,7 @@ public class InfoSegController extends HttpServlet {
                     retJSon = PerfilControler.findPerfilByIdOrEmail(request, response);
                     break;
                 case 5:
-                    response.setContentType("image/jpeg");
-                    out = response.getWriter();
+                    response.setContentType("image/jpeg");                    
                     PerfilControler.showImageById(request, response);
                     break;
                 case 6:
@@ -72,7 +71,6 @@ public class InfoSegController extends HttpServlet {
                     retJSon = PerfilControler.autenticaUsuario(request, response);
                     break;
                 case 8:
-                    out = response.getWriter();
                     PerfilControler.findImagemTokenById(request, response);
                     break;
                 case 9:
@@ -80,6 +78,9 @@ public class InfoSegController extends HttpServlet {
                     break;
                 case 10:
                     retJSon = PerfilControler.getWeatherInfoByLatLon(request, response);
+                    break;
+                case 11:
+                    retJSon = PerfilControler.hasEmailIntoDataStore(request,response);
                     break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
