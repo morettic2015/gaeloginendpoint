@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
     <application>gaeloginendpoint</application>
-    <version>s07e10</version>
+    <version>s01e02</version>
     <threadsafe>true</threadsafe>
   <!--  <instance-class>B8</instance-class>
     <basic-scaling>

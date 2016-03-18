@@ -15,6 +15,8 @@ import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.*;
+import br.com.morettic.gaelogin.smartcities.vo.Rating;
+import br.com.morettic.gaelogin.smartcities.vo.TipoEmail;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
@@ -437,20 +439,6 @@ public class PerfilControler {
             }
         }
 
-        //Cria um perfil default.....
-     /*   if (p.size() < 1) {
-         pNovo = new Perfil();
-         pNovo.setEmail(email);
-         pNovo.setPassWd(pass);
-         pNovo.setEhPessoaFisica("true");
-         pNovo.setNome("");
-         pNovo.setNascimento("");
-         pNovo.setCpfCnpj("");
-         pNovo.setComplemento("");
-         pNovo.setConfig(-1l);
-         pNovo.setCep("");
-         pm.makePersistent(pNovo);
-         }*/
         if (pNovo != null) {
             retorno = pNovo;
         } else if (retorno == null) {
@@ -564,23 +552,76 @@ public class PerfilControler {
     }
 
     public static JSONObject sendGMail(HttpServletRequest request, HttpServletResponse response) {
-        String msgBody = "TESTE TESTE TESTE TESTE";
+        //Recupera o email da requisição
+        String email = request.getParameter("email");
+        //Conecta no banco
+        pm = PMF.get().getPersistenceManager();
+        Query q = pm.newQuery(Perfil.class);
+        String pQuery = "email == :pEmail";
+        q.setFilter(pQuery);
+        String msgBody = "";
+        List<Perfil> lRet = (List<Perfil>) q.execute(email.toUpperCase());
+        //Nao tem nenhum com o email pesquisado....
+        if ((lRet.size() < 1)) {
+            return new JSONObject();
+        }
+        //Recupera o perfil
+        Perfil p = lRet.get(0);
+
+        TipoEmail tipoEmail = TipoEmail.valueOf(request.getParameter("tipo"));
         Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         try {
+            //Cria mensagem
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("malacma@gmail.com","MORETTIC - Tecnologia da Informação e Comunicação"));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                    "malacma@gmail.com", "TESTE"));
-            msg.setSubject("Feedback");
+            msg.setFrom(new InternetAddress("malacma@gmail.com", "Smartcities Framework - Cidades Inteligêntes"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(email, p.getNome()));
+
+            //Mensagem recuperar senha
+            if (tipoEmail.equals(TipoEmail.RECUPERAR_SENHA)) {
+                msg.setSubject("[SmartcitiesAPP - Recuperação de senha]");
+                msgBody += "Conforme solicitado, abaixo segue sua senha";
+                msgBody += "\n\nSenha:" + p.getPassWd();
+                //Mensagem novo cadastro
+            } else if (tipoEmail.equals(TipoEmail.NOVO_CADASTRO)) {
+                msg.setSubject("[SmartcitiesAPP - Perfil cadastrado com sucesso]");
+                msgBody += "\nBem vindo ao nosso aplicativo Smarticies APP. Seu perfil foi cadastrado com sucesso. Abaixo seguem suas informações. Mantenha seu perfil atualizado! Aproveite para registrar ocorrências em sua cidade.";
+                msgBody += "\n\nNome:" + p.getNome();
+                msgBody += "\n\nUsuario:" + p.getEmail();
+                msgBody += "\n\nSenha:" + p.getPassWd();
+            }
+            msgBody += "\n\nhttp://morettic.com.br";
             msg.setText(msgBody);
             Transport.send(msg);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        
+
         return new JSONObject();
     }
 
+    public static final JSONObject ocorrenciaRating(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+
+        Long idOcorrencia = new Long(request.getParameter("idOcorrencia"));
+        Long idPerfil = new Long(request.getParameter("idPerfil"));
+        Double rating = new Double(request.getParameter("rating"));
+
+        pm = PMF.get().getPersistenceManager();
+
+        Rating r = new Rating();
+        r.setIdOcorrencia(idOcorrencia);
+        r.setIdProfile(idPerfil);
+        r.setRating(rating);
+
+        pm.makePersistent(r);
+
+        JSONObject js = new JSONObject();
+
+        js.put("rating", rating);
+        js.put("idPerfil", idPerfil);
+        js.put("idOcorrencia", idOcorrencia);
+
+        return js;
+    }
 }
