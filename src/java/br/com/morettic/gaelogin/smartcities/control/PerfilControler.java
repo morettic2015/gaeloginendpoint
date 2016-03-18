@@ -600,28 +600,44 @@ public class PerfilControler {
 
         return new JSONObject();
     }
-
+    /**
+     * @Param idOcorrencia:Long
+     * @Param idPerfil:Long
+     * @Param rating:Double
+     * @Todo Criar indices no gae....
+     @ https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=13&idPerfil=5142768607297536&idOcorrencia=4822398406754304&rating=5.5
+     */
     public static final JSONObject ocorrenciaRating(HttpServletRequest request, HttpServletResponse response) throws JSONException {
 
+        JSONObject js = new JSONObject();
         Long idOcorrencia = new Long(request.getParameter("idOcorrencia"));
         Long idPerfil = new Long(request.getParameter("idPerfil"));
         Double rating = new Double(request.getParameter("rating"));
 
         pm = PMF.get().getPersistenceManager();
 
-        Rating r = new Rating();
-        r.setIdOcorrencia(idOcorrencia);
-        r.setIdProfile(idPerfil);
-        r.setRating(rating);
-
-        pm.makePersistent(r);
-
-        JSONObject js = new JSONObject();
-
         js.put("rating", rating);
         js.put("idPerfil", idPerfil);
         js.put("idOcorrencia", idOcorrencia);
 
+        try {
+            Ocorrencia o1 = pm.getObjectById(Ocorrencia.class, idOcorrencia);
+            Perfil p1 = pm.getObjectById(Perfil.class, idPerfil);
+            js.put("msg", "Sucesso");
+            js.put("code", "200");
+        } catch (Exception e) {
+            js.put("msg", "Ocorrência/Perfil inválidos!");
+            js.put("code", "404");
+            return js;
+        }
+        //Cria o rating valido no sistema....
+        Rating r = new Rating();
+        r.setIdOcorrencia(idOcorrencia);
+        r.setIdProfile(idPerfil);
+        r.setRating(rating);
+        //Salva 
+        pm.makePersistent(r);
+        //Retorna completo
         return js;
     }
 }
