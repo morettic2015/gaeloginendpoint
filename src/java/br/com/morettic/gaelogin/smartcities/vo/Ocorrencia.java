@@ -5,8 +5,10 @@
  */
 package br.com.morettic.gaelogin.smartcities.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import javax.jdo.annotations.Cacheable;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Key;
@@ -19,7 +21,8 @@ import javax.jdo.annotations.PrimaryKey;
  * @author LuisAugusto
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
-public class Ocorrencia {
+@Cacheable("true")
+public class Ocorrencia implements Serializable ,Comparable<Ocorrencia>{
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -53,10 +56,10 @@ public class Ocorrencia {
 
     @Persistent(name = "avatar3")
     private Long avatar3;
-    
+
     @Persistent
     private boolean enabledData;
-    
+
     @Persistent
     private String segment;
 
@@ -146,7 +149,6 @@ public class Ocorrencia {
         this.segment = segment;
     }
 
-   
     public Long getPerfil() {
         return perfilUsuario;
     }
@@ -195,8 +197,6 @@ public class Ocorrencia {
         this.avatar3 = avatar3;
     }
 
-   
-
     public String getAdress() {
         return adress.toUpperCase();
     }
@@ -238,6 +238,10 @@ public class Ocorrencia {
         hash = 59 * hash + Objects.hashCode(this.tipo);
         return hash;
     }
-    
-    
+
+    @Override
+    public int compareTo(Ocorrencia o) {
+        return this.getTitulo().compareToIgnoreCase(o.getTitulo());
+    }
+
 }

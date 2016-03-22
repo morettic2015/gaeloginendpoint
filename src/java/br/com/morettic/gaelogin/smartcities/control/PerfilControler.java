@@ -42,6 +42,9 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import com.google.appengine.api.taskqueue.Queue;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 
 ;
 
@@ -163,9 +166,11 @@ public class PerfilControler {
         pm = PMF.get().getPersistenceManager();
         //Set fields
         Perfil p = new Perfil();
+        boolean ehNovo = true;
         String id = request.getParameter("id");
         if (!id.equals("-1")) {
             p = pm.getObjectById(Perfil.class, Long.parseLong(id));
+            ehNovo = false;
             //p.setKey();
         }
 
@@ -196,13 +201,26 @@ public class PerfilControler {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            //Fecha a conexão com o datastore
             pm.close();
+            //Coloca os parametros 
+            js.put("key", p.getKey());
+            js.put("path", p.getEmail());
+            
+            //Manda email de boas vindas!
+            if (ehNovo) {
+                //https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=11&&tipo=NOVO_CADASTROemail="
+                Queue queue = QueueFactory.getDefaultQueue();
+                queue.add(TaskOptions.Builder.withUrl("/infosegcontroller.exec")
+                        .param("action","11")
+                        .param("tipo", "NOVO_CADASTRO")
+                        .param("email", p.getEmail())
+                );
+            }
+
+            return js;
         }
 
-        js.put("key", p.getKey());
-        js.put("path", p.getEmail());
-
-        return js;
     }
     public static final String ERROR = "error";
     public static final String EMAIL_JÁ_EXISTE_NA_BASE_DE_DADOS = "email já existe na base de dados!";
@@ -307,11 +325,13 @@ public class PerfilControler {
         List<Long> lOcorrencias;
         Set<Ocorrencia> lSOcorrencias = new HashSet<Ocorrencia>();
         String id = request.getParameter("id");
-
         double lat = Double.parseDouble(request.getParameter("lat"));
+        double latMax, latMin, q1;
 
-        pm = PMF.get().getPersistenceManager();
+        //recupera perfil
         Perfil p = pm.getObjectById(Perfil.class, new Long(id));
+
+        //Recupera as ocorrencias do perfil.
         if (request.getParameter("mine") != null) {//
             lOcorrencias = p.getlOcorrencias();
             for (Long idOcorrencia : lOcorrencias) {
@@ -320,25 +340,23 @@ public class PerfilControler {
             }
         }
 
-        double q1 = 0.0d;
-
-        if (request.getParameter("d").equals("50")) {
-            q1 = (50 * UMK / 1000);
-        } else if (request.getParameter("d").equals("20")) {
-            q1 = (20 * UMK / 1000);
-        } else if (request.getParameter("d").equals("10")) {
-            q1 = (10 * UMK / 1000);
-        } else {
-            q1 = (100 * UMK / 1000);
+        //Recupera a variação da latitude
+        int distance = 0;
+        try {
+            distance = Integer.parseInt(request.getParameter("d"));
+        } catch (NumberFormatException e) {
+            distance = 10;//Distancia = 0 
         }
-        double latMax, latMin;
 
+        //Calc da latitude variacao
+        q1 = calcLat(distance);
         latMax = (lat + q1);
         latMin = (lat - q1);
-
+        js.put("latMax", latMax);
+        js.put("latMin", latMin);
         /**
-         * Query q = pm.newQuery(Person.class, "(lastName == 'Smith' || lastName
-         * == 'Jones')" + " && firstName == 'Harold'");
+         * int Query q = pm.newQuery(Person.class, "(lastName == 'Smith' ||
+         * lastName == 'Jones')" + " && firstName == 'Harold'");
          */
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
@@ -348,9 +366,11 @@ public class PerfilControler {
                 mapaChaves.put(tp, tp);
             }
         }
+        //Consulta as ocorrências
         Query q = pm.newQuery(Ocorrencia.class);
         lSOcorrencias.addAll((List<Ocorrencia>) q.execute());
 
+        //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         for (Ocorrencia o : lSOcorrencias) {
@@ -600,6 +620,7 @@ public class PerfilControler {
 
         return new JSONObject();
     }
+
     /**
      * @Param idOcorrencia:Long
      * @Param idPerfil:Long
@@ -641,5 +662,9 @@ public class PerfilControler {
         pm.makePersistent(r);
         //Retorna completo
         return js;
+    }
+
+    public static Double calcLat(int distance) {
+        return (Double) (distance * UMK / 1000);
     }
 }

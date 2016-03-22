@@ -5,6 +5,7 @@
  */
 package br.com.morettic.gaelogin.smartcities.vo;
 
+import java.io.Serializable;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Key;
@@ -17,7 +18,7 @@ import javax.jdo.annotations.PrimaryKey;
  * @author LuisAugusto
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
-public class Configuracao {
+public class Configuracao implements Serializable{
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
