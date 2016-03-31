@@ -89,10 +89,13 @@ public class InfoSegController extends HttpServlet {
                     retJSon = PerfilControler.ocorrenciaRating(request, response);
                     break;
                 case 14:
-                    retJSon = PerfilControler.getProfileFromDeepWeb(request,response);
+                    retJSon = PerfilControler.getProfileFromDeepWeb(request, response);
                     break;
-                     case 15:
-                    retJSon = PerfilControler.updateConfigInfoFromProfile(request,response);
+                case 15:
+                    retJSon = PerfilControler.updateConfigInfoFromProfile(request, response);
+                    break;
+                case 16:
+                    retJSon = PerfilControler.findListOcorrenciasRecentes(request, response);
                     break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");

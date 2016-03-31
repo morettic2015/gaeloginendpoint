@@ -747,8 +747,10 @@ public class PerfilControler {
         String url = "https://api.fullcontact.com/v2/person.json?email=" + email + "&apiKey=ba2fbd5adb0456e2";
         return readJSONUrl(url);
     }
+
     /**
-     @URL https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=15&idProfile=5083670394175488&phone=+55(48)96004929&props=a:b-c:d-e:F
+     * @URL
+     * https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=15&idProfile=5083670394175488&phone=+55(48)96004929&props=a:b-c:d-e:F
      */
     public static JSONObject updateConfigInfoFromProfile(HttpServletRequest request, HttpServletResponse response) throws JSONException {
 
@@ -784,20 +786,82 @@ public class PerfilControler {
             js.put("phone", phone);
             js.put("id", cfg.getKey());
             js.put("pk", cfg.getOwner());
-            
+
             JSONArray ja = new JSONArray();
             Set<String> c = cfg.getlPropriedades().keySet();
-            for(String key:c){
+            for (String key : c) {
                 JSONObject js2 = new JSONObject();
                 js2.put(key, cfg.getValue(key));
                 ja.put(js2);
             }
-            js.put("cfg",ja);
+            js.put("cfg", ja);
             js.put("status", 200);
         } catch (Exception e) {
             js.put("status", 500);
             js.put("error", e.getLocalizedMessage());
         }
+        return js;
+    }
+
+    public static JSONObject findListOcorrenciasRecentes(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+        Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Ocorrencia order by dtOcorrencia desc");
+        q.setRange(0, 20);
+        
+        JSONObject js = new JSONObject();
+        List<Ocorrencia> lSOcorrencias = (List<Ocorrencia>) q.execute();
+
+        //Formata o resultado filtrado
+        JSONArray ja = new JSONArray();
+        DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        for (Ocorrencia o : lSOcorrencias) {
+            JSONObject js1 = new JSONObject();
+            js1.put("id", o.getKey());
+            js1.put("tit", o.getTitulo());
+            js1.put("desc", o.getDescricao());
+            js1.put("tipo", o.getTipo().toString());
+            js1.put("date", dt.format(o.getDtOcorrencia()));
+            js1.put("address", o.getAdress());
+
+                //Validar se nao tiver o avatar....
+            //Recupera a imagem para associar o token do blob
+            Imagem m = null;
+            
+            try {
+                m = pm.getObjectById(Imagem.class, o.getAvatar());
+                js1.put("token", m.getKey());
+            } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
+                js1.put("token", "-1");
+            }
+
+            //Imagens opcionais da ocorrência
+            if (o.getAvatar1() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar1());
+                js1.put("token1", m.getKey());
+            } else {
+                js1.put("token1", "null");
+            }
+            if (o.getAvatar2() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar2());
+                js1.put("token2", m.getKey());
+            } else {
+                js1.put("token2", "null");
+            }
+            if (o.getAvatar3() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar3());
+                js1.put("token3", m.getKey());
+            } else {
+                js1.put("token3", "null");
+            }
+
+            //Recupera o perfil
+            Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
+            js1.put("author", pOcorencia.getNome());
+
+            ja.put(js1);
+
+        }
+        js.put("rList", ja);
         return js;
     }
 }
