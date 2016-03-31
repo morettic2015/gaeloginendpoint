@@ -15,6 +15,7 @@ import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.*;
+import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.Rating;
 import br.com.morettic.gaelogin.smartcities.vo.TipoEmail;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
@@ -206,13 +207,13 @@ public class PerfilControler {
             //Coloca os parametros 
             js.put("key", p.getKey());
             js.put("path", p.getEmail());
-            
+
             //Manda email de boas vindas!
             if (ehNovo) {
                 //https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=11&&tipo=NOVO_CADASTROemail="
                 Queue queue = QueueFactory.getDefaultQueue();
                 queue.add(TaskOptions.Builder.withUrl("/infosegcontroller.exec")
-                        .param("action","11")
+                        .param("action", "11")
                         .param("tipo", "NOVO_CADASTRO")
                         .param("email", p.getEmail())
                 );
@@ -666,5 +667,137 @@ public class PerfilControler {
 
     public static Double calcLat(int distance) {
         return (Double) (distance * UMK / 1000);
+    }
+
+    public static JSONObject getProfileFromDeepWeb(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        String email = request.getParameter("email");
+        JSONObject profile = new JSONObject();
+        profile.put("email", email);
+        profile.put("status", 404);
+
+        //read full contact
+        JSONObject fullContact = getFullContactJSON(email);
+        if (fullContact.getInt("status") == 200) {//Encontrou
+            profile.put("status", 200);
+            if (fullContact.has("photos")) {
+                JSONArray ja = fullContact.getJSONArray("photos");
+                String avatar = "avatar";
+                for (int i = 0; i < ja.length(); i++) {
+                    JSONObject js = ja.getJSONObject(i);
+                    profile.put(avatar + "_" + i, js.getString("url"));
+                }
+            }
+            if (fullContact.has("contactInfo")) {
+                if (fullContact.getJSONObject("contactInfo").has("fullName")) {
+                    profile.put("name", fullContact.getJSONObject("contactInfo").getString("fullName"));
+                }
+            }
+        } else {
+            //Read from pipl deepweb lol
+            fullContact = getPiplUrlJSON(email);//Cota acabou nego tenta a outra cota diária....
+            if (fullContact.getInt("@http_status_code") != 200) {
+                fullContact = getPiplUrlJSON1(email);
+            }
+            if (fullContact.getInt("@http_status_code") == 200) {
+                profile.put("status", 200);
+                if (fullContact.has("possible_persons")) {
+                    JSONArray ja = fullContact.getJSONArray("possible_persons");
+                    String nome = ja.getJSONObject(0)
+                            .getJSONArray("names")
+                            .getJSONObject(0)
+                            .getString("display");
+                    profile.put("name", nome);
+
+                    if (ja.getJSONObject(0).has("addresses")) {
+                        profile.put("country", ja.getJSONObject(0).getJSONArray("addresses").getJSONObject(0).getString("country"));
+                        profile.put("state", ja.getJSONObject(0).getJSONArray("addresses").getJSONObject(0).getString("state"));
+                        profile.put("display", ja.getJSONObject(0).getJSONArray("addresses").getJSONObject(0).getString("display"));
+                    }
+                }
+                if (fullContact.has("person")) {
+                    JSONArray ja = fullContact.getJSONObject("person").getJSONArray("names");
+                    String nome = ja.getJSONObject(0).getString("display");
+                    profile.put("name", nome);
+                    //Endereço
+                    if (fullContact.getJSONObject("person").has("addresses")) {
+                        ja = fullContact.getJSONObject("person").getJSONArray("addresses");
+                        profile.put("country", fullContact.getJSONObject("person").getJSONArray("addresses").getJSONObject(0).getString("country"));
+                        profile.put("city", fullContact.getJSONObject("person").getJSONArray("addresses").getJSONObject(0).getString("city"));
+                        profile.put("display", fullContact.getJSONObject("person").getJSONArray("addresses").getJSONObject(0).getString("display"));
+                    }
+                }
+            }
+        }
+
+        return profile;
+
+    }
+
+    private static final JSONObject getPiplUrlJSON(String email) {
+        String url = "http://api.pipl.com/search/?email=" + email + "&key=CONTACT-DEMO-rh6e4asn0wb8vgmj6wa0umbv";
+        return readJSONUrl(url);
+    }
+
+    private static final JSONObject getPiplUrlJSON1(String email) {
+        String url = "http://api.pipl.com/search/?email=" + email + "&key=CONTACT--DEMO-97k50hjhg35m89cka8fjy6vd";
+        return readJSONUrl(url);
+    }
+
+    private static final JSONObject getFullContactJSON(String email) {
+        String url = "https://api.fullcontact.com/v2/person.json?email=" + email + "&apiKey=ba2fbd5adb0456e2";
+        return readJSONUrl(url);
+    }
+    /**
+     @URL https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=15&idProfile=5083670394175488&phone=+55(48)96004929&props=a:b-c:d-e:F
+     */
+    public static JSONObject updateConfigInfoFromProfile(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+
+        pm = PMF.get().getPersistenceManager();
+        String idProfile = request.getParameter("idProfile");
+        Long id = new Long(idProfile);
+        Perfil p = pm.getObjectById(Perfil.class, id);
+        JSONObject js = new JSONObject();
+        Configuracao cfg = null;
+
+        try {
+            cfg = pm.getObjectById(Configuracao.class, id);
+            pm.deletePersistent(cfg);
+        } catch (Exception e) {
+        }
+        //Novo objeto remove e insere novo
+        cfg = new Configuracao();
+        cfg.setKey(id);
+        cfg.setOwner(id);
+        //Recupera o cellphone
+        String phone = request.getParameter("phone");
+        cfg.setCellPhone(phone);
+        //Propriedades
+        String[] properties = request.getParameter("props").split("-");
+        for (String str : properties) {
+            String[] pairs = str.split(":");
+            cfg.setPairValue(pairs[0], pairs[1]);
+        }
+
+        try {
+            pm.makePersistent(cfg);
+
+            js.put("phone", phone);
+            js.put("id", cfg.getKey());
+            js.put("pk", cfg.getOwner());
+            
+            JSONArray ja = new JSONArray();
+            Set<String> c = cfg.getlPropriedades().keySet();
+            for(String key:c){
+                JSONObject js2 = new JSONObject();
+                js2.put(key, cfg.getValue(key));
+                ja.put(js2);
+            }
+            js.put("cfg",ja);
+            js.put("status", 200);
+        } catch (Exception e) {
+            js.put("status", 500);
+            js.put("error", e.getLocalizedMessage());
+        }
+        return js;
     }
 }

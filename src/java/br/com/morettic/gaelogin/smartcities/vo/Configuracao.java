@@ -6,6 +6,7 @@
 package br.com.morettic.gaelogin.smartcities.vo;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Key;
@@ -23,17 +24,39 @@ public class Configuracao implements Serializable{
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long key;
-    @Persistent(name = "only_mine")
-    private boolean onlyMine;
+    
+    @Persistent
+    private Long owner;
+  
+    @Persistent(cacheable = "true")
+    private String cellPhone;
+    
+    @Persistent(serialized = "true", defaultFetchGroup="true")
+    private HashMap<String,String> lPropriedades;
+    
+    
+    public Configuracao(){
+        this.lPropriedades = new HashMap<String,String>();
+    }
+    
+    public String getValue(String key){
+        return this.lPropriedades.get(key);
+    }
 
-    @Persistent(name = "only_state")
-    private boolean onlyState;
+    public Long getOwner() {
+        return owner;
+    }
 
-    @Persistent(name = "only_city")
-    private boolean onlyCity;
-
-    @Persistent(name = "only_country")
-    private boolean onlyCountry;
+    public void setOwner(Long owner) {
+        this.owner = owner;
+    }
+    
+    public void setPairValue(String key,String Value){
+        if(this.lPropriedades==null){
+            this.lPropriedades = new HashMap();
+        }
+        this.lPropriedades.put(key, Value);
+    }
 
     public Long getKey() {
         return key;
@@ -43,36 +66,21 @@ public class Configuracao implements Serializable{
         this.key = key;
     }
 
-    public boolean isOnlyMine() {
-        return onlyMine;
+    public String getCellPhone() {
+        return cellPhone;
     }
 
-    public void setOnlyMine(boolean onlyMine) {
-        this.onlyMine = onlyMine;
+    public void setCellPhone(String cellPhone) {
+        this.cellPhone = cellPhone;
     }
 
-    public boolean isOnlyState() {
-        return onlyState;
+    public HashMap<String, String> getlPropriedades() {
+        return lPropriedades;
     }
 
-    public void setOnlyState(boolean onlyState) {
-        this.onlyState = onlyState;
+    public void setlPropriedades(HashMap<String, String> lPropriedades) {
+        this.lPropriedades = lPropriedades;
     }
-
-    public boolean isOnlyCity() {
-        return onlyCity;
-    }
-
-    public void setOnlyCity(boolean onlyCity) {
-        this.onlyCity = onlyCity;
-    }
-
-    public boolean isOnlyCountry() {
-        return onlyCountry;
-    }
-
-    public void setOnlyCountry(boolean onlyCountry) {
-        this.onlyCountry = onlyCountry;
-    }
-
+    
+    
 }
