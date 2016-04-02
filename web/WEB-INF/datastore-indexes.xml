@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <datastore-indexes autoGenerate="true">
-    <datastore-index kind="Ocorrencia" ancestor="false" source="manual">
+    <datastore-index kind="Registro" ancestor="false" source="manual">
         <property name="tipo" direction="asc"/>
         <property name="latitude" direction="asc"/>
     </datastore-index>
-    <datastore-index kind="Ocorrencia" ancestor="false" source="manual">
+    <datastore-index kind="Registro" ancestor="false" source="manual">
         <property name="tipo" direction="asc"/>
         <property name="latitude" direction="asc"/>
         <property name="latitude" direction="asc"/>
     </datastore-index>
-    <datastore-index kind="Ocorrencia" ancestor="false" source="manual">
+    <datastore-index kind="Registro" ancestor="false" source="manual">
         <property name="tipo" direction="asc"/>
         <property name="segment" direction="asc"/>
         <property name="latitude" direction="asc"/>

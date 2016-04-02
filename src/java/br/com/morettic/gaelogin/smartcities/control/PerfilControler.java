@@ -6,7 +6,7 @@
 package br.com.morettic.gaelogin.smartcities.control;
 
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
-import br.com.morettic.gaelogin.smartcities.vo.Ocorrencia;
+import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
@@ -46,6 +46,12 @@ import javax.mail.internet.MimeMessage;
 import com.google.appengine.api.taskqueue.Queue;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+import javax.jdo.Transaction;
 
 ;
 
@@ -73,7 +79,7 @@ public class PerfilControler {
         //Recupera o perfil
         Perfil p1 = pm.getObjectById(Perfil.class, new Long(req.getParameter("idProfile")));
         //Cria nova ocorrencia
-        Ocorrencia ocorrencia = new Ocorrencia();
+        Registro ocorrencia = new Registro();
         //SEt attrs
         ocorrencia.setTitulo(req.getParameter("titulo"));
         ocorrencia.setDtOcorrencia(new Date());
@@ -320,11 +326,12 @@ public class PerfilControler {
      *
      * q.setFilter("lastName == 'Smith' && height < maxHeight");
      */
+    //http://www.myweather2.com/developer/forecast.ashx?uac=<your unique access code>&query=24.15,56.32&temp_unit=f
     public static JSONObject findOcorrencias(HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
         List<Long> lOcorrencias;
-        Set<Ocorrencia> lSOcorrencias = new HashSet<Ocorrencia>();
+        Set<Registro> lSOcorrencias = new HashSet<Registro>();
         String id = request.getParameter("id");
         double lat = Double.parseDouble(request.getParameter("lat"));
         double latMax, latMin, q1;
@@ -336,7 +343,7 @@ public class PerfilControler {
         if (request.getParameter("mine") != null) {//
             lOcorrencias = p.getlOcorrencias();
             for (Long idOcorrencia : lOcorrencias) {
-                Ocorrencia e = pm.getObjectById(Ocorrencia.class, idOcorrencia);
+                Registro e = pm.getObjectById(Registro.class, idOcorrencia);
                 lSOcorrencias.add(e);
             }
         }
@@ -368,13 +375,12 @@ public class PerfilControler {
             }
         }
         //Consulta as ocorrências
-        Query q = pm.newQuery(Ocorrencia.class);
-        lSOcorrencias.addAll((List<Ocorrencia>) q.execute());
-
+        Query q = pm.newQuery(Registro.class);
+        lSOcorrencias.addAll((List<Registro>) q.execute());
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        for (Ocorrencia o : lSOcorrencias) {
+        for (Registro o : lSOcorrencias) {
             //Latitude da ocorrencia
             Float mLatitude = Float.parseFloat(o.getLatitude());
             //Verifica se o tipo da ocorrencia está no mapa de chaves de tipo.
@@ -431,7 +437,10 @@ public class PerfilControler {
                 ja.put(js1);
             }
         }
-
+        /**
+         * @TODO Implementar os dados do tempo
+         * http://www.myweather2.com/developer/forecast.ashx?uac=9H1IUHm/Ih&query=-27.57781410217285,-48.61552810668945&temp_unit=c&output=json
+         */
         js.put("rList", ja);
 
         return js;
@@ -645,7 +654,7 @@ public class PerfilControler {
         js.put("idOcorrencia", idOcorrencia);
 
         try {
-            Ocorrencia o1 = pm.getObjectById(Ocorrencia.class, idOcorrencia);
+            Registro o1 = pm.getObjectById(Registro.class, idOcorrencia);
             Perfil p1 = pm.getObjectById(Perfil.class, idPerfil);
             js.put("msg", "Sucesso");
             js.put("code", "200");
@@ -805,16 +814,17 @@ public class PerfilControler {
 
     public static JSONObject findListOcorrenciasRecentes(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         pm = PMF.get().getPersistenceManager();
-        Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Ocorrencia order by dtOcorrencia desc");
+        Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Registro order by dtOcorrencia desc");
         q.setRange(0, 20);
-        
+
         JSONObject js = new JSONObject();
-        List<Ocorrencia> lSOcorrencias = (List<Ocorrencia>) q.execute();
+        List<Registro> lSOcorrencias = (List<Registro>) q.execute();
+        //IP
 
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        for (Ocorrencia o : lSOcorrencias) {
+        for (Registro o : lSOcorrencias) {
             JSONObject js1 = new JSONObject();
             js1.put("id", o.getKey());
             js1.put("tit", o.getTitulo());
@@ -823,10 +833,10 @@ public class PerfilControler {
             js1.put("date", dt.format(o.getDtOcorrencia()));
             js1.put("address", o.getAdress());
 
-                //Validar se nao tiver o avatar....
+            //Validar se nao tiver o avatar....
             //Recupera a imagem para associar o token do blob
             Imagem m = null;
-            
+
             try {
                 m = pm.getObjectById(Imagem.class, o.getAvatar());
                 js1.put("token", m.getKey());
@@ -864,4 +874,211 @@ public class PerfilControler {
         js.put("rList", ja);
         return js;
     }
+
+    /**
+     * Switch para inicializar os dados de diferentes fontes.
+     */
+    public static JSONObject initDataStoreInfo(HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
+        int dataInfo = new Integer(request.getParameter("dataInfo"));
+        JSONObject js = new JSONObject();
+        switch (dataInfo) {
+            case 1:
+                int total = loadPostosDeSaude(request, response);
+                js.put("total", total);
+                js.put("action", "postos de saude inseridos como ocorrencias");
+                break;
+            case 2:
+                total = removePostosSaude();
+                js.put("total", total);
+                js.put("action", "postos de saude removidos da base");
+                break;
+            case 3:
+                total = loadUpaLocal(request, response);
+                js.put("total", total);
+                js.put("action", "UPAS ATUALIZADAS NA BASE");
+                break;
+            default:
+                break;
+
+        }
+
+        return js;
+    }
+
+    private static int removePostosSaude() {
+        pm = PMF.get().getPersistenceManager();
+
+        Query q = pm.newQuery(Registro.class);
+
+        List<Registro> lOcorrencias = (List<Registro>) q.execute();
+        int total = 0;
+        for (Registro o : lOcorrencias) {
+            if (o.getTipo().name().equals("POSTO_SAUDE")) {
+                pm.deletePersistent(o);
+                total++;
+            }
+        }
+
+        pm.close();
+
+        return total;
+    }
+
+    //4877958103695360 avatar
+    //5173176170446848 perfil
+    /**
+     *
+     *
+     * -23.896, vlr_latitude 1 -53.41, vlr_longitude 2 411885, cod_munic 3
+     * 6811299, cod_cnes 4 UNIDADE DE ATENCAO PRIMARIA SAUDE DA FAMILIA,
+     * nom_estab 5 RUA GUILHERME BRUXEL 6,CENTRO 7,Perobal 8,4436251462 9,
+     * dsc_endereco dsc_bairro dsc_cidade dsc_telefone Desempenho muito acima da
+     * mÃ©dia, dsc_estrut_fisic 10 Desempenho muito acima da mÃ©dia,ambiencia 11
+     * Desempenho mediano ou um pouco abaixo da
+     * mÃ©dia,dsc_adap_defic_fisic_idosos 12 Desempenho muito acima da mÃ©dia 13
+     */
+    private static int loadPostosDeSaude(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String murl = "http://repositorio.dados.gov.br/saude/unidades-saude/unidade-basica-saude/ubs.csv";
+        BufferedReader reader = null;
+        URL url;
+        int total = 0;
+        try {
+            url = new URL(murl);
+            reader = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line = null;
+
+            line = reader.readLine();
+            //IP
+            String ipAddress = request.getHeader("X-FORWARDED-FOR");
+            if (ipAddress == null) {
+                ipAddress = request.getRemoteAddr();
+            }
+
+            //LInha a linha cria as ocorrencias
+            while ((line = reader.readLine()) != null) {
+                //Se der erro na linha continua na proxima
+                try {
+                    pm = PMF.get().getPersistenceManager();
+                    String[] lRegister = line.split(",");
+                    //Ocorrencia 
+                    Registro o = new Registro();
+                    o.setLatitude(lRegister[0].toUpperCase());
+                    o.setLongitude(lRegister[1].toUpperCase());
+                    o.setTitulo(lRegister[4].toUpperCase());
+                    o.setDtOcorrencia(new Date());
+                    o.setIp("localhost");
+                    o.setAdress(lRegister[5].toUpperCase() + "," + lRegister[6].toUpperCase() + "," + lRegister[7].toUpperCase() + ",Fone:" + lRegister[8].toUpperCase());
+                    o.setAvatar(5068776655552512l);
+                    o.setPerfil(4520495223406592l);
+                    o.setTipo(TipoOcorrencia.POSTO_SAUDE);
+                    o.setDescricao(lRegister[9].toUpperCase());
+                    o.setIp(ipAddress);
+                    //Salva
+
+                    pm.makePersistent(o);
+                    pm.close();
+
+                    total++;
+
+                    o = null;
+                    lRegister = null;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            reader.close();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        } finally {
+            //Persiste as ocorrências
+            url = null;
+            reader.close();
+            pm.flush();
+            //Total de ocorrencias;
+
+            return total;
+        }
+    }
+
+    /**
+     *
+     *
+     *
+     * features: [ { type: "Feature", properties: [ { gid: "7085400" }, {
+     * co_cep: "83708-695" }, { uf: "PR" }, { cidade: "Araucária" }, {
+     * no_fantasia: "UNIDADE DE PRONTO ATENDIMENTO DE ARAUCARIA" }, { no_bairro:
+     * "COSTEIRA" }, { nu_endereco: "1" }, { no_logradouro: "RUA AUGUSTO RIBEIRO
+     * DOS SANTOS" }, { nu_telefone: "39056313" }, { ano_upa_func: "2016" }, {
+     * mes_upa_func: "2" }, { fonte_recurso: "MS" }, { porte: "3" } ], geometry:
+     * { type: "Point", coordinates: [ -49.41, -25.593 ] } },
+     *
+     */
+    private static int loadUpaLocal(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        JSONObject input = URLReader.readJSONUrl(HTTPI3GEOSAUDEGOVBRI3GEOOGCPHPSERVICE_WF_SV);
+        JSONArray ja = input.getJSONArray("features");
+        int total = 0;;
+        for (int i = 0; i < ja.length(); i++) {
+            //Cria o registro
+
+            try {
+                Registro r = new Registro();
+                r.setAvatar(5068776655552512l);//USUARIO ADMIN
+                r.setPerfil(4520495223406592l);//AVATAR ADMIN
+
+                //Propriedades do registro
+                JSONObject jsValues = ja.getJSONObject(i);
+                JSONArray lProperties = jsValues.getJSONArray("properties");
+                //Recover properties from service
+                String cep = lProperties.getJSONObject(1).getString("co_cep");
+                String uf = lProperties.getJSONObject(2).getString("uf");
+                String cidade = lProperties.getJSONObject(3).getString("cidade");
+                String no_fantasia = lProperties.getJSONObject(4).getString("no_fantasia");
+                String no_bairro = lProperties.getJSONObject(5).getString("no_bairro");
+                String nu_endereco = lProperties.getJSONObject(6).getString("nu_endereco");
+                String no_logradouro = lProperties.getJSONObject(7).getString("no_logradouro");
+                String nu_telefone = lProperties.getJSONObject(8).getString("nu_telefone");
+                String ano_upa_func = lProperties.getJSONObject(9).getString("ano_upa_func");
+                String mes_upa_func = lProperties.getJSONObject(10).getString("mes_upa_func");
+                String fonte_recurso = lProperties.getJSONObject(11).getString("fonte_recurso");
+                String porte = lProperties.getJSONObject(12).getString("porte");
+                //TIpo da ocorrencia
+                r.setTipo(TipoOcorrencia.UPA);
+                r.setTitulo(no_fantasia);
+                r.setDescricao("Ano/Mes de abertura:"
+                        + ano_upa_func + " "
+                        + mes_upa_func + " fonte de recursos:"
+                        + fonte_recurso + " porte:"
+                        + porte + ", fone:"
+                        + nu_telefone);
+                r.setAdress(no_logradouro + ","
+                        + no_bairro + ","
+                        + nu_endereco + ","
+                        + cidade + ","
+                        + cep + ","
+                        + uf);
+
+                //Local pega as coordenadas
+                JSONObject pos = jsValues.getJSONObject("geometry");
+                String latitude = pos.getJSONArray("coordinates").getString(1);
+                String longitude = pos.getJSONArray("coordinates").getString(0);
+                r.setLatitude(latitude);
+                r.setLongitude(longitude);
+
+                pm = PMF.get().getPersistenceManager();
+                pm.makePersistent(r);
+                pm.close();
+                total++;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        //Conecta
+
+        return total;
+    }
+    public static final String HTTPI3GEOSAUDEGOVBRI3GEOOGCPHPSERVICE_WF_SV = "http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=upa_funcionamento_cnes&outputFormat=JSON";
 }

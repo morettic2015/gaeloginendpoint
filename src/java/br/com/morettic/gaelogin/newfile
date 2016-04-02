@@ -4,3 +4,20 @@ http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFea
 http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=cnes&outputFormat=JSON
 //Unidades basicas de saude
 http://repositorio.dados.gov.br/saude/unidades-saude/unidade-basica-saude/ubs.csv
+
+http://dados.gov.br/dataset/febre_amarela_acrv/resource/6f62eef7-f6b5-4b5f-acb8-95c36f85722e
+
+Área com recomendação de vacina (ACRV) – Febre ...
+
+URL: http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=febre_amarela_acrv&outputFormat=JSON
+
+Do resumo do conjunto de dados
+
+istribuição de UPAS em Funcionamento
+
+URL: http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=upa_funcionamento_cnes&outputFormat=JSON
+
+Do resumo do conjunto de dados
+
+As Unidades de Pronto Atendimento (UPAs) ficam abe
+http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=upa_funcionamento_cnes&outputFormat=JSON

@@ -3,13 +3,14 @@
     <application>gaeloginendpoint</application>
     <version>s02e11</version>
     <threadsafe>true</threadsafe>
-  <!--  <instance-class>B8</instance-class>
+    <!--<instance-class>B8</instance-class>
     <basic-scaling>
-        <max-instances>5</max-instances>
+        <max-instances>1</max-instances>
         <idle-timeout>10m</idle-timeout>
     </basic-scaling> -->
     <system-properties>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
-        <property name="appengine.api.urlfetch.defaultDeadline" value="10"/>
+        <property name="appengine.api.urlfetch.defaultDeadline" value="60"/>
+        <property name="appengine.datastore.disableChunkSizeWarning" value="true"/>
     </system-properties>
 </appengine-web-app>

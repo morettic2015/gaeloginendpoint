@@ -27,5 +27,7 @@ public enum TipoOcorrencia {
     EDUCACAO,
     TRANSPORTE,
     OUTROS,
+    POSTO_SAUDE,
+    UPA,
     SEGURANCA;
 }

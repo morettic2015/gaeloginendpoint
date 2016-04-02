@@ -11,7 +11,6 @@ import java.util.Objects;
 import javax.jdo.annotations.Cacheable;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Key;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -22,7 +21,7 @@ import javax.jdo.annotations.PrimaryKey;
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 @Cacheable("true")
-public class Ocorrencia implements Serializable ,Comparable<Ocorrencia>{
+public class Registro implements Serializable ,Comparable<Registro>{
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -63,7 +62,7 @@ public class Ocorrencia implements Serializable ,Comparable<Ocorrencia>{
     @Persistent
     private String segment;
 
-    public Ocorrencia() {
+    public Registro() {
         this.enabledData = true;
         this.dtOcorrencia = new Date();
         this.segment = "ALL";
@@ -218,7 +217,7 @@ public class Ocorrencia implements Serializable ,Comparable<Ocorrencia>{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Ocorrencia other = (Ocorrencia) obj;
+        final Registro other = (Registro) obj;
         if (this.key != other.key && (this.key == null || !this.key.equals(other.key))) {
             return false;
         }
@@ -240,7 +239,7 @@ public class Ocorrencia implements Serializable ,Comparable<Ocorrencia>{
     }
 
     @Override
-    public int compareTo(Ocorrencia o) {
+    public int compareTo(Registro o) {
         return this.getTitulo().compareToIgnoreCase(o.getTitulo());
     }
 

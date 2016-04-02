@@ -97,12 +97,17 @@ public class InfoSegController extends HttpServlet {
                 case 16:
                     retJSon = PerfilControler.findListOcorrenciasRecentes(request, response);
                     break;
+                case 17:
+                    retJSon = PerfilControler.initDataStoreInfo(request, response);
+                    break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
                     PerfilControler.autenticaUsuarioGoogle(request, response);
                     break;
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             if (retJSon != null) {
                 out.print(retJSon);

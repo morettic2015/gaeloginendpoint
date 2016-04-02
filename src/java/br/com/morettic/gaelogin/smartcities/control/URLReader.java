@@ -42,7 +42,7 @@ public class URLReader {
             return elemento;
         }
     }
-
+    
     private static final String[] HEADERS_TO_TRY = {
         "X-Forwarded-For",
         "Proxy-Client-IP",
