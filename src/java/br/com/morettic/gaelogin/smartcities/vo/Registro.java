@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import javax.jdo.annotations.Cacheable;
+import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
@@ -16,12 +17,13 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 /**
+ * XXX.XXX.XXX.XXX.XXX
  *
  * @author LuisAugusto
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 @Cacheable("true")
-public class Registro implements Serializable ,Comparable<Registro>{
+public class Registro implements Serializable, Comparable<Registro> {
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -29,14 +31,19 @@ public class Registro implements Serializable ,Comparable<Registro>{
     @Persistent(name = "dt_ocorrencia")
     private Date dtOcorrencia;
     @Persistent(name = "titulo")
+    @Column(allowsNull = "false")
     private String titulo;
     @Persistent(name = "descricao")
+    @Column(allowsNull = "false")
     private String descricao;
     @Persistent(name = "latitude")
+    @Column(allowsNull = "false")
     private Float latitude;
     @Persistent(name = "longitude")
+    @Column(allowsNull = "false")
     private Float longitude;
-    @Persistent(name = "user_ip")
+    @Persistent
+    @Column(name = "user_ip", length = 25, defaultValue = "127.0.0.1")
     private String ip;
     @Persistent(name = "adress")
     private String adress;
@@ -45,6 +52,7 @@ public class Registro implements Serializable ,Comparable<Registro>{
     @Persistent
     private TipoOcorrencia tipo;
     @Persistent(name = "avatar")
+    @Column(allowsNull = "false")
     private Long avatar;
 
     @Persistent(name = "avatar1")
@@ -60,12 +68,14 @@ public class Registro implements Serializable ,Comparable<Registro>{
     private boolean enabledData;
 
     @Persistent
+    @Column(name = "segment", defaultValue = "ALL")
     private String segment;
 
     public Registro() {
         this.enabledData = true;
         this.dtOcorrencia = new Date();
         this.segment = "ALL";
+        this.tipo = TipoOcorrencia.OUTROS;
     }
 
     public boolean isEnabledData() {

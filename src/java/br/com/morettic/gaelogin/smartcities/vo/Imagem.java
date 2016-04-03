@@ -7,6 +7,7 @@ package br.com.morettic.gaelogin.smartcities.vo;
 
 import com.google.appengine.api.datastore.Blob;
 import java.io.Serializable;
+import javax.jdo.annotations.Cacheable;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.Key;
@@ -19,6 +20,7 @@ import javax.jdo.annotations.PrimaryKey;
  * @author LuisAugusto
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
+@Cacheable("true")
 public class Imagem implements Serializable{
 
     @PrimaryKey

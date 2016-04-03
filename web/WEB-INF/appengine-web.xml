@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
     <application>gaeloginendpoint</application>
-    <version>s02e17</version>
+    <version>s02e25</version>
     <threadsafe>true</threadsafe>
+    <sessions-enabled>true</sessions-enabled>    
     <!--<instance-class>B8</instance-class>
     <basic-scaling>
         <max-instances>1</max-instances>
@@ -13,4 +14,7 @@
         <property name="appengine.api.urlfetch.defaultDeadline" value="60"/>
         <property name="appengine.datastore.disableChunkSizeWarning" value="true"/>
     </system-properties>
+    <static-files>
+        <include path="/images/**.png" />
+    </static-files>
 </appengine-web-app>

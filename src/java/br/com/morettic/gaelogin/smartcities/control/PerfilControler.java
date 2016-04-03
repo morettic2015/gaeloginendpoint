@@ -816,7 +816,11 @@ public class PerfilControler {
         }
         return js;
     }
-
+    /**
+     * 
+     * @http://gaeloginendpoint.appspot.com/images/weather.png
+     * 
+     */
     public static JSONObject findListOcorrenciasRecentes(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         //Conecta com o banco
         pm = PMF.get().getPersistenceManager();
@@ -832,6 +836,9 @@ public class PerfilControler {
 
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
+        
+        //Imagem padrão
+        Imagem m = null;
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         for (Registro o : lSOcorrencias) {
             JSONObject js1 = new JSONObject();
@@ -845,15 +852,13 @@ public class PerfilControler {
 
             //Validar se nao tiver o avatar....
             //Recupera a imagem para associar o token do blob
-            Imagem m = null;
-
             try {
                 m = pm.getObjectById(Imagem.class, o.getAvatar());
                 js1.put("token", m.getKey());
             } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
                 js1.put("token", "-1");
             }
-
+            //Imagens adicionais e suas validações
             //Imagens opcionais da ocorrência
             if (o.getAvatar1() != null) {
                 m = pm.getObjectById(Imagem.class, o.getAvatar1());

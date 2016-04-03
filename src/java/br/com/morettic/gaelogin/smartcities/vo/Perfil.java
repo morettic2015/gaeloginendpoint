@@ -7,16 +7,15 @@ package br.com.morettic.gaelogin.smartcities.vo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import javax.jdo.annotations.Cacheable;
+import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Key;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import javax.jdo.annotations.Unique;
-import javax.persistence.PrePersist;
 
 /**
  *
@@ -27,14 +26,18 @@ import javax.persistence.PrePersist;
         name = "EMAIL_AK",
         members = {"email"}
 )
+
+@Cacheable("true")
 public class Perfil implements Serializable {
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long key;
     @Persistent(name = "email")
+    @Column(allowsNull = "false")
     private String email;
     @Persistent(name = "nome")
+    @Column(allowsNull = "false")
     private String nome;
     @Persistent(name = "nascimento")
     private String nascimento;
@@ -55,11 +58,10 @@ public class Perfil implements Serializable {
     @Persistent(name = "avatar")
     private Long avatar;
     @Persistent(name = "passwd")
+    @Column(allowsNull = "false")
     private String passWd;
-
     @Persistent(name = "origem")
     private String origem = "DEFAULT";
-
     @Persistent
     private Long config;
     @Persistent(name = "eh_pessoa_fisica")
