@@ -20,4 +20,8 @@
         <property name="cpfCnpj" direction="asc"/>
         <property name="passWd" direction="asc"/>
     </datastore-index>
+     <datastore-index kind="Rating" ancestor="false" source="manual">
+        <property name="idOcorrencia" direction="asc"/>
+        <property name="idProfile" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>

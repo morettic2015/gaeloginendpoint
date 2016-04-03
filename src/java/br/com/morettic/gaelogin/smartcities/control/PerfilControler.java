@@ -22,6 +22,9 @@ import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
+import com.google.appengine.api.datastore.Query.Filter;
+import com.google.appengine.api.datastore.Query.FilterOperator;
+import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -670,6 +673,8 @@ public class PerfilControler {
         r.setRating(rating);
         //Salva 
         pm.makePersistent(r);
+        //Adiciona no catalogo!!!!!
+        RatingSingleton.put(idOcorrencia, r.getKey(), rating);
         //Retorna completo
         return js;
     }
@@ -813,13 +818,17 @@ public class PerfilControler {
     }
 
     public static JSONObject findListOcorrenciasRecentes(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        //Conecta com o banco
         pm = PMF.get().getPersistenceManager();
         Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Registro order by dtOcorrencia desc");
         q.setRange(0, 20);
 
+        //Inicializa Json
         JSONObject js = new JSONObject();
         List<Registro> lSOcorrencias = (List<Registro>) q.execute();
-        //IP
+
+        //Executa apenas uma vez...
+        RatingSingleton.init(pm);
 
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
@@ -832,6 +841,7 @@ public class PerfilControler {
             js1.put("tipo", o.getTipo().toString());
             js1.put("date", dt.format(o.getDtOcorrencia()));
             js1.put("address", o.getAdress());
+            js1.put("rating", RatingSingleton.getRating(o.getKey()));
 
             //Validar se nao tiver o avatar....
             //Recupera a imagem para associar o token do blob
