@@ -29,5 +29,6 @@ public enum TipoOcorrencia {
     OUTROS,
     POSTO_SAUDE,
     UPA,
+    TEMPO,
     SEGURANCA;
 }

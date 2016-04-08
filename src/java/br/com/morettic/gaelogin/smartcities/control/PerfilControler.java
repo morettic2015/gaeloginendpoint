@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.*;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.Rating;
+import br.com.morettic.gaelogin.smartcities.vo.RegistroAnonimo;
 import br.com.morettic.gaelogin.smartcities.vo.TipoEmail;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
@@ -123,7 +124,29 @@ public class PerfilControler {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+//Seta como anonimo caso o parâmetro anonimo seja setado
+            String anonimous = req.getParameter("anonimous");
+            boolean isAnonimous = anonimous == null ? false : true;
+            if (isAnonimous) {
+                RegistroAnonimo registroAnonimo = new RegistroAnonimo();
+                registroAnonimo.setKey(ocorrencia.getKey());
+                registroAnonimo.setFakeRegister(ocorrencia.getKey());
 
+                JSONObject fakeProfile = URLReader.readJSONUrl("https://randomuser.me/api/");
+
+                String fakeAvatar = fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("picture").getString("large");
+                String fakeEmail = fakeProfile.getJSONArray("results").getJSONObject(0).getString("email");
+                String fakeName = fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("title");
+                fakeName += fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("first");
+                fakeName += fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("last");
+
+                registroAnonimo.setFakeAvatar(fakeAvatar);
+                registroAnonimo.setFakeEmail(fakeEmail);
+                registroAnonimo.setFakeName(fakeName);
+
+                pm.makePersistent(registroAnonimo);
+            }
+            //ocorrencia.setAnonimous(isAnonimous);
             pm.close();
         }
 
@@ -816,10 +839,11 @@ public class PerfilControler {
         }
         return js;
     }
+
     /**
-     * 
+     *
      * @http://gaeloginendpoint.appspot.com/images/weather.png
-     * 
+     *
      */
     public static JSONObject findListOcorrenciasRecentes(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         //Conecta com o banco
@@ -836,7 +860,7 @@ public class PerfilControler {
 
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
-        
+
         //Imagem padrão
         Imagem m = null;
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
