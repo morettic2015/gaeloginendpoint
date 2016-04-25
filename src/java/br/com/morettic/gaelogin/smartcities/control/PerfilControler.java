@@ -18,6 +18,7 @@ import static br.com.morettic.gaelogin.smartcities.control.URLReader.*;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.Rating;
 import br.com.morettic.gaelogin.smartcities.vo.RegistroAnonimo;
+import br.com.morettic.gaelogin.smartcities.vo.RegistroMapeado;
 import br.com.morettic.gaelogin.smartcities.vo.TipoEmail;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
@@ -54,6 +55,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.StringTokenizer;
 import javax.jdo.Transaction;
 
@@ -128,22 +130,7 @@ public class PerfilControler {
             String anonimous = req.getParameter("anonimous");
             boolean isAnonimous = anonimous == null ? false : true;
             if (isAnonimous) {
-                RegistroAnonimo registroAnonimo = new RegistroAnonimo();
-                registroAnonimo.setKey(ocorrencia.getKey());
-                registroAnonimo.setFakeRegister(ocorrencia.getKey());
-
-                JSONObject fakeProfile = URLReader.readJSONUrl("https://randomuser.me/api/");
-
-                String fakeAvatar = fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("picture").getString("large");
-                String fakeEmail = fakeProfile.getJSONArray("results").getJSONObject(0).getString("email");
-                String fakeName = fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("title");
-                fakeName += fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("first");
-                fakeName += fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("last");
-
-                registroAnonimo.setFakeAvatar(fakeAvatar);
-                registroAnonimo.setFakeEmail(fakeEmail);
-                registroAnonimo.setFakeName(fakeName);
-
+                RegistroAnonimo registroAnonimo = makeRegistroAnonimo(ocorrencia);
                 pm.makePersistent(registroAnonimo);
             }
             //ocorrencia.setAnonimous(isAnonimous);
@@ -156,6 +143,30 @@ public class PerfilControler {
 
         return js;
     }
+
+    private static final RegistroAnonimo makeRegistroAnonimo(Registro ocorrencia) throws JSONException {
+        RegistroAnonimo registroAnonimo = new RegistroAnonimo();
+        registroAnonimo.setKey(ocorrencia.getKey());
+        registroAnonimo.setFakeRegister(ocorrencia.getKey());
+
+        JSONObject fakeProfile = URLReader.readJSONUrl(HTTPSRANDOMUSERMEAPI);
+
+        String fakeAvatar = fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("picture").getString("large");
+        String fakeEmail = fakeProfile.getJSONArray("results").getJSONObject(0).getString("email");
+        String fakeName = fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("title");
+        fakeName += " " + fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("first");
+        fakeName += " " + fakeProfile.getJSONArray("results").getJSONObject(0).getJSONObject("name").getString("last");
+
+        registroAnonimo.setFakeAvatar(fakeAvatar);
+        registroAnonimo.setFakeEmail(fakeEmail);
+        registroAnonimo.setFakeName(fakeName);
+
+        fakeProfile = null;
+
+        return registroAnonimo;
+    }
+
+    public static final String HTTPSRANDOMUSERMEAPI = "https://randomuser.me/api/";
 
     /**
      *
@@ -342,40 +353,31 @@ public class PerfilControler {
     }
 
     /**
-     * Query q = pm.newQuery(Person.class); q.setFilter("lastName ==
-     * lastNameParam"); q.setOrdering("height desc");
-     * q.declareParameters("String lastNameParam");
-     *
-     * try { List<Person> results = (List<Person>) q.execute("Smith"); if
-     * (!results.isEmpty()) { for (Person p : results) { // Process result p } }
-     * else { // Handle "no results" case } } finally { q.closeAll(); }
-     *
-     * q.setFilter("lastName == 'Smith' && height < maxHeight");
+     * @Filtra latitude e longitude
      */
     //http://www.myweather2.com/developer/forecast.ashx?uac=<your unique access code>&query=24.15,56.32&temp_unit=f
     public static JSONObject findOcorrencias(HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
-        List<Long> lOcorrencias;
         Set<Registro> lSOcorrencias = new HashSet<Registro>();
         String id = request.getParameter("id");
         double lat = Double.parseDouble(request.getParameter("lat"));
         double latMax, latMin, q1;
+        //Recupera a variação da latitude
+        int distance = 0;
+        //total tela
+        int totaltela = 0;
 
         //recupera perfil
         Perfil p = pm.getObjectById(Perfil.class, new Long(id));
 
         //Recupera as ocorrencias do perfil.
         if (request.getParameter("mine") != null) {//
-            lOcorrencias = p.getlOcorrencias();
-            for (Long idOcorrencia : lOcorrencias) {
-                Registro e = pm.getObjectById(Registro.class, idOcorrencia);
-                lSOcorrencias.add(e);
-            }
+            String filter = "this.perfilUsuario==" + p.getKey();
+            Query q2 = pm.newQuery(Registro.class, filter);
+            lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute());
         }
 
-        //Recupera a variação da latitude
-        int distance = 0;
         try {
             distance = Integer.parseInt(request.getParameter("d"));
         } catch (NumberFormatException e) {
@@ -395,80 +397,88 @@ public class PerfilControler {
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
             String[] types = request.getParameter("type").split(",");
-
             for (String tp : types) {
                 mapaChaves.put(tp, tp);
             }
         }
-        //Consulta as ocorrências
-        Query q = pm.newQuery(Registro.class);
-        lSOcorrencias.addAll((List<Registro>) q.execute());
+        String filter = "this.latitude>=latMin && this.latitude<=latMax ";
+        Query q = pm.newQuery(Registro.class, filter);
+        q.declareParameters("Float latMin,Float latMax");
+
+        lSOcorrencias.addAll((List<Registro>) q.execute(latMin, latMax));
+
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         for (Registro o : lSOcorrencias) {
-            //Latitude da ocorrencia
-            Float mLatitude = Float.parseFloat(o.getLatitude());
             //Verifica se o tipo da ocorrencia está no mapa de chaves de tipo.
             //Se o mapa de chaves estiver vazio e nao tiver a chave nao faz nada 
             if (!mapaChaves.isEmpty() && !mapaChaves.containsValue(o.getTipo().name())) {
                 continue;//Não e do tipo pesquisado
             }
-            if (mLatitude >= latMin && mLatitude <= latMax) {
-                //Monta o JSON
-                JSONObject js1 = new JSONObject();
-                js1.put("id", o.getKey());
-                js1.put("ip", o.getIp());
-                js1.put("lat", o.getLatitude());
-                js1.put("lon", o.getLongitude());
-                js1.put("tit", o.getTitulo());
-                js1.put("desc", o.getDescricao());
-                js1.put("tipo", o.getTipo().toString());
-                js1.put("date", dt.format(o.getDtOcorrencia()));
 
-                //Validar se nao tiver o avatar....
-                //Recupera a imagem para associar o token do blob
-                Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
-                js1.put("token", m.getKey());
+            //Monta o JSON
+            JSONObject js1 = new JSONObject();
+            js1.put("id", o.getKey());
+            js1.put("ip", o.getIp());
+            js1.put("lat", o.getLatitude());
+            js1.put("lon", o.getLongitude());
+            js1.put("tit", o.getTitulo());
+            js1.put("desc", o.getDescricao() + " " + o.getAdress());
+            js1.put("tipo", o.getTipo().toString());
+            js1.put("date", dt.format(o.getDtOcorrencia()));
 
-                //Imagens opcionais da ocorrência
-                if (o.getAvatar1() != null) {
-                    m = pm.getObjectById(Imagem.class, o.getAvatar1());
-                    js1.put("token1", m.getKey());
-                } else {
-                    js1.put("token1", "null");
-                }
-                if (o.getAvatar2() != null) {
-                    m = pm.getObjectById(Imagem.class, o.getAvatar2());
-                    js1.put("token2", m.getKey());
-                } else {
-                    js1.put("token2", "null");
-                }
-                if (o.getAvatar3() != null) {
-                    m = pm.getObjectById(Imagem.class, o.getAvatar3());
-                    js1.put("token3", m.getKey());
-                } else {
-                    js1.put("token3", "null");
-                }
+            totaltela++;
 
-                //Recupera o perfil
-                Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
-                js1.put("author", pOcorencia.getNome());
-                js1.put("email", pOcorencia.getEmail());
+            //Validar se nao tiver o avatar....
+            //Recupera a imagem para associar o token do blob
+            Imagem m = pm.getObjectById(Imagem.class, o.getAvatar());
+            js1.put("token", m.getKey());
 
-                //Recupera o avatar do usuario
-                m = pm.getObjectById(Imagem.class, pOcorencia.getAvatar());
-                js1.put("avatar", p.getAvatar());
-
-                ja.put(js1);
+            //Imagens opcionais da ocorrência
+            if (o.getAvatar1() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar1());
+                js1.put("token1", m.getKey());
+            } else {
+                js1.put("token1", "null");
             }
-        }
-        /**
-         * @TODO Implementar os dados do tempo
-         * http://www.myweather2.com/developer/forecast.ashx?uac=9H1IUHm/Ih&query=-27.57781410217285,-48.61552810668945&temp_unit=c&output=json
-         */
-        js.put("rList", ja);
+            if (o.getAvatar2() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar2());
+                js1.put("token2", m.getKey());
+            } else {
+                js1.put("token2", "null");
+            }
+            if (o.getAvatar3() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar3());
+                js1.put("token3", m.getKey());
+            } else {
+                js1.put("token3", "null");
+            }
 
+            //Recupera o perfil
+            Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
+            js1.put("author", pOcorencia.getNome());
+            js1.put("email", pOcorencia.getEmail());
+
+            //Recupera o avatar do usuario
+            m = pm.getObjectById(Imagem.class, pOcorencia.getAvatar());
+            js1.put("avatar", m.getKey());
+
+            ja.put(js1);
+            pOcorencia = null;
+            m = null;
+
+        }
+        lSOcorrencias.clear();
+        lSOcorrencias = null;
+        mapaChaves.clear();
+        mapaChaves = null;
+        q = null;
+        p = null;
+        filter = null;
+        js.put("totalView", totaltela);
+        js.put("rList", ja);
+        pm.close();
         return js;
     }
 
@@ -915,7 +925,9 @@ public class PerfilControler {
     }
 
     /**
-     * Switch para inicializar os dados de diferentes fontes.
+     *
+     * ?action=17&dataInfo=4id=??&avatar=?? Switch para inicializar os dados de
+     * diferentes fontes.
      */
     public static JSONObject initDataStoreInfo(HttpServletRequest request, HttpServletResponse response) throws JSONException, IOException {
         int dataInfo = new Integer(request.getParameter("dataInfo"));
@@ -936,6 +948,7 @@ public class PerfilControler {
                 js.put("total", total);
                 js.put("action", "UPAS ATUALIZADAS NA BASE");
                 break;
+
             default:
                 break;
 
@@ -1120,4 +1133,57 @@ public class PerfilControler {
         return total;
     }
     public static final String HTTPI3GEOSAUDEGOVBRI3GEOOGCPHPSERVICE_WF_SV = "http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=upa_funcionamento_cnes&outputFormat=JSON";
+
+    public static JSONObject loadNuclearPowerPlants(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        String url = "https://sutikasipus.cartodb.com/api/v2/sql?q=select * from public.nuclear_power_stations_worldwide";
+
+        long idProfile = Long.parseLong(request.getParameter("id"));
+        long idAvatar = Long.parseLong(request.getParameter("avatar"));
+
+        JSONObject js = URLReader.readJSONUrl(url);
+        JSONArray rows = js.getJSONArray("rows");
+
+        int total = rows.length();
+
+        for (int i = 0; i < total; i++) {
+            JSONObject powerPlant = rows.getJSONObject(i);
+
+            Registro r1 = new Registro();
+
+            r1.setKey(new Long(powerPlant.getString("cartodb_id")));
+            r1.setLatitude(powerPlant.getString("latitude"));
+            r1.setLongitude(powerPlant.getString("longitude"));
+            r1.setAdress(powerPlant.getString("country"));
+            r1.setDtOcorrencia(new Date());
+            r1.setPerfil(idProfile);
+            r1.setTitulo(powerPlant.getString("name"));
+            r1.setAvatar(idAvatar);
+            r1.setIp(getClientIpAddress(request));
+            r1.setTipo(TipoOcorrencia.USINA_NUCLEAR);
+            r1.setSegment("ALL");
+            //Description
+            StringBuilder sb = new StringBuilder();
+            sb.append("Reatores ativos:");
+            sb.append(powerPlant.getString("active_reactors"));
+            sb.append(", inativos:");
+            sb.append(powerPlant.getString("shut_down_reactors"));
+            sb.append(", em construção:");
+            sb.append(powerPlant.getString("reactors_under_construction"));
+
+            //Dados mapeados da região
+            RegistroMapeado registroMapeado = new RegistroMapeado(powerPlant.getLong("cartodb_id"),
+                    powerPlant.getString("the_geom"),
+                    powerPlant.getString("the_geom_webmercator"));
+
+            try {
+                pm = PMF.get().getPersistenceManager();
+                pm.makePersistent(r1);
+                pm.makePersistent(registroMapeado);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return js;
+    }
 }

@@ -30,5 +30,6 @@ public enum TipoOcorrencia {
     POSTO_SAUDE,
     UPA,
     TEMPO,
+    USINA_NUCLEAR,
     SEGURANCA;
 }

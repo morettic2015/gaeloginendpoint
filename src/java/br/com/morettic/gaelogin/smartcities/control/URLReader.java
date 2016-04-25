@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import static java.net.URLEncoder.encode;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -22,7 +23,7 @@ public class URLReader {
     public static final JSONObject readJSONUrl(String murl) {
         JSONObject elemento = new JSONObject();
         try {
-            URL url = new URL(murl);
+            URL url = new URL(encode(murl));
             BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
             String line;
 
@@ -38,6 +39,7 @@ public class URLReader {
         } catch (Exception e) {
             elemento = new JSONObject();
             elemento.put("ERROR", e.toString());
+            e.printStackTrace();
         } finally {
             return elemento;
         }

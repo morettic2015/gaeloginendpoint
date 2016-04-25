@@ -100,6 +100,8 @@ public class InfoSegController extends HttpServlet {
                 case 17:
                     retJSon = PerfilControler.initDataStoreInfo(request, response);
                     break;
+                case 18:
+                    retJSon = PerfilControler.loadNuclearPowerPlants(request,response);
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
                     PerfilControler.autenticaUsuarioGoogle(request, response);

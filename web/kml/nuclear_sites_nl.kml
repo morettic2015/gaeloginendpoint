@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Folder>
+	<name>Nuclear Sites</name>
+	<visibility>0</visibility>
+	<open>1</open>
+	<Snippet maxLines="0"></Snippet>
+	<description><![CDATA[<a href="http://www.gelib.com/nuclear-sites.htm">More Information</a><br><br>]]></description>
+	<LookAt>
+		<longitude>-98.22149444291884</longitude>
+		<latitude>36.91193635611737</latitude>
+		<altitude>0</altitude>
+		<range>3685996.147481793</range>
+		<tilt>21.10250450613177</tilt>
+		<heading>0.4191693509456568</heading>
+		<altitudeMode>relativeToGround</altitudeMode>
+	</LookAt>
+	<Style>
+		<ListStyle>
+			<listItemType>radioFolder</listItemType>
+			<bgColor>00ffffff</bgColor>
+			<maxSnippetLines>2</maxSnippetLines>
+		</ListStyle>
+	</Style>
+	<Folder>
+		<name>None</name>
+		<visibility>0</visibility>
+		<Style>
+			<ListStyle>
+				<listItemType>checkHideChildren</listItemType>
+				<bgColor>00ffffff</bgColor>
+				<maxSnippetLines>2</maxSnippetLines>
+			</ListStyle>
+		</Style>
+	</Folder>
+	<Folder>
+		<name>ICBM Bases/Silos</name>
+		<visibility>0</visibility>
+		<open>1</open>
+		<Snippet maxLines="0"></Snippet>
+		<NetworkLink>
+			<name>Russian (EugeneF)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=103947#Post103947</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=34152&amp;filename=83812-RussianICBMSites.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>Russian (krenote)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=103975#Post103975</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=34159&amp;filename=1277453-SovietICBM.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>US</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=30268#Post30268</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=11025&amp;filename=22704-ICBMs.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>US-Malmstrom</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=30300#Post30300</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=11027&amp;filename=1008038-MalmstromICBMs.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>Russian (Grimmie)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=137517#Post137517</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=50292&amp;filename=117733-RussaICBM.kmz</href>
+			</Link>
+		</NetworkLink>
+	</Folder>
+	<Folder>
+		<name>Reactor and Other Sites</name>
+		<visibility>0</visibility>
+		<open>1</open>
+		<Snippet maxLines="0"></Snippet>
+		<Folder>
+			<name>MIT Global Security Working Group</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://web.mit.edu/stgs/nuclearweapons.html</description>
+			<NetworkLink>
+				<name>North Korea&apos;s Nuclear Facilities</name>
+				<visibility>0</visibility>
+				<Snippet maxLines="0"></Snippet>
+				<Style>
+					<ListStyle>
+						<listItemType>check</listItemType>
+						<bgColor>00ffffff</bgColor>
+						<maxSnippetLines>2</maxSnippetLines>
+					</ListStyle>
+				</Style>
+				<flyToView>1</flyToView>
+				<Link>
+					<href>http://web.mit.edu/stgs/images/North%20Korea%20WMD%20facilities.kmz</href>
+				</Link>
+			</NetworkLink>
+			<NetworkLink>
+				<name>Iran&apos;s Nuclear Facilities</name>
+				<visibility>0</visibility>
+				<Snippet maxLines="0"></Snippet>
+				<Style>
+					<ListStyle>
+						<listItemType>check</listItemType>
+						<bgColor>00ffffff</bgColor>
+						<maxSnippetLines>2</maxSnippetLines>
+					</ListStyle>
+				</Style>
+				<flyToView>1</flyToView>
+				<Link>
+					<href>http://web.mit.edu/stgs/images/Iran%27s%20Nuclear%20Facilities2.kmz</href>
+				</Link>
+			</NetworkLink>
+			<NetworkLink>
+				<name>China Nuclear Facilities</name>
+				<visibility>0</visibility>
+				<Snippet maxLines="0"></Snippet>
+				<Style>
+					<ListStyle>
+						<listItemType>check</listItemType>
+						<bgColor>00ffffff</bgColor>
+						<maxSnippetLines>2</maxSnippetLines>
+					</ListStyle>
+				</Style>
+				<flyToView>1</flyToView>
+				<Link>
+					<href>http://web.mit.edu/stgs/images/China%27s%20nuclear%20facilities.kmz</href>
+				</Link>
+			</NetworkLink>
+			<NetworkLink>
+				<name>Russia&apos;s Nuclear Facilities</name>
+				<visibility>0</visibility>
+				<Snippet maxLines="0"></Snippet>
+				<Style>
+					<ListStyle>
+						<listItemType>check</listItemType>
+						<bgColor>00ffffff</bgColor>
+						<maxSnippetLines>2</maxSnippetLines>
+					</ListStyle>
+				</Style>
+				<flyToView>1</flyToView>
+				<Link>
+					<href>http://web.mit.edu/stgs/images/Russia%27s%20nuclear%20complex.kmz</href>
+				</Link>
+			</NetworkLink>
+		</Folder>
+		<NetworkLink>
+			<name>US Weapon Locations</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=689810#Post689810</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=406345&amp;filename=cl-12-12-06-724702101.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>US Nuclear Facilities</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=21156#Post21156</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=8278&amp;filename=14930-NukeFac.kml</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>Reactor Sites (PriceCollins)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=273231#Post273231</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=125179&amp;filename=260231-Nuclear_Facilities_v4.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>Reactor Sites (javaMaster)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=1134235#Post1134235</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=723900&amp;filename=1213927-WorldNuclearReactors.kmz</href>
+			</Link>
+		</NetworkLink>
+		<NetworkLink>
+			<name>Reactor Sites (jyco)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=931109#Post931109</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=586865&amp;filename=989824-WorldNuclearPowerplants12.kmz</href>
+			</Link>
+		</NetworkLink>
+	</Folder>
+	<Folder>
+		<name>Test Sites</name>
+		<visibility>0</visibility>
+		<open>1</open>
+		<Snippet maxLines="0"></Snippet>
+		<NetworkLink>
+			<name>Nevada Test Range Time Display</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=213202#Post213202</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=91269&amp;filename=196208-nuc_time_series.kmz</href>
+			</Link>
+		</NetworkLink>
+		<Folder>
+			<name>Test Sites (Calico Jack)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=57062#Post57062</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<NetworkLink>
+				<name>Soviet Nukes</name>
+				<visibility>0</visibility>
+				<Snippet maxLines="0"></Snippet>
+				<Link>
+					<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=18223&amp;filename=47919-sovietnukes.kmz</href>
+				</Link>
+			</NetworkLink>
+			<NetworkLink>
+				<name>US Nukes (Calico Jack)</name>
+				<visibility>0</visibility>
+				<Snippet maxLines="0"></Snippet>
+				<Link>
+					<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=18222&amp;filename=43349-usnukes.kmz</href>
+				</Link>
+			</NetworkLink>
+		</Folder>
+		<NetworkLink>
+			<name>Test Sites (Hill)</name>
+			<visibility>0</visibility>
+			<Snippet maxLines="0"></Snippet>
+			<description>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=showflat&amp;Number=45239#Post45239</description>
+			<Style>
+				<ListStyle>
+					<listItemType>check</listItemType>
+					<bgColor>00ffffff</bgColor>
+					<maxSnippetLines>2</maxSnippetLines>
+				</ListStyle>
+			</Style>
+			<flyToView>1</flyToView>
+			<Link>
+				<href>http://bbs.keyhole.com/ubb/ubbthreads.php?ubb=download&amp;Number=14927&amp;filename=34290-NuclearExplosionsv4.kmz</href>
+			</Link>
+		</NetworkLink>
+	</Folder>
+</Folder>
+</kml>
