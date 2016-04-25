@@ -371,13 +371,6 @@ public class PerfilControler {
         //recupera perfil
         Perfil p = pm.getObjectById(Perfil.class, new Long(id));
 
-        //Recupera as ocorrencias do perfil.
-        if (request.getParameter("mine") != null) {//
-            String filter = "this.perfilUsuario==" + p.getKey();
-            Query q2 = pm.newQuery(Registro.class, filter);
-            lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute());
-        }
-
         try {
             distance = Integer.parseInt(request.getParameter("d"));
         } catch (NumberFormatException e) {
@@ -390,10 +383,7 @@ public class PerfilControler {
         latMin = (lat - q1);
         js.put("latMax", latMax);
         js.put("latMin", latMin);
-        /**
-         * int Query q = pm.newQuery(Person.class, "(lastName == 'Smith' ||
-         * lastName == 'Jones')" + " && firstName == 'Harold'");
-         */
+
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
             String[] types = request.getParameter("type").split(",");
@@ -401,11 +391,24 @@ public class PerfilControler {
                 mapaChaves.put(tp, tp);
             }
         }
+
+        /**
+         * Filter
+         */
         String filter = "this.latitude>=latMin && this.latitude<=latMax ";
         Query q = pm.newQuery(Registro.class, filter);
         q.declareParameters("Float latMin,Float latMax");
-
+        //Adiciona todos
         lSOcorrencias.addAll((List<Registro>) q.execute(latMin, latMax));
+        //se tiver checkado mine carrega 50 do cara que devem ser do mesmo tipo filtrado
+        //Recupera as ocorrencias do perfil.
+        if (request.getParameter("mine") != null) {//
+            filter = "this.perfilUsuario==pPerfil";
+            Query q2 = pm.newQuery(Registro.class, filter);
+            q2.declareParameters("Long pPerfil");
+            q2.setRange(0, 50);//TOP 
+            lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
+        }
 
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
@@ -469,16 +472,12 @@ public class PerfilControler {
             m = null;
 
         }
+
         lSOcorrencias.clear();
-        lSOcorrencias = null;
-        mapaChaves.clear();
-        mapaChaves = null;
         q = null;
-        p = null;
-        filter = null;
         js.put("totalView", totaltela);
         js.put("rList", ja);
-        pm.close();
+
         return js;
     }
 
