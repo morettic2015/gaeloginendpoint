@@ -6,17 +6,6 @@
 package br.com.morettic.gaelogin.smartcities.vo;
 
 /**
-*                  case R.id.rMeioAmbiente:
-                       break;
-                   case R.id.rSaude:
-                       break;
-                   case R.id.rEducacao:
-                       break;
-                   case R.id.rSegurança:
-                       break;
-                   case R.id.rPolitica:
-                       break;
-                   case R.id.rTransporte:
  * @author LuisAugusto
  */
 public enum TipoOcorrencia {
@@ -29,6 +18,7 @@ public enum TipoOcorrencia {
     OUTROS,
     POSTO_SAUDE,
     UPA,
+    ESPORTE,
     TEMPO,
     USINA_NUCLEAR,
     SEGURANCA;

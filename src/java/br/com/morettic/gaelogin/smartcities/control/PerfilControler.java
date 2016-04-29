@@ -400,6 +400,7 @@ public class PerfilControler {
             filter = "this.perfilUsuario==pPerfil";
             Query q2 = pm.newQuery(Registro.class, filter);
             q2.declareParameters("Long pPerfil");
+            //q2.setOrdering("dtOcorrencia desc");
             q2.setRange(0, 50);//TOP 
             lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
         }
