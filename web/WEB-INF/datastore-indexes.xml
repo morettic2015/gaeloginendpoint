@@ -21,8 +21,7 @@
         <property name="passWd" direction="asc"/>
     </datastore-index>
      <datastore-index kind="Rating" ancestor="false" source="manual">
-        <property name="idOcorrencia" direction="desc"/>
-        <property name="idProfile" direction="desc"/>
-        <property name="dtOcorrencia" direction="desc"/>
+        <property name="idOcorrencia" direction="asc"/>
+        <property name="idProfile" direction="asc"/>
     </datastore-index>
 </datastore-indexes>

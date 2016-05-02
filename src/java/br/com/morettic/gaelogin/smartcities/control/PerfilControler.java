@@ -356,6 +356,7 @@ public class PerfilControler {
         Set<Registro> lSOcorrencias = new HashSet<Registro>();
         String id = request.getParameter("id");
         double lat = Double.parseDouble(request.getParameter("lat"));
+        double lon = Double.parseDouble(request.getParameter("lon"));
         double latMax, latMin, q1;
         //Recupera a variação da latitude
         int distance = 0;
@@ -404,7 +405,11 @@ public class PerfilControler {
             q2.setRange(0, 50);//TOP 
             lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
         }
-
+        //Lon max com base no raio da distância
+        double lonMax = lon + (distance*0.001);
+        double lonMin = lon - (distance*0.001);
+        js.put("lonMax", lonMax);
+        js.put("lonMin", lonMin);
         //Formata o resultado filtrado
         JSONArray ja = new JSONArray();
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
@@ -413,6 +418,10 @@ public class PerfilControler {
             //Se o mapa de chaves estiver vazio e nao tiver a chave nao faz nada 
             if (!mapaChaves.isEmpty() && !mapaChaves.containsValue(o.getTipo().name())) {
                 continue;//Não e do tipo pesquisado
+            }
+            double mLon = new Double(o.getLongitude());
+            if (!(mLon >= lonMin) && (mLon <= lonMax)) {
+                continue;
             }
 
             //Monta o JSON
