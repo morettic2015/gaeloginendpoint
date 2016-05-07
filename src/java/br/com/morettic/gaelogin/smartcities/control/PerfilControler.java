@@ -210,6 +210,16 @@ public class PerfilControler {
             p = pm.getObjectById(Perfil.class, Long.parseLong(id));
             ehNovo = false;
             //p.setKey();
+        } else {//Não tem como ter email repetido no DataStore
+            Query qEmail = pm.newQuery(Perfil.class);
+            String pQuery = "email == :pEmail";
+            qEmail.setFilter(pQuery);
+            String email = request.getParameter("email");
+            List<Perfil> lRet = (List<Perfil>) qEmail.execute(email.toUpperCase());
+            if(lRet.size()>0){
+                ehNovo = false;
+                p = lRet.get(0);
+            }
         }
 
         p.setEmail(request.getParameter("email"));
@@ -219,22 +229,19 @@ public class PerfilControler {
         p.setCep(request.getParameter("cep"));
         p.setPassWd(request.getParameter("passwd"));
         p.setComplemento(request.getParameter("complemento"));
-        p.setPais("PT_BR");
+
         p.setEhPessoaFisica(request.getParameter("pjf"));
         p.setNascimento(request.getParameter("nasc"));
 
         //ABre dados do endereço baseado no cep
-        JSONObject address = readJSONUrl(HTTPSVIACEPCOMBRWS + request.getParameter("cep") + "/json/");
+        JSONObject address = readJSONUrl(HTTPSVIACEPCOMBRWS + request.getParameter("cep").replace("-", ""));
 
-        //Se tem o attr logradouro retornou o endereço baseado no cep....
-        if (address.has("logradouro")) {
-            p.setRua(address.getString("logradouro"));
-            p.setCidade(address.getString("localidade"));
-            p.setBairro(address.getString("bairro"));
-        }
+        p.setRua(address.getString("state"));
+        p.setCidade(address.getString("city"));
+        p.setBairro(address.getString("bairro"));
+        p.setPais(address.getString("country"));
         //persiste objeto
         try {
-
             pm.makePersistent(p);
         } catch (Exception e) {
             e.printStackTrace();
@@ -263,7 +270,7 @@ public class PerfilControler {
     public static final String ERROR = "error";
     public static final String EMAIL_JÁ_EXISTE_NA_BASE_DE_DADOS = "email já existe na base de dados!";
     public static final String UM_FILHO_DA_PUTA_TENTOU_HACKER_OU_BUG_DE_ = "Um filho da puta tentou hacker ou bug de uma client maldito. Email ja existente porra!!!!";
-    public static final String HTTPSVIACEPCOMBRWS = "https://viacep.com.br/ws/";
+    public static final String HTTPSVIACEPCOMBRWS = "http://smartapp.morettic.com.br/postalcode/?code=";
 
     public static JSONObject getUploadPath(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
@@ -406,8 +413,8 @@ public class PerfilControler {
             lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
         }
         //Lon max com base no raio da distância
-        double lonMax = lon + (distance*0.001);
-        double lonMin = lon - (distance*0.001);
+        double lonMax = lon + (distance * 0.001);
+        double lonMin = lon - (distance * 0.001);
         js.put("lonMax", lonMax);
         js.put("lonMin", lonMin);
         //Formata o resultado filtrado

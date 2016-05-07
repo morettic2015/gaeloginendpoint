@@ -5,6 +5,7 @@
  */
 package br.com.morettic.gaelogin.smartcities.control;
 
+import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,23 +24,20 @@ public class URLReader {
     public static final JSONObject readJSONUrl(String murl) {
         JSONObject elemento = new JSONObject();
         try {
-            URL url = new URL(encode(murl));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-            String line;
-
-            StringBuilder sb = new StringBuilder();
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
+            URL url = new URL(murl);
+            StringBuilder sb;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                String line;
+                sb = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
             }
-            reader.close();
-            System.out.println(sb.toString());
-
             elemento = new JSONObject(sb.toString());
 
-        } catch (Exception e) {
+        } catch (IOException | JSONException e) {
             elemento = new JSONObject();
             elemento.put("ERROR", e.toString());
-            e.printStackTrace();
         } finally {
             return elemento;
         }
