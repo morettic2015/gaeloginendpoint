@@ -59,7 +59,7 @@ import java.util.Collection;
  *
  * @author LuisAugusto
  */
-public class PerfilControler {
+public class PerfilController {
 
     private static PersistenceManager pm = null;
     private static BlobstoreService blobstoreService;
@@ -413,8 +413,8 @@ public class PerfilControler {
             lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
         }
         //Lon max com base no raio da distância
-        double lonMax = lon + (distance * 0.001);
-        double lonMin = lon - (distance * 0.001);
+        double lonMax = lon + (distance * 0.0009);
+        double lonMin = lon - (distance * 0.0009);
         js.put("lonMax", lonMax);
         js.put("lonMin", lonMin);
         //Formata o resultado filtrado
@@ -892,6 +892,8 @@ public class PerfilControler {
             js1.put("tipo", o.getTipo().toString());
             js1.put("date", dt.format(o.getDtOcorrencia()));
             js1.put("address", o.getAdress());
+            js1.put("lat", o.getLatitude());
+            js1.put("lon", o.getLongitude());
             js1.put("rating", RatingSingleton.getRating(o.getKey()));
 
             //Validar se nao tiver o avatar....

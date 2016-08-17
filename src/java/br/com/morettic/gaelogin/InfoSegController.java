@@ -5,7 +5,8 @@
  */
 package br.com.morettic.gaelogin;
 
-import br.com.morettic.gaelogin.smartcities.control.PerfilControler;
+import br.com.morettic.gaelogin.smartcities.control.PerfilController;
+import br.com.morettic.gaelogin.smartcities.control.PushController;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.IOException;
@@ -49,62 +50,66 @@ public class InfoSegController extends HttpServlet {
             out = response.getWriter();
             switch (actionNumber) {
                 case 1://Cadastra uma ocorrência;
-                    retJSon = PerfilControler.saveOcorrencia(request, response);
+                    retJSon = PerfilController.saveOcorrencia(request, response);
                     break;
                 case 2://Cadastra uma imagem;
-                    retJSon = PerfilControler.saveImagem(request, response);
+                    retJSon = PerfilController.saveImagem(request, response);
                     break;
                 case 3://Cadastra um perfil;
-                    retJSon = PerfilControler.savePerfil(request, response);
+                    retJSon = PerfilController.savePerfil(request, response);
                     break;
                 case 4:
-                    retJSon = PerfilControler.findPerfilByIdOrEmail(request, response);
+                    retJSon = PerfilController.findPerfilByIdOrEmail(request, response);
                     break;
                 case 5:
                     response.setContentType("image/jpeg");
-                    PerfilControler.showImageById(request, response);
+                    PerfilController.showImageById(request, response);
                     break;
                 case 6:
-                    retJSon = PerfilControler.findOcorrencias(request, response);
+                    retJSon = PerfilController.findOcorrencias(request, response);
                     break;
                 case 7:
-                    retJSon = PerfilControler.autenticaUsuario(request, response);
+                    retJSon = PerfilController.autenticaUsuario(request, response);
                     break;
                 case 8:
-                    PerfilControler.findImagemTokenById(request, response);
+                    PerfilController.findImagemTokenById(request, response);
                     break;
                 case 9:
-                    retJSon = PerfilControler.getProfileFromLDAP(request, response);
+                    retJSon = PerfilController.getProfileFromLDAP(request, response);
                     break;
                 case 10:
-                    retJSon = PerfilControler.getWeatherInfoByLatLon(request, response);
+                    retJSon = PerfilController.getWeatherInfoByLatLon(request, response);
                     break;
                 case 11:
-                    retJSon = PerfilControler.hasEmailIntoDataStore(request, response);
+                    retJSon = PerfilController.hasEmailIntoDataStore(request, response);
                     break;
                 case 12:
-                    retJSon = PerfilControler.sendGMail(request, response);
+                    retJSon = PerfilController.sendGMail(request, response);
                     break;
                 case 13:
-                    retJSon = PerfilControler.ocorrenciaRating(request, response);
+                    retJSon = PerfilController.ocorrenciaRating(request, response);
                     break;
                 case 14:
-                    retJSon = PerfilControler.getProfileFromDeepWeb(request, response);
+                    retJSon = PerfilController.getProfileFromDeepWeb(request, response);
                     break;
                 case 15:
-                    retJSon = PerfilControler.updateConfigInfoFromProfile(request, response);
+                    retJSon = PerfilController.updateConfigInfoFromProfile(request, response);
                     break;
                 case 16:
-                    retJSon = PerfilControler.findListOcorrenciasRecentes(request, response);
+                    retJSon = PerfilController.findListOcorrenciasRecentes(request, response);
                     break;
                 case 17:
-                    retJSon = PerfilControler.initDataStoreInfo(request, response);
+                    retJSon = PerfilController.initDataStoreInfo(request, response);
                     break;
                 case 18:
-                    retJSon = PerfilControler.loadNuclearPowerPlants(request,response);
+                    retJSon = PerfilController.loadNuclearPowerPlants(request, response);
+                    break;
+                case 19:
+                    retJSon = PushController.registerUserDevice(request, response);
+                    break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
-                    PerfilControler.autenticaUsuarioGoogle(request, response);
+                    PerfilController.autenticaUsuarioGoogle(request, response);
                     break;
             }
 

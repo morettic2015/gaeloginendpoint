@@ -5,7 +5,7 @@
  */
 package br.com.morettic.gaelogin;
 
-import br.com.morettic.gaelogin.smartcities.control.PerfilControler;
+import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class InfoSegUploadController extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
         try {
-            response.getWriter().print(PerfilControler.getUploadPath(request, response));
+            response.getWriter().print(PerfilController.getUploadPath(request, response));
         } catch (JSONException ex) {
             response.getWriter().print(new JSONObject());
         }
@@ -64,7 +64,7 @@ public class InfoSegUploadController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("application/json; charset=UTF-8");
-        response.getWriter().print(PerfilControler.uploadImage(request, response));
+        response.getWriter().print(PerfilController.uploadImage(request, response));
     }
 
     /**
