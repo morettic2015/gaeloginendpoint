@@ -50,7 +50,7 @@ public class PushController {
             js.put("token", myDevice.getDeviceToken());
             js.put("so", myDevice.getSo().toString());
             js.put("user", myDevice.getIdProfile());
-
+///////
             return js;
         }
     }
