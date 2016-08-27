@@ -105,15 +105,15 @@ public class PushController {
         //Adiciona todos
         int total = 0;
 
-        q1 = calcLat(20);
+        q1 = calcLat(5);
         latMax = (lat + q1);
         latMin = (lat - q1);
 
         js.put("latMax", latMax);
         js.put("latMin", latMin);
 
-        double lonMax = lon + (20 * 0.0009);
-        double lonMin = lon - (20 * 0.0009);
+        double lonMax = lon + (5 * 0.0009);
+        double lonMin = lon - (5 * 0.0009);
 
         js.put("lonMax", lonMax);
         js.put("lonMin", lonMin);
@@ -127,8 +127,12 @@ public class PushController {
             total++;
         }
         String token = request.getParameter("token");
-
         String msg = total + "_news_around_you!";
+        //I
+        if (total < 1) {
+            msg = "Share_something_with_us!Be_the_first!";
+        }
+
         String url = "http://www.univoxer.com:8080/push_io/single_push.io?token=" + token + "&msg=" + msg;
         js.put("push", URLReader.readUrl(url));
         js.put("url", url);
