@@ -8,14 +8,18 @@ package br.com.morettic.gaelogin.smartcities.control;
 import br.com.morettic.gaelogin.smartcities.vo.DeviceType;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
 import br.com.morettic.gaelogin.smartcities.vo.PushDevice;
+import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import static java.net.URLEncoder.encode;
 
 /**
  *
@@ -24,6 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 public class PushController {
 
     private static PersistenceManager pm = null;
+    private static final Double UMK = 0.1570d;
+
+    public static Double calcLat(int distance) {
+        return (Double) (distance * UMK / 1000);
+    }
 
     public static final JSONObject registerUserDevice(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
@@ -66,9 +75,9 @@ public class PushController {
         for (PushDevice p : lPushes) {
             try {
                 JSONObject js1 = new JSONObject();
-                
+
                 Perfil p1 = pm.getObjectById(Perfil.class, p.getIdProfile());
-                
+
                 js1.put("token", p.getDeviceToken());
                 String msgFinal = main.replace("%", p1.getNome());
                 js1.put("msg", msgFinal);
@@ -79,6 +88,51 @@ public class PushController {
             }
         }
         js.put("devices", ja);
+        return js;
+    }
+
+    public static JSONObject sendPushResumeFromLocation(HttpServletRequest request) throws JSONException {
+        JSONObject js = new JSONObject();
+        pm = PMF.get().getPersistenceManager();
+        String filter = "this.latitude>=latMin && this.latitude<=latMax ";
+        Query q = pm.newQuery(Registro.class, filter);
+        q.declareParameters("Float latMin,Float latMax");
+        Set<Registro> lSOcorrencias = new HashSet<Registro>();
+        double lon = Double.parseDouble(request.getParameter("lon"));
+        double lat = Double.parseDouble(request.getParameter("lat"));
+        double latMax, latMin, q1;
+
+        //Adiciona todos
+        int total = 0;
+
+        q1 = calcLat(20);
+        latMax = (lat + q1);
+        latMin = (lat - q1);
+
+        js.put("latMax", latMax);
+        js.put("latMin", latMin);
+
+        double lonMax = lon + (20 * 0.0009);
+        double lonMin = lon - (20 * 0.0009);
+
+        js.put("lonMax", lonMax);
+        js.put("lonMin", lonMin);
+
+        lSOcorrencias.addAll((List<Registro>) q.execute(latMin, latMax));
+        for (Registro o : lSOcorrencias) {
+            double mLon = new Double(o.getLongitude());
+            if (!(mLon >= lonMin) && (mLon <= lonMax)) {
+                continue;
+            }
+            total++;
+        }
+        String token = request.getParameter("token");
+
+        String msg = total + "_news_around_you!";
+        String url = "http://www.univoxer.com:8080/push_io/single_push.io?token=" + token + "&msg=" + msg;
+        js.put("push", URLReader.readUrl(url));
+        js.put("url", url);
+        js.put("msg", msg);
         return js;
     }
 }

@@ -110,6 +110,9 @@ public class InfoSegController extends HttpServlet {
                 case 20:
                     retJSon = PushController.getRegisteredDevices(request);
                     break;
+                case 33:
+                    retJSon = PushController.sendPushResumeFromLocation(request);
+                    break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
                     PerfilController.autenticaUsuarioGoogle(request, response);

@@ -21,6 +21,26 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class URLReader {
 
+    public static final String readUrl(String murl) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            URL url = new URL(murl);
+            
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
+                String line;
+                
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            return sb.toString();
+        }
+    }
+
     public static final JSONObject readJSONUrl(String murl) {
         JSONObject elemento = new JSONObject();
         try {
@@ -42,7 +62,7 @@ public class URLReader {
             return elemento;
         }
     }
-    
+
     private static final String[] HEADERS_TO_TRY = {
         "X-Forwarded-For",
         "Proxy-Client-IP",
