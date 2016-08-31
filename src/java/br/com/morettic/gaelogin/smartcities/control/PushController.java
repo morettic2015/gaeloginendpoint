@@ -6,6 +6,7 @@
 package br.com.morettic.gaelogin.smartcities.control;
 
 import br.com.morettic.gaelogin.smartcities.vo.DeviceType;
+import br.com.morettic.gaelogin.smartcities.vo.LogLocalizacao;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
 import br.com.morettic.gaelogin.smartcities.vo.PushDevice;
 import br.com.morettic.gaelogin.smartcities.vo.Registro;
@@ -87,6 +88,7 @@ public class PushController {
                 continue;
             }
         }
+        pm.close();
         js.put("devices", ja);
         return js;
     }
@@ -94,12 +96,27 @@ public class PushController {
     public static JSONObject sendPushResumeFromLocation(HttpServletRequest request) throws JSONException {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
+        String token = request.getParameter("token");
+        //Save last user position....TRACKER
+        //Locale lat lon
+        double lon = Double.parseDouble(request.getParameter("lon"));
+        double lat = Double.parseDouble(request.getParameter("lat"));
+        //Get user id based on device token
+        //try to persist
+        try {
+            String id = request.getParameter("id");
+            String ipAddress = request.getHeader("X-FORWARDED-FOR") != null ? request.getHeader("X-FORWARDED-FOR") : request.getRemoteAddr();
+            LogLocalizacao logLocale = new LogLocalizacao(token, new Long(id), lat, lon, ipAddress);
+            pm.makePersistent(logLocale);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //Filter count to send push
         String filter = "this.latitude>=latMin && this.latitude<=latMax ";
         Query q = pm.newQuery(Registro.class, filter);
         q.declareParameters("Float latMin,Float latMax");
         Set<Registro> lSOcorrencias = new HashSet<Registro>();
-        double lon = Double.parseDouble(request.getParameter("lon"));
-        double lat = Double.parseDouble(request.getParameter("lat"));
+
         double latMax, latMin, q1;
 
         //Adiciona todos
@@ -126,17 +143,20 @@ public class PushController {
             }
             total++;
         }
-        String token = request.getParameter("token");
+
         String msg = total + "_news_around_you!";
         //I
         if (total < 1) {
             msg = "Share_something_with_us!Be_the_first!";
         }
 
-        String url = "http://www.univoxer.com:8080/push_io/single_push.io?token=" + token + "&msg=" + msg;
+        String url = HTTPWWWUNIVOXERCOM8080PUSH_IOSINGLE_PUSHI + token + "&msg=" + msg;
         js.put("push", URLReader.readUrl(url));
         js.put("url", url);
         js.put("msg", msg);
+
+        pm.close();
         return js;
     }
+    public static final String HTTPWWWUNIVOXERCOM8080PUSH_IOSINGLE_PUSHI = "http://www.univoxer.com:8080/push_io/single_push.io?token=";
 }

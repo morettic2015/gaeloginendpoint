@@ -20,6 +20,7 @@ public enum TipoOcorrencia {
     UPA,
     ESPORTE,
     TEMPO,
+    IMOVEIS,
     USINA_NUCLEAR,
     SEGURANCA;
 }
