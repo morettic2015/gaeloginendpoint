@@ -388,7 +388,7 @@ public class PerfilController {
         js.put("latMax", latMax);
         js.put("latMin", latMin);
 
-        boolean searchImoveis = false,searchAlimentacao = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
+        boolean searchImoveis = false, searchAlimentacao = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
             String[] types = request.getParameter("type").split(",");
@@ -516,8 +516,17 @@ public class PerfilController {
         q = null;
         js.put("totalView", totaltela);
         js.put("rList", ja);
+        /**
+         * @TODO make filters based on the token from user. In the future i need
+         * to make a HASHMAP for each language EACH STOP WORD NEED A TRANSLATION
+         * IN A TABLE!!!!
+         *
+         *
+         */
         //Carrega os imóveis
         //Le dados do genimo
+        String city = request.getParameter("myCity");
+        JSONArray jOpenStreetMap = new JSONArray();
         if (searchImoveis) {
             Integer i = new Integer(request.getParameter("d"));
             //i*=2;
@@ -528,82 +537,85 @@ public class PerfilController {
             totaltela += ja.length();
             js.put("totalView", totaltela);
             js.put("totalImoveis", ja.length());
+
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "IMOVEIS", TipoOcorrencia.IMOVEIS.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "IMOBILIARIA", TipoOcorrencia.IMOVEIS.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CORRETORA", TipoOcorrencia.IMOVEIS.toString()));
         }
-        String city = request.getParameter("myCity");
-        JSONArray jOpenStreetMap = new JSONArray();
-        /**
-         * @TODO make filters based on the token from user. In the future i need
-         * to make a HASHMAP for each language
-         * EACH STOP WORD NEED A TRANSLATION IN A TABLE!!!!
-         */
+
         if (searchTurismo) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR",TipoOcorrencia.TURISMO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "HOTEL",TipoOcorrencia.TURISMO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB",TipoOcorrencia.TURISMO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "IGREJA",TipoOcorrencia.TURISMO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PARQUE",TipoOcorrencia.TURISMO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MARINA",TipoOcorrencia.TURISMO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR", TipoOcorrencia.TURISMO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "HOTEL", TipoOcorrencia.TURISMO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB", TipoOcorrencia.TURISMO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "IGREJA", TipoOcorrencia.TURISMO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PARQUE", TipoOcorrencia.TURISMO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MARINA", TipoOcorrencia.TURISMO.toString()));
         }
         if (searchPolice) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "POLICE",TipoOcorrencia.SEGURANCA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "POLICE", TipoOcorrencia.SEGURANCA.toString()));
         }
         if (searchAlimentacao) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PIZZA",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CHURRASCARIA",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SUSHI",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BUFFET",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PADARIA",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SUPERMERCADO",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MERCADO",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RESTAURANTE",TipoOcorrencia.ALIMENTACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BURGER",TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PIZZA", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CHURRASCARIA", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SUSHI", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BUFFET", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PADARIA", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SUPERMERCADO", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MERCADO", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RESTAURANTE", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BURGER", TipoOcorrencia.ALIMENTACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CAFE", TipoOcorrencia.ALIMENTACAO.toString()));
         }
         if (searchMeio) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MORRO",TipoOcorrencia.MEIO_AMBIENTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "COSTAO",TipoOcorrencia.MEIO_AMBIENTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "DUNAS",TipoOcorrencia.MEIO_AMBIENTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "LAGO",TipoOcorrencia.MEIO_AMBIENTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MORRO", TipoOcorrencia.MEIO_AMBIENTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "COSTAO", TipoOcorrencia.MEIO_AMBIENTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "DUNAS", TipoOcorrencia.MEIO_AMBIENTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "LAGO", TipoOcorrencia.MEIO_AMBIENTE.toString()));
         }
         if (searchPol) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MACONARIA",TipoOcorrencia.POLITICA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PREFEITURA",TipoOcorrencia.POLITICA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SECRETARIA",TipoOcorrencia.POLITICA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FEDERACAO",TipoOcorrencia.POLITICA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MACONARIA", TipoOcorrencia.POLITICA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PREFEITURA", TipoOcorrencia.POLITICA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SECRETARIA", TipoOcorrencia.POLITICA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FEDERACAO", TipoOcorrencia.POLITICA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ADVOGADO", TipoOcorrencia.POLITICA.toString()));
         }
         if (searchInfra) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA",TipoOcorrencia.INFRAESTRUTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO",TipoOcorrencia.INFRAESTRUTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BANCO",TipoOcorrencia.INFRAESTRUTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUNDACAO",TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO", TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BANCO", TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUNDACAO", TipoOcorrencia.INFRAESTRUTURA.toString()));
         }
         if (searchSaude) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SAUDE",TipoOcorrencia.SAUDE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "UPA",TipoOcorrencia.SAUDE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FARMACIA",TipoOcorrencia.SAUDE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SAUDE", TipoOcorrencia.SAUDE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "UPA", TipoOcorrencia.SAUDE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FARMACIA", TipoOcorrencia.SAUDE.toString()));
         }
         if (searchCult) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TEATRO",TipoOcorrencia.CULTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "EVENTOS",TipoOcorrencia.CULTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CINEMA",TipoOcorrencia.CULTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TEATRO", TipoOcorrencia.CULTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "EVENTOS", TipoOcorrencia.CULTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CINEMA", TipoOcorrencia.CULTURA.toString()));
         }
         if (searchSpo) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESPORTE",TipoOcorrencia.ESPORTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUTEBOL",TipoOcorrencia.ESPORTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TENIS",TipoOcorrencia.ESPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESPORTE", TipoOcorrencia.ESPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUTEBOL", TipoOcorrencia.ESPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TENIS", TipoOcorrencia.ESPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SURF", TipoOcorrencia.ESPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SKATE", TipoOcorrencia.ESPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "GOLF", TipoOcorrencia.ESPORTE.toString()));
         }
         if (searchTransp) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TAXI",TipoOcorrencia.TRANSPORTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TERMINAL",TipoOcorrencia.TRANSPORTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PONTO DE ONIBUS",TipoOcorrencia.TRANSPORTE.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA",TipoOcorrencia.TRANSPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TAXI", TipoOcorrencia.TRANSPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TERMINAL", TipoOcorrencia.TRANSPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PONTO DE ONIBUS", TipoOcorrencia.TRANSPORTE.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.TRANSPORTE.toString()));
         }
         if (searchEduc) {
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "EDUCACAO",TipoOcorrencia.EDUCACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "UNIVERSIDADE",TipoOcorrencia.EDUCACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FACULDADE",TipoOcorrencia.EDUCACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESCOLA",TipoOcorrencia.EDUCACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CURSO",TipoOcorrencia.EDUCACAO.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BIBLIOTECA",TipoOcorrencia.EDUCACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "EDUCACAO", TipoOcorrencia.EDUCACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "UNIVERSIDADE", TipoOcorrencia.EDUCACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FACULDADE", TipoOcorrencia.EDUCACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESCOLA", TipoOcorrencia.EDUCACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CURSO", TipoOcorrencia.EDUCACAO.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BIBLIOTECA", TipoOcorrencia.EDUCACAO.toString()));
         }
         //Merge all jsonobjects from openstreet into a single Array
         JSONArray openStreetFinal = new JSONArray();
@@ -1374,13 +1386,13 @@ public class PerfilController {
         String service = request.getParameter("service");
         //Monta URL
         JSONObject js = new JSONObject();
-        js.put("result", getOpenStreeMapCollection(city, service,"SEARCH"));
+        js.put("result", getOpenStreeMapCollection(city, service, "SEARCH"));
         js.put("profile", getMyProfile());
         return js;
     }
     private static HashMap<Long, JSONObject> cKey = new HashMap<Long, JSONObject>();
 
-    private static JSONArray getOpenStreeMapCollection(String city, String service,String type) {
+    private static JSONArray getOpenStreeMapCollection(String city, String service, String type) {
 
         JSONArray ja, ja2 = new JSONArray();
 
