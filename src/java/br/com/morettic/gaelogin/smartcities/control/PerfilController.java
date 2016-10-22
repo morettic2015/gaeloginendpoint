@@ -388,7 +388,7 @@ public class PerfilController {
         js.put("latMax", latMax);
         js.put("latMin", latMin);
 
-        boolean searchImoveis = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
+        boolean searchImoveis = false,searchAlimentacao = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
             String[] types = request.getParameter("type").split(",");
@@ -415,6 +415,8 @@ public class PerfilController {
                     searchCult = true;
                 } else if (tp.equals(TipoOcorrencia.MEIO_AMBIENTE.toString())) {
                     searchMeio = true;
+                } else if (tp.equals(TipoOcorrencia.ALIMENTACAO.toString())) {
+                    searchAlimentacao = true;
                 }
                 mapaChaves.put(tp, tp);
             }
@@ -532,11 +534,10 @@ public class PerfilController {
         /**
          * @TODO make filters based on the token from user. In the future i need
          * to make a HASHMAP for each language
-         *
+         * EACH STOP WORD NEED A TRANSLATION IN A TABLE!!!!
          */
         if (searchTurismo) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR"));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RESTAURANTE"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "HOTEL"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "IGREJA"));
@@ -545,6 +546,17 @@ public class PerfilController {
         }
         if (searchPolice) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "POLICE"));
+        }
+        if (searchAlimentacao) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PIZZA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CHURRASCARIA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SUSHI"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BUFFET"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PADARIA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SUPERMERCADO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MERCADO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RESTAURANTE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BURGER"));
         }
         if (searchMeio) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "MORRO"));
@@ -556,11 +568,13 @@ public class PerfilController {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "MACONARIA"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "PREFEITURA"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "SECRETARIA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FEDERACAO"));
         }
         if (searchInfra) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO"));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "BANCO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUNDACAO"));
         }
         if (searchSaude) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "SAUDE"));
