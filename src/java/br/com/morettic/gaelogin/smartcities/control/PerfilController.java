@@ -51,7 +51,9 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collection;
+import java.util.Random;
 
 ;
 
@@ -216,7 +218,7 @@ public class PerfilController {
             qEmail.setFilter(pQuery);
             String email = request.getParameter("email");
             List<Perfil> lRet = (List<Perfil>) qEmail.execute(email.toUpperCase());
-            if(lRet.size()>0){
+            if (lRet.size() > 0) {
                 ehNovo = false;
                 p = lRet.get(0);
             }
@@ -386,10 +388,34 @@ public class PerfilController {
         js.put("latMax", latMax);
         js.put("latMin", latMin);
 
+        boolean searchImoveis = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
             String[] types = request.getParameter("type").split(",");
             for (String tp : types) {
+                if (tp.equals(TipoOcorrencia.IMOVEIS.toString())) {
+                    searchImoveis = true;
+                } else if (tp.equals(TipoOcorrencia.TURISMO.toString())) {
+                    searchTurismo = true;
+                } else if (tp.equals(TipoOcorrencia.INFRAESTRUTURA.toString())) {
+                    searchInfra = true;
+                } else if (tp.equals(TipoOcorrencia.SEGURANCA.toString())) {
+                    searchPolice = true;
+                } else if (tp.equals(TipoOcorrencia.SAUDE.toString())) {
+                    searchSaude = true;
+                } else if (tp.equals(TipoOcorrencia.EDUCACAO.toString())) {
+                    searchEduc = true;
+                } else if (tp.equals(TipoOcorrencia.ESPORTE.toString())) {
+                    searchSpo = true;
+                } else if (tp.equals(TipoOcorrencia.TRANSPORTE.toString())) {
+                    searchTransp = true;
+                } else if (tp.equals(TipoOcorrencia.POLITICA.toString())) {
+                    searchPol = true;
+                } else if (tp.equals(TipoOcorrencia.CULTURA.toString())) {
+                    searchCult = true;
+                } else if (tp.equals(TipoOcorrencia.MEIO_AMBIENTE.toString())) {
+                    searchMeio = true;
+                }
                 mapaChaves.put(tp, tp);
             }
         }
@@ -488,7 +514,105 @@ public class PerfilController {
         q = null;
         js.put("totalView", totaltela);
         js.put("rList", ja);
+        //Carrega os imóveis
+        //Le dados do genimo
+        if (searchImoveis) {
+            Integer i = new Integer(request.getParameter("d"));
+            //i*=2;
+            String url = URLReader.getUrlGenimo(lat + "", lon + "", i.toString());
+            ja = URLReader.readJSONArrayUrl(url);
+            js.put("iList", ja);
+            js.put("totalBigData", totaltela);
+            totaltela += ja.length();
+            js.put("totalView", totaltela);
+            js.put("totalImoveis", ja.length());
+        }
+        String city = request.getParameter("myCity");
+        JSONArray jOpenStreetMap = new JSONArray();
+        /**
+         * @TODO make filters based on the token from user. In the future i need
+         * to make a HASHMAP for each language
+         *
+         */
+        if (searchTurismo) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RESTAURANTE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "HOTEL"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "IGREJA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PARQUE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MARINA"));
+        }
+        if (searchPolice) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "POLICE"));
+        }
+        if (searchMeio) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MORRO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "COSTAO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "DUNAS"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "LAGO"));
+        }
+        if (searchPol) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "MACONARIA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PREFEITURA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SECRETARIA"));
+        }
+        if (searchInfra) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BANCO"));
+        }
+        if (searchSaude) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SAUDE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "UPA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FARMACIA"));
+        }
+        if (searchCult) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TEATRO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "EVENTOS"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CINEMA"));
+        }
+        if (searchSpo) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESPORTE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUTEBOL"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TENIS"));
+        }
+        if (searchTransp) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TAXI"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "TERMINAL"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PONTO DE ONIBUS"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA"));
+        }
+        if (searchEduc) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "EDUCACAO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "UNIVERSIDADE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "FACULDADE"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESCOLA"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CURSO"));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BIBLIOTECA"));
+        }
+        //Merge all jsonobjects from openstreet into a single Array
+        JSONArray openStreetFinal = new JSONArray();
+        for (int i = 0; i < jOpenStreetMap.length(); i++) {
+            ja = jOpenStreetMap.getJSONArray(i);
+            for (int x = 0; x < ja.length(); x++) {
+                openStreetFinal.put(ja.getJSONObject(x));
+            }
 
+        }
+        jOpenStreetMap = null;
+
+        js.put("openStreetSize", openStreetFinal.length());
+        js.put("openStreet", openStreetFinal);
+
+        //Adiciona cinco usuários anonimos para os dados abertos humanizar!
+        JSONArray lUsers = new JSONArray();
+        lUsers.put(getMyProfile());
+        lUsers.put(getMyProfile());
+        lUsers.put(getMyProfile());
+        lUsers.put(getMyProfile());
+        lUsers.put(getMyProfile());
+        js.put("profiles", lUsers);
         return js;
     }
 
@@ -1197,5 +1321,168 @@ public class PerfilController {
         }
 
         return js;
+    }
+
+    /**
+     * http://nominatim.openstreetmap.org/search?q=hotel%20florianopolis&format=json&polygon=0&addressdetails=1
+     *
+     *
+     *
+     * result: [ { icon:
+     * "http://nominatim.openstreetmap.org/images/mapicons/accommodation_hotel2.p.20.png",
+     * display_name: "Hotel Porto da Ilha, Rua Dom Jaime C��mara, Morro da
+     * Mariquinha, Centro, Florian��polis, Microrregi��o de Florian��polis,
+     * Mesorregi��o da Grande Florian��polis, Santa Catarina, South Region,
+     * 88015-530, Brazil", licence: "Data �� OpenStreetMap contributors, ODbL
+     * 1.0. http://www.openstreetmap.org/copyright", place_id: "118437043", lon:
+     * "-48.5520058498876", importance: 0.101, address: { region: "Mesorregi��o
+     * da Grande Florian��polis", county: "Microrregi��o de Florian��polis",
+     * suburb: "Centro", state: "Santa Catarina", road: "Rua Dom Jaime C��mara",
+     * hotel: "Hotel Porto da Ilha", postcode: "88015-530", country_code: "br",
+     * neighbourhood: "Morro da Mariquinha", country: "Brazil", city:
+     * "Florian��polis" }, boundingbox: [ "-27.5926301", "-27.5923632",
+     * "-48.5520729", "-48.5519388" ], osm_id: "227073641", class: "tourism",
+     * osm_type: "way", type: "hotel", lat: "-27.5924966" },
+     *     
+* {
+     * id: 5110511926509568, author: "LAM MXRETTX", lon: "-48.67482", desc:
+     * "CLÍNICO GERAL", token3: "null", token: 5673461879930880, address:
+     * "ESTRADA GRP | 396 (IBIRAQUERA | PRAIA ROSA |
+     * OUVIDOR),NULL,21,IMBITUBA,88495-000,STATE OF SANTA CATARINA,BRAZIL",
+     * token1: "null", token2: "null", tipo: "SAUDE", tit: "CONSULTÓRIO
+     * ODONTOLÓGICO ", rating: 3.5, date: "2016-09-11 07:45", lat: "-28.101107"
+     * },
+     *
+     * @Search open stree map
+     */
+    public static JSONObject findOpenStreeMapInfo(HttpServletRequest request, HttpServletResponse response) throws JSONException {
+        String city = request.getParameter("city");
+        String service = request.getParameter("service");
+        //Monta URL
+        JSONObject js = new JSONObject();
+        js.put("result", getOpenStreeMapCollection(city, service));
+        js.put("profile", getMyProfile());
+        return js;
+    }
+    private static HashMap<Long, JSONObject> cKey = new HashMap<Long, JSONObject>();
+
+    private static JSONArray getOpenStreeMapCollection(String city, String service) {
+
+        JSONArray ja, ja2 = new JSONArray();
+
+        //Le a URL
+        try {
+
+            ja = URLReader.readJSONArrayUrl(URLReader.getUrlOpenStreetMap(city, service));
+
+            for (int i = 0; i < ja.length(); i++) {
+
+                JSONObject js1 = new JSONObject(), js2;
+                //Pega do openstreetmap
+                js2 = ja.getJSONObject(i);
+
+                //No duplicate from differente categories.
+                //We may got an interssection so this avoid...
+                if (cKey.containsKey(js2.getLong("place_id"))) {
+                    ja2.put(cKey.get(js2.getLong("place_id")));
+                    continue;
+                }
+
+                //trata
+                String token = js2.has("icon") ? js2.getString("icon") : null;
+                String display_name = js2.getString("display_name");
+                String display_nameV[] = display_name.split(",");
+                StringBuilder addrs = new StringBuilder();
+                if (js2.getJSONObject("address").has("road")) {
+                    addrs.append(js2.getJSONObject("address").getString("road"));
+                    addrs.append(" ");
+                }
+                if (js2.getJSONObject("address").has("house_number")) {
+                    addrs.append(js2.getJSONObject("address").getString("house_number"));
+                    addrs.append(" ");
+                }
+                if (js2.getJSONObject("address").has("postcode")) {
+                    addrs.append(js2.getJSONObject("address").getString("postcode"));
+                    addrs.append(" ");
+                }
+                if (js2.getJSONObject("address").has("suburb")) {
+                    addrs.append(js2.getJSONObject("address").getString("suburb"));
+                    addrs.append(" ");
+                }
+                if (js2.getJSONObject("address").has("city")) {
+                    addrs.append(js2.getJSONObject("address").getString("city"));
+                    addrs.append(" ");
+                }
+                if (js2.getJSONObject("address").has("state")) {
+                    addrs.append(js2.getJSONObject("address").getString("state"));
+                    addrs.append(" ");
+                }
+                if (js2.getJSONObject("address").has("county")) {
+                    addrs.append(js2.getJSONObject("address").getString("county"));
+                }
+                //Randon rating
+                Random r = new Random();
+                double rate = 0.0 + (5.0 - 0.0) * r.nextDouble();
+
+                //seta
+                js1.put("id", js2.getLong("place_id"));
+                js1.put("lon", js2.getString("lon"));
+                js1.put("desc", js2.get("class") + " - " + js2.get("type"));
+                //js1.put("token3", null);
+
+                js1.put("token", token);
+                //js1.put("token", null);
+                js1.put("address", addrs.toString());
+                //js1.put("token1", null);
+                //js1.put("token2", null);
+                js1.put("tipo", service.toUpperCase());
+                js1.put("tit", display_nameV[0]);
+                js1.put("rating", rate);
+                js1.put("date", new Date());
+                js1.put("lat", js2.getString("lat"));
+
+                //coloca na saida
+                ja2.put(js1);
+                cKey.put(js2.getLong("place_id"), js1);
+
+            }
+
+        } catch (Exception e) {
+            JSONObject js = new JSONObject();
+
+            js.put("500", e.toString());
+            ja2.put(js);
+        } finally {
+            return ja2;
+        }
+    }
+
+    /**
+     *
+     * name: { title: "miss", first: "kristin", last: "perry"
+     *     
+* location: { street: "2123 avondale ave", city: "grapevine", state:
+     * "alaska", postcode: 19219 },
+     *
+     */
+    private static JSONObject getMyProfile() throws JSONException {
+        JSONObject perfil = new JSONObject();
+        JSONObject fake = URLReader.readJSONUrl(HTTPSRANDOMUSERMEAPI);
+        JSONObject fakeOne = fake.getJSONArray("results").getJSONObject(0);
+
+        perfil.put("name", fakeOne.getJSONObject("name").getString("title")
+                + "," + fakeOne.getJSONObject("name").getString("first")
+                + "," + fakeOne.getJSONObject("name").getString("last"));
+
+        perfil.put("location", fakeOne.getJSONObject("location").getString("street")
+                + "," + fakeOne.getJSONObject("location").getString("city")
+                + "," + fakeOne.getJSONObject("location").getString("state")
+                + "," + fakeOne.getJSONObject("location").getString("postcode"));
+
+        perfil.put("email", fakeOne.getString("email"));
+        perfil.put("phone", fakeOne.getString("phone"));
+        perfil.put("avatar", fakeOne.getJSONObject("picture").getString("thumbnail"));
+
+        return perfil;
     }
 }

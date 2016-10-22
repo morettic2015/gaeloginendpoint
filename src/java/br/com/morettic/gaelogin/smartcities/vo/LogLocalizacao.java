@@ -21,10 +21,13 @@ import javax.jdo.annotations.PrimaryKey;
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 @Cacheable("true")
-public class LogLocalizacao implements Serializable, Comparable<LogLocalizacao>{
+public class LogLocalizacao implements Serializable, Comparable<LogLocalizacao> {
+
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long keyPerfil;
+    @Persistent
+    private Long mKey;
 
     @Persistent
     private String token;
@@ -60,12 +63,11 @@ public class LogLocalizacao implements Serializable, Comparable<LogLocalizacao>{
     public void setMyip(String myip) {
         this.myip = myip;
     }
-    
-    
-    public LogLocalizacao(String token,Long perfilId,Double lat,Double lon,String ip){
+
+    public LogLocalizacao(String token, Long perfilId, Double lat, Double lon, String ip) {
         this.lastLog = new Date();
         this.token = token;
-        this.keyPerfil = perfilId;
+        this.mKey = perfilId;
         this.lat = Float.parseFloat(lat.toString());
         this.lon = Float.parseFloat(lon.toString());
         this.myip = ip;
@@ -127,7 +129,15 @@ public class LogLocalizacao implements Serializable, Comparable<LogLocalizacao>{
 
     @Override
     public int compareTo(LogLocalizacao o) {
-        return (int) (lastLog.getTime()-o.getLastLog().getTime());
+        return (int) (lastLog.getTime() - o.getLastLog().getTime());
     }
-    
+
+    public Long getmKey() {
+        return mKey;
+    }
+
+    public void setmKey(Long mKey) {
+        this.mKey = mKey;
+    }
+
 }

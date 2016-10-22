@@ -19,8 +19,18 @@ public enum TipoOcorrencia {
     POSTO_SAUDE,
     UPA,
     ESPORTE,
+    TURISMO,
     TEMPO,
+    HOTEL,
     IMOVEIS,
     USINA_NUCLEAR,
-    SEGURANCA;
+    SEGURANCA,
+    ALIMENTACAO,
+    SHOP,
+    CULTURA,
+    BAR,
+    RESTAURANTE,
+    CINEMA,
+    TEATRO,
+    INFRAESTRUTURA;
 }
