@@ -1019,7 +1019,7 @@ public class PerfilController {
         //Conecta com o banco
         pm = PMF.get().getPersistenceManager();
         Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Registro order by dtOcorrencia desc");
-        q.setRange(0, 20);
+        q.setRange(0, 10);
 
         //Inicializa Json
         JSONObject js = new JSONObject();
@@ -1082,7 +1082,12 @@ public class PerfilController {
             ja.put(js1);
 
         }
-        js.put("rList", ja);
+        
+        String ct = request.getParameter("city");
+        
+        js.put("rList", ja);        
+        js.put("wList",readJSONArrayUrl(getWebhoseIo(ct)));
+        js.put("tList",readJSONArrayUrl(getTwitter(ct)));
         return js;
     }
 

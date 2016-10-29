@@ -140,4 +140,11 @@ public class URLReader {
         sb.append("&format=json&polygon=0&addressdetails=1&accept-language=en-US,pt-BR");
         return sb.toString();
     }
+    
+    public static final String getWebhoseIo(String aq){
+        return "http://citywatch.com.br/v1/webhoseNews.php?query="+URLEncoder.encode(aq);
+    }
+    public static final String getTwitter(String aq){
+        return "http://citywatch.com.br/v1/twitterNews.php?query="+URLEncoder.encode(aq);
+    }
 }
