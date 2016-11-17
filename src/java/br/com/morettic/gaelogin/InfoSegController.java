@@ -112,7 +112,22 @@ public class InfoSegController extends HttpServlet {
                     break;
                 case 21:
                     response.setContentType("application/json; charset=ISO-8859-1");
-                    retJSon = PerfilController.findOpenStreeMapInfo(request,response);
+                    retJSon = PerfilController.findOpenStreeMapInfo(request, response);
+                    break;
+                case 22:
+                    retJSon = PushController.sendMessage(request);
+                    break;
+                case 23:
+                    retJSon = PushController.getMessages(request);
+                    break;
+                case 24:
+                    retJSon = PushController.sendPromo(request);
+                    break;
+                case 25:
+                    retJSon = PushController.getPromos(request);
+                    break;
+                case 26:
+                    retJSon = PushController.createContact(request);
                     break;
                 case 33:
                     retJSon = PushController.sendPushResumeFromLocation(request);

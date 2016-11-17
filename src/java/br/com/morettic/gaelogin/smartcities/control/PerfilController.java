@@ -388,7 +388,7 @@ public class PerfilController {
         js.put("latMax", latMax);
         js.put("latMin", latMin);
 
-        boolean searchImoveis = false, searchAlimentacao = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
+        boolean searchImoveis = false, searchBeer = false, searchAlimentacao = false, searchMeio = false, searchCult = false, searchTransp = false, searchPol = false, searchTurismo = false, searchInfra = false, searchPolice = false, searchSaude = false, searchEduc = false, searchSpo = false;
         HashMap<String, String> mapaChaves = new HashMap<String, String>();
         if (request.getParameter("type") != null) {
             String[] types = request.getParameter("type").split(",");
@@ -397,6 +397,8 @@ public class PerfilController {
                     searchImoveis = true;
                 } else if (tp.equals(TipoOcorrencia.TURISMO.toString())) {
                     searchTurismo = true;
+                } else if (tp.equals(TipoOcorrencia.BEER.toString())) {
+                    searchBeer = true;
                 } else if (tp.equals(TipoOcorrencia.INFRAESTRUTURA.toString())) {
                     searchInfra = true;
                 } else if (tp.equals(TipoOcorrencia.SEGURANCA.toString())) {
@@ -578,6 +580,14 @@ public class PerfilController {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "SECRETARIA", TipoOcorrencia.POLITICA.toString()));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "FEDERACAO", TipoOcorrencia.POLITICA.toString()));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "ADVOGADO", TipoOcorrencia.POLITICA.toString()));
+        }
+        if (searchBeer) {
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR", TipoOcorrencia.BEER.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "CERVEJA", TipoOcorrencia.BEER.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "BEER", TipoOcorrencia.BEER.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "DRINK", TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SHOW", TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB", TipoOcorrencia.INFRAESTRUTURA.toString()));
         }
         if (searchInfra) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.INFRAESTRUTURA.toString()));
@@ -1082,12 +1092,12 @@ public class PerfilController {
             ja.put(js1);
 
         }
-        
+
         String ct = request.getParameter("city");
-        
-        js.put("rList", ja);        
-        js.put("wList",readJSONArrayUrl(getWebhoseIo(ct)));
-        js.put("tList",readJSONArrayUrl(getTwitter(ct)));
+
+        js.put("rList", ja);
+        js.put("wList", readJSONArrayUrl(getWebhoseIo(ct)));
+        js.put("tList", readJSONArrayUrl(getTwitter(ct)));
         return js;
     }
 

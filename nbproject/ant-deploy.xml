@@ -3,8 +3,8 @@
 
     <!-- Google App Engine Properties -->
     <property name="appengine.location" value="C:\Users\LuisAugusto\Documents\appengine-java-sdk-1.9.23"/>
-    <property name="appengine.http.port" value="1999"/>
-    <property name="appengine.debug.port" value="1998"/>
+    <property name="appengine.http.port" value="9999"/>
+    <property name="appengine.debug.port" value="8765"/>
     <property name="jvmargs" value=""/>
 
     <!-- Import Google App Engine Macros -->

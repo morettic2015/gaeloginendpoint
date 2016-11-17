@@ -30,6 +30,7 @@ public enum TipoOcorrencia {
     CULTURA,
     BAR,
     RESTAURANTE,
+    BEER,
     CINEMA,
     TEATRO,
     INFRAESTRUTURA;
