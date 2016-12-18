@@ -252,6 +252,14 @@ public class PushController {
             Perfil p = pm.getObjectById(Perfil.class, c.getFrom());
             promo.put("author", p.getNome());
             promo.put("email", p.getEmail());
+            
+            JSONArray jT = new JSONArray();
+            
+            List<String> lTipos = c.getlTipos();
+            for(String tp:lTipos){
+                jT.put(tp);
+            }
+            promo.put("canais",jT);
 
             ja.put(promo);
         }

@@ -39,4 +39,38 @@ public class ApiLog implements Serializable {
     @Persistent
     private Integer totalRequests;
 
+    public Long getKey() {
+        return key;
+    }
+
+    public void setKey(Long key) {
+        this.key = key;
+    }
+
+    public Long getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Long owner) {
+        this.owner = owner;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
+    public Integer getTotalRequests() {
+        return totalRequests;
+    }
+
+    public void setTotalRequests(Integer totalRequests) {
+        this.totalRequests = totalRequests;
+    }
+    
+    
+
 }

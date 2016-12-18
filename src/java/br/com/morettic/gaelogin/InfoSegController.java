@@ -129,6 +129,9 @@ public class InfoSegController extends HttpServlet {
                 case 26:
                     retJSon = PushController.createContact(request);
                     break;
+                case 27:
+                    retJSon = PerfilController.getMyFavorites(request);
+                    break;
                 case 33:
                     retJSon = PushController.sendPushResumeFromLocation(request);
                     break;

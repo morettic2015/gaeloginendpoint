@@ -52,6 +52,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.Normalizer;
 import java.util.Collection;
 import java.util.Random;
 
@@ -653,6 +654,9 @@ public class PerfilController {
     }
 
     /**
+     * DOes the fuck email exists?
+     */
+    /**
      * http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=7&email=malacma@hotmail.com&pass=jsjsjssss
      */
     public static JSONObject autenticaUsuario(HttpServletRequest request, HttpServletResponse response) throws JSONException {
@@ -1093,7 +1097,8 @@ public class PerfilController {
 
         }
 
-        String ct = request.getParameter("city");
+        String ct = Normalizer.normalize(request.getParameter("city"), Normalizer.Form.NFD);
+        ct = ct.replaceAll("[^\\p{ASCII}]", "");
 
         js.put("rList", ja);
         js.put("wList", readJSONArrayUrl(getWebhoseIo(ct)));
@@ -1525,5 +1530,70 @@ public class PerfilController {
         perfil.put("avatar", fakeOne.getJSONObject("picture").getString("thumbnail"));
 
         return perfil;
+    }
+
+    /**
+     * @recover all favorites from one
+     */
+    public static JSONObject getMyFavorites(HttpServletRequest request) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+        Query q = pm.newQuery(Rating.class);
+        String pQuery = "idProfile == :idProfile";
+        q.setFilter(pQuery);
+        DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        List<Rating> lRet = (List<Rating>) q.execute(Long.parseLong(request.getParameter("id")));
+        JSONObject jsRet = new JSONObject();
+        JSONArray jaArr = new JSONArray();
+        for (Rating r : lRet) {
+            Registro o = pm.getObjectById(Registro.class, r.getIdOcorrencia());
+            //Monta o JSON
+            JSONObject js1 = new JSONObject();
+            js1.put("id", o.getKey());
+            js1.put("ip", o.getIp());
+            js1.put("lat", o.getLatitude());
+            js1.put("lon", o.getLongitude());
+            js1.put("tit", o.getTitulo());
+            js1.put("desc", o.getDescricao() + " " + o.getAdress());
+            js1.put("tipo", o.getTipo().toString());
+            js1.put("date", dt.format(o.getDtOcorrencia()));
+
+            Imagem m;
+            try {
+                m = pm.getObjectById(Imagem.class, o.getAvatar());
+                js1.put("token", m.getKey());
+            } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
+                js1.put("token", "-1");
+            }
+            //Imagens adicionais e suas validações
+            //Imagens opcionais da ocorrência
+            if (o.getAvatar1() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar1());
+                js1.put("token1", m.getKey());
+            } else {
+                js1.put("token1", "null");
+            }
+            if (o.getAvatar2() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar2());
+                js1.put("token2", m.getKey());
+            } else {
+                js1.put("token2", "null");
+            }
+            if (o.getAvatar3() != null) {
+                m = pm.getObjectById(Imagem.class, o.getAvatar3());
+                js1.put("token3", m.getKey());
+            } else {
+                js1.put("token3", "null");
+            }
+
+            //Recupera o perfil
+            Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
+            js1.put("author", pOcorencia.getNome());
+
+            jaArr.put(js1);
+        }
+
+        jsRet.put("myFav", jaArr);
+        pm.close();
+        return jsRet;
     }
 }
