@@ -7,6 +7,8 @@ package br.com.morettic.gaelogin;
 
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
+import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
+import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.IOException;
@@ -132,6 +134,9 @@ public class InfoSegController extends HttpServlet {
                 case 27:
                     retJSon = PerfilController.getMyFavorites(request);
                     break;
+                case 28:
+                    retJSon = getMyTypes();
+                    break;
                 case 33:
                     retJSon = PushController.sendPushResumeFromLocation(request);
                     break;
@@ -198,4 +203,16 @@ public class InfoSegController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+    private static final JSONObject getMyTypes() throws JSONException {
+        JSONArray ja = new JSONArray();
+
+        for (TipoOcorrencia tp : TipoOcorrencia.values()) {
+            ja.put(tp.toString());
+        }
+
+        JSONObject js = new JSONObject();
+        js.put("types", ja);
+        
+        return js;
+    }
 }
