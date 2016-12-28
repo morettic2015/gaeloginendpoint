@@ -5,6 +5,8 @@
  */
 package br.com.morettic.gaelogin.smartcities.control;
 
+import br.com.morettic.gaelogin.InfoSegController;
+import static br.com.morettic.gaelogin.InfoSegController.log;
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
 import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
@@ -369,7 +371,7 @@ public class PerfilController {
         double lon = Double.parseDouble(request.getParameter("lon"));
         double latMax, latMin, q1;
         //Recupera a variação da latitude
-        int distance = 0;
+        Integer distance = 0;
         //total tela
         int totaltela = 0;
 
@@ -531,10 +533,13 @@ public class PerfilController {
         String city = request.getParameter("myCity");
         JSONArray jOpenStreetMap = new JSONArray();
         if (searchImoveis) {
-            Integer i = new Integer(request.getParameter("d"));
+
+           // I//nteger dImoveis = distance < 1000 ? 1000 : distance;
             //i*=2;
-            String url = URLReader.getUrlGenimo(lat + "", lon + "", i.toString());
-            ja = URLReader.readJSONArrayUrl(url);
+            GenimoController gc = new GenimoController(lat, lon, distance);
+            ja = gc.doSearch();
+
+            js.put("urlGenimo", gc.getUrl());
             js.put("iList", ja);
             js.put("totalBigData", totaltela);
             totaltela += ja.length();
@@ -650,6 +655,9 @@ public class PerfilController {
         lUsers.put(getMyProfile());
         lUsers.put(getMyProfile());
         js.put("profiles", lUsers);
+
+        pm.close();
+
         return js;
     }
 
@@ -698,7 +706,7 @@ public class PerfilController {
         js.put("pass", retorno.getPassWd());
         js.put("configId", retorno.getConfig());
         js.put("pjf", retorno.isEhPessoaFisica());
-
+        pm.close();
         return js;
     }
 
@@ -710,6 +718,7 @@ public class PerfilController {
         String imgToken = m.getImage().substring(0, m.getImage().length() - 2);
         imgToken = imgToken.substring(2);
         response.sendRedirect("infosegcontroller.exec?action=5&blob-key=" + imgToken);
+       // pm.close();
 
     }
 
@@ -741,6 +750,7 @@ public class PerfilController {
         } else {
             js.put("total", 1);
         }
+        pm.close();
         return js;
     }
 
@@ -1595,5 +1605,81 @@ public class PerfilController {
         jsRet.put("myFav", jaArr);
         pm.close();
         return jsRet;
+    }
+
+    /**
+     * http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=7&email=malacma@hotmail.com&pass=jsjsjssss
+     */
+    public static JSONObject perfilExists(HttpServletRequest request, JSONObject js1) throws JSONException {
+        JSONObject js = js1;
+        Perfil retorno = null;
+
+        String email = request.getParameter("email").toUpperCase();
+
+        pm = PMF.get().getPersistenceManager();
+        Query q = pm.newQuery(Perfil.class);
+        String pQuery = "email == :pEmail";
+        q.setFilter(pQuery);
+
+        List<Perfil> p = (List<Perfil>) q.execute(email);
+        retorno = p.size() > 0 ? p.get(0) : null;
+
+        if (retorno != null) {
+            js.put("exists", true);
+            js.put("avatar", retorno.getAvatar());
+            js.put("cep", retorno.getCep());
+            js.put("complemento", retorno.getComplemento());
+            js.put("cpfCnpj", retorno.getCpfCnpj());
+            js.put("email", retorno.getEmail());
+            js.put("key", retorno.getKey());
+            js.put("nasc", retorno.getNascimento());
+            js.put("nome", retorno.getNome());
+            //js.put("pass", retorno.getPassWd());
+            js.put("configId", retorno.getConfig());
+            js.put("pjf", retorno.isEhPessoaFisica());
+            js.put("cidade", retorno.getCidade());
+            js.put("pais", retorno.getPais());
+            js.put("bairro", retorno.getBairro());
+            js.put("rua", retorno.getRua());
+
+            try {
+                JSONArray ja = new JSONArray();
+                Configuracao cfg = pm.getObjectById(Configuracao.class, retorno.getKey());
+                js.put("cell", cfg.getCellPhone());
+                js.put("push", cfg.getPushEnabled());
+                Set<String> mKeys = cfg.getlPropriedades().keySet();
+
+                for (String s : mKeys) {
+                    ja.put(cfg.getlPropriedades().get(s));
+                }
+                js.put("config", ja);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            js.put("exists", false);
+        }
+        pm.close();
+        return js;
+    }
+
+    public static JSONObject getMyWebsiteProfile(HttpServletRequest request, JSONObject types) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+
+        JSONObject js = types;
+
+        Long id = Long.parseLong(request.getParameter("id"));
+        Perfil p = pm.getObjectById(Perfil.class, id);
+
+        js.put("cep", p.getCep());
+        js.put("rua", p.getRua());
+        js.put("bairro", p.getBairro());
+        js.put("cidade", p.getCidade());
+        js.put("pais", p.getPais());
+
+        return js;
+
     }
 }

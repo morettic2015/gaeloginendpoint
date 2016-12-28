@@ -127,11 +127,6 @@ public class URLReader {
      * "0.157535365702884" },
      *
      */
-    public static final String getUrlGenimo(String lat, String lon, String distance) {
-        String url = "http://www.genimo.com.br/api/fcitywatch/news/" + lat + "/" + lon + "/" + distance;
-        return url;
-    }
-
     public static final String getUrlOpenStreetMap(String city, String service) {
         StringBuilder sb = new StringBuilder("http://nominatim.openstreetmap.org/search?q=");
         sb.append(URLEncoder.encode(city));

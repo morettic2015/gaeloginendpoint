@@ -5,6 +5,7 @@
  */
 package br.com.morettic.gaelogin;
 
+import br.com.morettic.gaelogin.smartcities.control.ConfigController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
@@ -13,6 +14,11 @@ import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -25,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author LuisAugusto
  */
 public class InfoSegController extends HttpServlet {
+
+    public static final Logger log = Logger.getLogger(InfoSegController.class.getName());
 
     private JSONObject retJSon;
 
@@ -134,8 +142,17 @@ public class InfoSegController extends HttpServlet {
                 case 27:
                     retJSon = PerfilController.getMyFavorites(request);
                     break;
+                case 29:
+                    retJSon = PerfilController.getMyWebsiteProfile(request, getMyTypes());
+                    break;
                 case 28:
                     retJSon = getMyTypes();
+                    break;
+                case 30:
+                    retJSon = PerfilController.perfilExists(request, getMyTypes());
+                    break;
+                case 31:
+                    retJSon = ConfigController.updateProfileConfig(request, getMyTypes());
                     break;
                 case 33:
                     retJSon = PushController.sendPushResumeFromLocation(request);
@@ -148,10 +165,14 @@ public class InfoSegController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+            log.warning(e.toString());
         } finally {
             if (retJSon != null) {
+                log.info(retJSon.toString());
+
                 out.print(retJSon);
             }
+
             out.close();
         }
     }
@@ -203,16 +224,27 @@ public class InfoSegController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
-    private static final JSONObject getMyTypes() throws JSONException {
+    public static final JSONObject getMyTypes() throws JSONException {
         JSONArray ja = new JSONArray();
 
+        List<String> lStrings = new ArrayList<String>();
         for (TipoOcorrencia tp : TipoOcorrencia.values()) {
-            ja.put(tp.toString());
+            if (tp.isIsVisible()) {
+                lStrings.add(tp.name());
+            }
         }
+
+        Collections.sort(lStrings);
+
+        for (String t : lStrings) {
+            ja.put(t);
+        }
+
+        lStrings.clear();
 
         JSONObject js = new JSONObject();
         js.put("types", ja);
-        
+
         return js;
     }
 }

@@ -21,27 +21,29 @@ import javax.jdo.annotations.PrimaryKey;
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 @Cacheable("true")
-public class Configuracao implements Serializable{
+public class Configuracao implements Serializable {
 
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long key;
-    
+
     @Persistent
     private Long owner;
-  
+
+    @Persistent
+    private boolean pushEnabled = true;
+
     @Persistent(cacheable = "true")
     private String cellPhone;
-    
-    @Persistent(serialized = "true", defaultFetchGroup="true")
-    private HashMap<String,String> lPropriedades;
-    
-    
-    public Configuracao(){
-        this.lPropriedades = new HashMap<String,String>();
+
+    @Persistent(serialized = "true", defaultFetchGroup = "true")
+    private HashMap<String, String> lPropriedades;
+
+    public Configuracao() {
+        this.lPropriedades = new HashMap<String, String>();
     }
-    
-    public String getValue(String key){
+
+    public String getValue(String key) {
         return this.lPropriedades.get(key);
     }
 
@@ -52,9 +54,17 @@ public class Configuracao implements Serializable{
     public void setOwner(Long owner) {
         this.owner = owner;
     }
-    
-    public void setPairValue(String key,String Value){
-        if(this.lPropriedades==null){
+
+    public boolean getPushEnabled() {
+        return pushEnabled;
+    }
+
+    public void setPushEnabled(boolean pushEnabled) {
+        this.pushEnabled = pushEnabled;
+    }
+
+    public void setPairValue(String key, String Value) {
+        if (this.lPropriedades == null) {
             this.lPropriedades = new HashMap();
         }
         this.lPropriedades.put(key, Value);
@@ -83,6 +93,5 @@ public class Configuracao implements Serializable{
     public void setlPropriedades(HashMap<String, String> lPropriedades) {
         this.lPropriedades = lPropriedades;
     }
-    
-    
+
 }
