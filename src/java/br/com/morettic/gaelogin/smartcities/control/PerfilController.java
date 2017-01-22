@@ -1713,4 +1713,35 @@ public class PerfilController {
         pm.close();
         return js;
     }
+
+    public static JSONObject joinUs(HttpServletRequest request) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+
+        JSONObject js = new JSONObject();
+        JSONArray ja = new JSONArray();
+
+        Query q = pm.newQuery(Perfil.class);
+        List<Perfil> joinUsNow = (List<Perfil>) q.execute();
+
+        for (Perfil p : joinUsNow) {
+            //Inicializa Json
+            JSONObject js1 = new JSONObject();
+            try {
+                Imagem m = pm.getObjectById(Imagem.class, p.getAvatar());
+
+                //TOken &
+                js1.put("image", m.getImage());
+                js1.put("path", m.getPath());
+                js1.put("nick", p.getNome());
+
+                ja.put(js1);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        js.put("result", ja);
+        pm.close();
+        return js;
+    }
 }
