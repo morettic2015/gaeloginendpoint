@@ -154,6 +154,9 @@ public class InfoSegController extends HttpServlet {
                 case 31:
                     retJSon = ConfigController.updateProfileConfig(request, getMyTypes());
                     break;
+                case 32:
+                    retJSon = PerfilController.getMyExperiences(request);
+                    break;
                 case 33:
                     retJSon = PushController.sendPushResumeFromLocation(request);
                     break;
@@ -165,10 +168,10 @@ public class InfoSegController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            log.warning(e.toString());
+            //log.warning(e.toString());
         } finally {
             if (retJSon != null) {
-                log.info(retJSon.toString());
+                //log.info(retJSon.toString());
 
                 out.print(retJSon);
             }

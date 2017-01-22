@@ -31,7 +31,7 @@ public class Configuracao implements Serializable {
     private Long owner;
 
     @Persistent
-    private boolean pushEnabled = true;
+    private Boolean pushEnabled = true;
 
     @Persistent(cacheable = "true")
     private String cellPhone;

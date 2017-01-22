@@ -71,7 +71,7 @@ public class ConfigController {
         }
 
         cfn.setCellPhone(request.getParameter("cell"));
-        cfn.setPushEnabled(request.getParameter("push").equals("") ? false : true);
+        cfn.setPushEnabled(request.getParameter("push")==null ? false : true);
 
         //Mapa de configurações
         HashMap<String, String> prop = new HashMap<String, String>();

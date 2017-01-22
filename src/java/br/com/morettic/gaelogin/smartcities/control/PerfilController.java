@@ -534,7 +534,7 @@ public class PerfilController {
         JSONArray jOpenStreetMap = new JSONArray();
         if (searchImoveis) {
 
-           // I//nteger dImoveis = distance < 1000 ? 1000 : distance;
+            // I//nteger dImoveis = distance < 1000 ? 1000 : distance;
             //i*=2;
             GenimoController gc = new GenimoController(lat, lon, distance);
             ja = gc.doSearch();
@@ -718,7 +718,7 @@ public class PerfilController {
         String imgToken = m.getImage().substring(0, m.getImage().length() - 2);
         imgToken = imgToken.substring(2);
         response.sendRedirect("infosegcontroller.exec?action=5&blob-key=" + imgToken);
-       // pm.close();
+        // pm.close();
 
     }
 
@@ -1678,8 +1678,39 @@ public class PerfilController {
         js.put("bairro", p.getBairro());
         js.put("cidade", p.getCidade());
         js.put("pais", p.getPais());
-
+        //pm.close();
         return js;
 
+    }
+
+    public static JSONObject getMyExperiences(HttpServletRequest request) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+
+        JSONObject js = new JSONObject();
+        JSONArray ja = new JSONArray();
+
+        Long id = Long.parseLong(request.getParameter("id"));
+        Perfil p = pm.getObjectById(Perfil.class, id);
+
+        List<Long> ids = p.getlIDsOcorrencias();
+        for (Long idR : ids) {
+            Registro r = pm.getObjectById(Registro.class, idR);
+
+            JSONObject js1 = new JSONObject();
+
+            js1.put("id", r.getKey());
+            js1.put("lat", r.getLatitude());
+            js1.put("lon", r.getLongitude());
+            js1.put("tit", r.getTitulo());
+            js1.put("desc", r.getDescricao());
+            js1.put("tipo", r.getTipo().toString());
+            js1.put("localizacao", r.getAdress());
+            js1.put("dt", r.getDtOcorrencia());
+            ja.put(js1);
+        }
+
+        js.put("result", ja);
+        pm.close();
+        return js;
     }
 }
