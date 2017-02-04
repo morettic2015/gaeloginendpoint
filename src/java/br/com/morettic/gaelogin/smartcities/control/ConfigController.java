@@ -71,14 +71,18 @@ public class ConfigController {
         }
 
         cfn.setCellPhone(request.getParameter("cell"));
-        cfn.setPushEnabled(request.getParameter("push")==null ? false : true);
+        cfn.setPushEnabled(request.getParameter("push")==null ? false : request.getParameter("push").equals("")?false:true);
 
         //Mapa de configurações
         HashMap<String, String> prop = new HashMap<String, String>();
 
         //Set sexo
         prop.put("SEXO", request.getParameter("sex"));
-
+        
+        //set is a bussiness?
+        String bussiness =  request.getParameter("bussiness")==null?"0":request.getParameter("bussiness").equals("1")?"IS_A_BUSSINESS":"NOT_A_BUSSINESS";
+        prop.put("bussiness",bussiness);
+        
         String[] lProperties = request.getParameter("props").split(",");
         JSONArray jaMyP = new JSONArray();
         //Mapa de properiedades

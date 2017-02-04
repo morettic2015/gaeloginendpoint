@@ -8,6 +8,7 @@ package br.com.morettic.gaelogin;
 import br.com.morettic.gaelogin.smartcities.control.ConfigController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
+import br.com.morettic.gaelogin.smartcities.control.URLReader;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -162,6 +163,11 @@ public class InfoSegController extends HttpServlet {
                     break;
                 case 34:
                     retJSon = PerfilController.joinUs(request);
+                    break;
+                case 99:
+                    JSONObject js = new JSONObject();
+                    js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
+                    retJSon = js;
                     break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");

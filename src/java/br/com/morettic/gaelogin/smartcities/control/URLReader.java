@@ -83,6 +83,7 @@ public class URLReader {
         } catch (IOException | JSONException e) {
             elemento = new JSONObject();
             elemento.put("ERROR", e.toString());
+            e.printStackTrace();
         } finally {
             return elemento;
         }
@@ -135,11 +136,56 @@ public class URLReader {
         sb.append("&format=json&polygon=0&addressdetails=1&accept-language=en-US,pt-BR");
         return sb.toString();
     }
-    
-    public static final String getWebhoseIo(String aq){
-        return "http://citywatch.com.br/v1/webhoseNews.php?query="+URLEncoder.encode(aq);
+
+    public static final JSONArray getWebhoseIoResults(String aq) throws JSONException {
+        StringBuilder sb = new StringBuilder("http://webhose.io/search?token=1fc216b6-77ed-4ab8-8afb-a3ba12a44e09&format=json&ts=1485912032309q=");
+        sb.append(URLEncoder.encode(aq));
+        JSONObject js = new JSONObject(readJSONUrl(sb.toString()));
+        //Retorno
+        JSONArray ja = new JSONArray();
+        JSONArray jaFull = js.getJSONArray("posts");
+        /**
+         * id: "e5dff2f5ec0154fcd6d3e0408212c3eac68b1684", 
+         * author: "Agencia
+         * RBS", 
+         * title: "UFSC de luto: morre o professor João Benjamin Cruz",
+         * text: "Moacir Pereira 03/01/2017 | 21h05 Atualizada em 03/01/2017 |
+         * 21h10 UFSC de luto: morre o professor João Benjamin Cruz O professor
+         * destacou-", 
+         * lon: -51.2,
+         * token:
+         * "http://anoticia.rbsdirect.com.br/imagesrc/22107036.jpg?w=200",
+         * idWebPage: 1,
+         * date: "2017-01-04T06:05:00.000+02:00", 
+         * lat: -30.0333,
+         * country: "Brazil", 
+         * city: "Porto Alegre"
+         *
+         */
+        for (int i = 0; i < jaFull.length(); i++) {
+            JSONObject localNew = new JSONObject();
+            localNew.put("id", jaFull.getJSONObject(i).getString("uuid"));
+            localNew.put("title", jaFull.getJSONObject(i).getString("title"));
+            localNew.put("text", jaFull.getJSONObject(i).getString("text"));
+            localNew.put("lon", "");
+            localNew.put("token", jaFull.getJSONObject(i).getJSONObject("thread").getString("main_image"));
+            localNew.put("idWebPage", "");
+            localNew.put("date", jaFull.getJSONObject(i).getJSONObject("thread").getString("published"));
+            localNew.put("lat", "");
+            localNew.put("country", "");
+            localNew.put("city", "");
+            ja.put(localNew);
+            
+        }
+
+        return ja;
     }
-    public static final String getTwitter(String aq){
-        return "http://citywatch.com.br/v1/twitterNews.php?query="+URLEncoder.encode(aq);
+
+    public static final String getWebhoseIo(String aq) {
+        return "http://citywatch.com.br/v1/webhoseNews.php?query=" + URLEncoder.encode(aq);
+    }
+
+    public static final String getTwitter(String aq) {
+        return "http://citywatch.com.br/v1/twitterNews.php?query=" + URLEncoder.encode(aq);
     }
 }

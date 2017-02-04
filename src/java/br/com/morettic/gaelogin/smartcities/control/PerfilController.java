@@ -229,9 +229,13 @@ public class PerfilController {
 
         p.setEmail(request.getParameter("email"));
         p.setNome(request.getParameter("nome"));
-        p.setCpfCnpj(request.getParameter("cpfCnpj"));
+        if (!request.getParameter("cpfCnpj").equals("000.000.000-00")) {
+            p.setCpfCnpj(request.getParameter("cpfCnpj"));
+        }
         p.setAvatar(Long.parseLong(request.getParameter("avatar")));
-        p.setCep(request.getParameter("cep"));
+        if (!request.getParameter("cep").equals("000.000.000-00")) {
+            p.setCep(request.getParameter("cep"));
+        }
         p.setPassWd(request.getParameter("passwd"));
         p.setComplemento(request.getParameter("complemento"));
 
@@ -1041,78 +1045,87 @@ public class PerfilController {
      */
     public static JSONObject findListOcorrenciasRecentes(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         //Conecta com o banco
-        pm = PMF.get().getPersistenceManager();
-        Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Registro order by dtOcorrencia desc");
-        q.setRange(0, 10);
+        JSONObject js = new JSONObject();
+        String city = request.getParameter("city") == null ? "NONEEEEEEEEEE" : request.getParameter("city");
+        if (request.getSession(true).getAttribute(city) == null) {
+            pm = PMF.get().getPersistenceManager();
+            Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Registro order by dtOcorrencia desc");
+            q.setRange(0, 10);
 
         //Inicializa Json
-        JSONObject js = new JSONObject();
-        List<Registro> lSOcorrencias = (List<Registro>) q.execute();
+            List<Registro> lSOcorrencias = (List<Registro>) q.execute();
 
-        //Executa apenas uma vez...
-        RatingSingleton.init(pm);
+            //Executa apenas uma vez...
+            RatingSingleton.init(pm);
 
-        //Formata o resultado filtrado
-        JSONArray ja = new JSONArray();
+            //Formata o resultado filtrado
+            JSONArray ja = new JSONArray();
 
-        //Imagem padrão
-        Imagem m = null;
-        DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-        for (Registro o : lSOcorrencias) {
-            JSONObject js1 = new JSONObject();
-            js1.put("id", o.getKey());
-            js1.put("tit", o.getTitulo());
-            js1.put("desc", o.getDescricao());
-            js1.put("tipo", o.getTipo().toString());
-            js1.put("date", dt.format(o.getDtOcorrencia()));
-            js1.put("address", o.getAdress());
-            js1.put("lat", o.getLatitude());
-            js1.put("lon", o.getLongitude());
-            js1.put("rating", RatingSingleton.getRating(o.getKey()));
+            //Imagem padrão
+            Imagem m = null;
+            DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+            for (Registro o : lSOcorrencias) {
+                JSONObject js1 = new JSONObject();
+                js1.put("id", o.getKey());
+                js1.put("tit", o.getTitulo());
+                js1.put("desc", o.getDescricao());
+                js1.put("tipo", o.getTipo().toString());
+                js1.put("date", dt.format(o.getDtOcorrencia()));
+                js1.put("address", o.getAdress());
+                js1.put("lat", o.getLatitude());
+                js1.put("lon", o.getLongitude());
+                js1.put("rating", RatingSingleton.getRating(o.getKey()));
 
             //Validar se nao tiver o avatar....
-            //Recupera a imagem para associar o token do blob
-            try {
-                m = pm.getObjectById(Imagem.class, o.getAvatar());
-                js1.put("token", m.getKey());
-            } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
-                js1.put("token", "-1");
-            }
+                //Recupera a imagem para associar o token do blob
+                try {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar());
+                    js1.put("token", m.getKey());
+                } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
+                    js1.put("token", "-1");
+                }
             //Imagens adicionais e suas validações
-            //Imagens opcionais da ocorrência
-            if (o.getAvatar1() != null) {
-                m = pm.getObjectById(Imagem.class, o.getAvatar1());
-                js1.put("token1", m.getKey());
-            } else {
-                js1.put("token1", "null");
-            }
-            if (o.getAvatar2() != null) {
-                m = pm.getObjectById(Imagem.class, o.getAvatar2());
-                js1.put("token2", m.getKey());
-            } else {
-                js1.put("token2", "null");
-            }
-            if (o.getAvatar3() != null) {
-                m = pm.getObjectById(Imagem.class, o.getAvatar3());
-                js1.put("token3", m.getKey());
-            } else {
-                js1.put("token3", "null");
+                //Imagens opcionais da ocorrência
+                if (o.getAvatar1() != null) {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar1());
+                    js1.put("token1", m.getKey());
+                } else {
+                    js1.put("token1", "null");
+                }
+                if (o.getAvatar2() != null) {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar2());
+                    js1.put("token2", m.getKey());
+                } else {
+                    js1.put("token2", "null");
+                }
+                if (o.getAvatar3() != null) {
+                    m = pm.getObjectById(Imagem.class, o.getAvatar3());
+                    js1.put("token3", m.getKey());
+                } else {
+                    js1.put("token3", "null");
+                }
+
+                //Recupera o perfil
+                Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
+                js1.put("author", pOcorencia.getNome());
+
+                ja.put(js1);
+
             }
 
-            //Recupera o perfil
-            Perfil pOcorencia = pm.getObjectById(Perfil.class, o.getPerfil());
-            js1.put("author", pOcorencia.getNome());
+            String ct = Normalizer.normalize(city, Normalizer.Form.NFD);
+            ct = ct.replaceAll("[^\\p{ASCII}]", "");
 
-            ja.put(js1);
-
+            js.put("rList", ja);
+            js.put("wList", readJSONArrayUrl(getWebhoseIo(ct)));
+            js.put("tList", readJSONArrayUrl(getTwitter(ct)));
+            js.put("has", false);
+            request.getSession(true).setAttribute(city, js.toString());
+        } else {
+            js = new JSONObject(request.getSession(true).getAttribute(city).toString());
+            js.put("has", true);
         }
 
-        String ct = Normalizer.normalize(request.getParameter("city"), Normalizer.Form.NFD);
-        ct = ct.replaceAll("[^\\p{ASCII}]", "");
-
-        js.put("rList", ja);
-        js.put("wList", readJSONArrayUrl(getWebhoseIo(ct)));
-        js.put("tList", readJSONArrayUrl(getTwitter(ct)));
         return js;
     }
 
