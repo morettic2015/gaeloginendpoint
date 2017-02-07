@@ -257,7 +257,7 @@ public class PerfilController {
         } finally {
             //Fecha a conexão com o datastore
             pm.close();
-            //Coloca os parametros 
+            //Coloca os parametros
             js.put("key", p.getKey());
             js.put("path", p.getEmail());
 
@@ -353,7 +353,7 @@ public class PerfilController {
 
          Image oldImage = ImagesServiceFactory.makeImageFromBlob(blobKey);
          Transform resize = ImagesServiceFactory.makeResize(150, 150);
-        
+
          Image newImage = imagesService.applyTransform(resize, oldImage);
 
          byte[] newImageData = newImage.;*/
@@ -385,7 +385,7 @@ public class PerfilController {
         try {
             distance = Integer.parseInt(request.getParameter("d"));
         } catch (NumberFormatException e) {
-            distance = 10;//Distancia = 0 
+            distance = 10;//Distancia = 0
         }
 
         //Calc da latitude variacao
@@ -446,7 +446,7 @@ public class PerfilController {
             Query q2 = pm.newQuery(Registro.class, filter);
             q2.declareParameters("Long pPerfil");
             //q2.setOrdering("dtOcorrencia desc");
-            q2.setRange(0, 50);//TOP 
+            q2.setRange(0, 50);//TOP
             lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
         }
         //Lon max com base no raio da distância
@@ -459,7 +459,7 @@ public class PerfilController {
         DateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         for (Registro o : lSOcorrencias) {
             //Verifica se o tipo da ocorrencia está no mapa de chaves de tipo.
-            //Se o mapa de chaves estiver vazio e nao tiver a chave nao faz nada 
+            //Se o mapa de chaves estiver vazio e nao tiver a chave nao faz nada
             if (!mapaChaves.isEmpty() && !mapaChaves.containsValue(o.getTipo().name())) {
                 continue;//Não e do tipo pesquisado
             }
@@ -595,9 +595,13 @@ public class PerfilController {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR", TipoOcorrencia.BEER.toString()));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "CERVEJA", TipoOcorrencia.BEER.toString()));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "BEER", TipoOcorrencia.BEER.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "DRINK", TipoOcorrencia.INFRAESTRUTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SHOW", TipoOcorrencia.INFRAESTRUTURA.toString()));
-            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB", TipoOcorrencia.INFRAESTRUTURA.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "DRINK", TipoOcorrencia.BEER.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "SHOW", TipoOcorrencia.BEER.toString()));
+            jOpenStreetMap.put(getOpenStreeMapCollection(city, "PUB", TipoOcorrencia.BEER.toString()));
+            //BeerMapping
+
+            BeerMappingController bmc = new BeerMappingController(lat, lon);
+            jOpenStreetMap.put(bmc.doSearch());
         }
         if (searchInfra) {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.INFRAESTRUTURA.toString()));
@@ -892,7 +896,7 @@ public class PerfilController {
         r.setIdOcorrencia(idOcorrencia);
         r.setIdProfile(idPerfil);
         r.setRating(rating);
-        //Salva 
+        //Salva
         pm.makePersistent(r);
         //Adiciona no catalogo!!!!!
         RatingSingleton.put(idOcorrencia, r.getKey(), rating);
@@ -1052,7 +1056,7 @@ public class PerfilController {
             Query q = pm.newQuery("select from br.com.morettic.gaelogin.smartcities.vo.Registro order by dtOcorrencia desc");
             q.setRange(0, 10);
 
-        //Inicializa Json
+            //Inicializa Json
             List<Registro> lSOcorrencias = (List<Registro>) q.execute();
 
             //Executa apenas uma vez...
@@ -1076,7 +1080,7 @@ public class PerfilController {
                 js1.put("lon", o.getLongitude());
                 js1.put("rating", RatingSingleton.getRating(o.getKey()));
 
-            //Validar se nao tiver o avatar....
+                //Validar se nao tiver o avatar....
                 //Recupera a imagem para associar o token do blob
                 try {
                     m = pm.getObjectById(Imagem.class, o.getAvatar());
@@ -1084,7 +1088,7 @@ public class PerfilController {
                 } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
                     js1.put("token", "-1");
                 }
-            //Imagens adicionais e suas validações
+                //Imagens adicionais e suas validações
                 //Imagens opcionais da ocorrência
                 if (o.getAvatar1() != null) {
                     m = pm.getObjectById(Imagem.class, o.getAvatar1());
@@ -1217,7 +1221,7 @@ public class PerfilController {
                 try {
                     pm = PMF.get().getPersistenceManager();
                     String[] lRegister = line.split(",");
-                    //Ocorrencia 
+                    //Ocorrencia
                     Registro o = new Registro();
                     o.setLatitude(lRegister[0].toUpperCase());
                     o.setLongitude(lRegister[1].toUpperCase());
@@ -1412,8 +1416,8 @@ public class PerfilController {
      * "Florian��polis" }, boundingbox: [ "-27.5926301", "-27.5923632",
      * "-48.5520729", "-48.5519388" ], osm_id: "227073641", class: "tourism",
      * osm_type: "way", type: "hotel", lat: "-27.5924966" },
-     *     
-* {
+     *
+     * {
      * id: 5110511926509568, author: "LAM MXRETTX", lon: "-48.67482", desc:
      * "CLÍNICO GERAL", token3: "null", token: 5673461879930880, address:
      * "ESTRADA GRP | 396 (IBIRAQUERA | PRAIA ROSA |
@@ -1529,8 +1533,8 @@ public class PerfilController {
     /**
      *
      * name: { title: "miss", first: "kristin", last: "perry"
-     *     
-* location: { street: "2123 avondale ave", city: "grapevine", state:
+     *
+     * location: { street: "2123 avondale ave", city: "grapevine", state:
      * "alaska", postcode: 19219 },
      *
      */
