@@ -1,6 +1,6 @@
 //Lista de equipes de saude
 http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=acs_equipes&outputFormat=JSON
-//Estabelecimentos de saude 
+//Estabelecimentos de saude
 http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=cnes&outputFormat=JSON
 //Unidades basicas de saude
 http://repositorio.dados.gov.br/saude/unidades-saude/unidade-basica-saude/ubs.csv
@@ -21,3 +21,27 @@ Do resumo do conjunto de dados
 
 As Unidades de Pronto Atendimento (UPAs) ficam abe
 http://i3geo.saude.gov.br/i3geo/ogc.php?service=WFS&version=1.0.0&request=GetFeature&typeName=upa_funcionamento_cnes&outputFormat=JSON
+
+lat, lon
+
+curl "https://airport.api.aero/airport/ORK?user_key=c49c615fab5bf6946108a27db616a895&lng=-48.5041692&lat=27.601195"
+ {
+   "processingDurationMillis":22,
+   "authorisedAPI":true,
+   "success":true,
+   "airports":[
+      {
+         "code":"ORK",
+         "name":"Cork",
+         "city":"Cork",
+         "country":"Ireland",
+         "lat":51.841269,
+         "lng":-8.491111,
+         "timezone":"Europe/Dublin"
+      }
+   ]
+}
+
+
+https://api.airbnb.com/v2/search_results?client_id=3092nxybyb0otqw18e8nh5nty&locale=pt-BR&currency=USD&_format=for_search_results_with_minimal_pricing&_limit=50&_offset=0&fetch_facets=true&guests=1&ib=true&ib_add_photo_flow=true&location=Florianopolis&min_bathrooms=0&min_bedrooms=0&min_beds=1&min_num_pic_urls=10&price_max=210&price_min=40&sort=1&user_lat=-27.601195&user_lng=-48.5041692
+https://api.airbnb.com/v2/reviews?client_id=3092nxybyb0otqw18e8nh5nty&listing_id=8124754&role=all

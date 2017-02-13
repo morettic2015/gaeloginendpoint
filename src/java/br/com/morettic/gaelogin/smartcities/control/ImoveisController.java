@@ -16,13 +16,13 @@ import java.net.URL;
  *
  * @author LuisAugusto
  */
-public class GenimoController implements Search {
+public class ImoveisController implements Search {
 
     private JSONArray ja;
     private Integer distance;
     private Double latitude, longitude;
 
-    public GenimoController(Double lat, Double lon, Integer d) {
+    public ImoveisController(Double lat, Double lon, Integer d) {
         this.distance = d;
         this.latitude = lat;
         this.longitude = lon;

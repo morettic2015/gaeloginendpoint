@@ -5,6 +5,7 @@
  */
 package br.com.morettic.gaelogin;
 
+import br.com.morettic.gaelogin.smartcities.control.AirbnbController;
 import br.com.morettic.gaelogin.smartcities.control.ConfigController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
@@ -52,7 +53,7 @@ public class InfoSegController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try {
-
+            JSONObject js = new JSONObject();
             String action = request.getParameter("action");
             Integer actionNumber = -1;
             if (action != null) {
@@ -146,7 +147,7 @@ public class InfoSegController extends HttpServlet {
                 case 29:
                     retJSon = PerfilController.getMyWebsiteProfile(request, getMyTypes());
                     break;
-                case 28:
+                case 28://RESULT MY TYPES FROM ENUM
                     retJSon = getMyTypes();
                     break;
                 case 30:
@@ -164,8 +165,12 @@ public class InfoSegController extends HttpServlet {
                 case 34:
                     retJSon = PerfilController.joinUs(request);
                     break;
+                case 35://AIRBNB TEST ONLY
+                    AirbnbController airbnbController = new AirbnbController(request.getParameter("city"), Double.parseDouble(request.getParameter("lat")), Double.parseDouble(request.getParameter("lon")));
+                    retJSon = js.put("result", airbnbController.doSearch());
+                    break;
                 case 99:
-                    JSONObject js = new JSONObject();
+
                     js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
                     retJSon = js;
                     break;
@@ -177,7 +182,8 @@ public class InfoSegController extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            //log.warning(e.toString());
+            Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage());
+            Logger.getAnonymousLogger().log(Level.SEVERE, e.toString());
         } finally {
             if (retJSon != null) {
                 //log.info(retJSon.toString());

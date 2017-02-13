@@ -540,7 +540,7 @@ public class PerfilController {
 
             // I//nteger dImoveis = distance < 1000 ? 1000 : distance;
             //i*=2;
-            GenimoController gc = new GenimoController(lat, lon, distance);
+            ImoveisController gc = new ImoveisController(lat, lon, distance);
             ja = gc.doSearch();
 
             js.put("urlGenimo", gc.getUrl());
@@ -553,6 +553,9 @@ public class PerfilController {
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "IMOVEIS", TipoOcorrencia.IMOVEIS.toString()));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "IMOBILIARIA", TipoOcorrencia.IMOVEIS.toString()));
             jOpenStreetMap.put(getOpenStreeMapCollection(city, "CORRETORA", TipoOcorrencia.IMOVEIS.toString()));
+
+            AirbnbController airbnbController = new AirbnbController(city, lat, lon);
+            js.put("airbnb", airbnbController.doSearch());
         }
 
         if (searchTurismo) {

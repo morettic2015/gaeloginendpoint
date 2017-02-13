@@ -10,6 +10,7 @@ package br.com.morettic.gaelogin.smartcities.vo;
  */
 public enum TipoOcorrencia {
 
+    AIRBNB(false),
     SERVICOS(false),
     SAUDE(true),
     POLITICA(true),
@@ -51,4 +52,5 @@ public enum TipoOcorrencia {
     }
 
     private boolean isVisible = false;
+
 }
