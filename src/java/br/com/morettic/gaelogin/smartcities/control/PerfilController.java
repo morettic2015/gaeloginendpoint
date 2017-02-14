@@ -1087,7 +1087,7 @@ public class PerfilController {
                 //Recupera a imagem para associar o token do blob
                 try {
                     m = pm.getObjectById(Imagem.class, o.getAvatar());
-                    js1.put("token", m.getKey());
+                    js1.put("token", getUrlFromImage(pm, m.getKey()));
                 } catch (javax.jdo.JDOObjectNotFoundException jDOObjectNotFoundException) {
                     js1.put("token", "-1");
                 }
@@ -1095,19 +1095,19 @@ public class PerfilController {
                 //Imagens opcionais da ocorrência
                 if (o.getAvatar1() != null) {
                     m = pm.getObjectById(Imagem.class, o.getAvatar1());
-                    js1.put("token1", m.getKey());
+                    js1.put("token1", getUrlFromImage(pm, m.getKey()));
                 } else {
                     js1.put("token1", "null");
                 }
                 if (o.getAvatar2() != null) {
                     m = pm.getObjectById(Imagem.class, o.getAvatar2());
-                    js1.put("token2", m.getKey());
+                    js1.put("token2", getUrlFromImage(pm, m.getKey()));
                 } else {
                     js1.put("token2", "null");
                 }
                 if (o.getAvatar3() != null) {
                     m = pm.getObjectById(Imagem.class, o.getAvatar3());
-                    js1.put("token3", m.getKey());
+                    js1.put("token3", getUrlFromImage(pm, m.getKey()));
                 } else {
                     js1.put("token3", "null");
                 }
@@ -1124,7 +1124,8 @@ public class PerfilController {
             ct = ct.replaceAll("[^\\p{ASCII}]", "");
 
             js.put("rList", ja);
-            js.put("wList", readJSONArrayUrl(getWebhoseIo(ct)));
+            //js.put("wList", readJSONArrayUrl(getWebhoseIo(ct)));//Twoo slow need to improve it.....
+            js.put("wList", new JSONArray());
             js.put("tList", readJSONArrayUrl(getTwitter(ct)));
             js.put("has", false);
             request.getSession(true).setAttribute(city, js.toString());
@@ -1134,6 +1135,14 @@ public class PerfilController {
         }
 
         return js;
+    }
+
+    private static final String getUrlFromImage(PersistenceManager pm, Long id) {
+        Imagem m = pm.getObjectById(Imagem.class, id);
+
+        String imgToken = m.getImage().substring(0, m.getImage().length() - 2);
+        imgToken = imgToken.substring(2);
+        return ("http://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + imgToken);
     }
 
     /**

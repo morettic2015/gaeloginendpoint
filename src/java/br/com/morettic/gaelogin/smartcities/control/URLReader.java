@@ -9,15 +9,10 @@ import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import static java.net.URLEncoder.encode;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -145,21 +140,14 @@ public class URLReader {
         JSONArray ja = new JSONArray();
         JSONArray jaFull = js.getJSONArray("posts");
         /**
-         * id: "e5dff2f5ec0154fcd6d3e0408212c3eac68b1684", 
-         * author: "Agencia
-         * RBS", 
-         * title: "UFSC de luto: morre o professor João Benjamin Cruz",
+         * id: "e5dff2f5ec0154fcd6d3e0408212c3eac68b1684", author: "Agencia
+         * RBS", title: "UFSC de luto: morre o professor João Benjamin Cruz",
          * text: "Moacir Pereira 03/01/2017 | 21h05 Atualizada em 03/01/2017 |
          * 21h10 UFSC de luto: morre o professor João Benjamin Cruz O professor
-         * destacou-", 
-         * lon: -51.2,
-         * token:
+         * destacou-", lon: -51.2, token:
          * "http://anoticia.rbsdirect.com.br/imagesrc/22107036.jpg?w=200",
-         * idWebPage: 1,
-         * date: "2017-01-04T06:05:00.000+02:00", 
-         * lat: -30.0333,
-         * country: "Brazil", 
-         * city: "Porto Alegre"
+         * idWebPage: 1, date: "2017-01-04T06:05:00.000+02:00", lat: -30.0333,
+         * country: "Brazil", city: "Porto Alegre"
          *
          */
         for (int i = 0; i < jaFull.length(); i++) {
@@ -175,17 +163,17 @@ public class URLReader {
             localNew.put("country", "");
             localNew.put("city", "");
             ja.put(localNew);
-            
+
         }
 
         return ja;
     }
 
     public static final String getWebhoseIo(String aq) {
-        return "http://citywatch.com.br/v1/webhoseNews.php?query=" + URLEncoder.encode(aq);
+        return "https://citywatch.com.br/v1/webhoseNews.php?query=" + URLEncoder.encode(aq);
     }
 
     public static final String getTwitter(String aq) {
-        return "http://citywatch.com.br/v1/twitterNews.php?query=" + URLEncoder.encode(aq);
+        return "https://citywatch.com.br/v1/twitterNews.php?query=" + URLEncoder.encode(aq);
     }
 }
