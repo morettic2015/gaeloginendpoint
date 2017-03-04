@@ -57,6 +57,8 @@ import java.net.URLEncoder;
 import java.text.Normalizer;
 import java.util.Collection;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 ;
 
@@ -370,7 +372,7 @@ public class PerfilController {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
         Set<Registro> lSOcorrencias = new HashSet<Registro>();
-        String id = request.getParameter("id");
+        //String id = request.getParameter("id");
         double lat = Double.parseDouble(request.getParameter("lat"));
         double lon = Double.parseDouble(request.getParameter("lon"));
         double latMax, latMin, q1;
@@ -380,8 +382,7 @@ public class PerfilController {
         int totaltela = 0;
 
         //recupera perfil
-        Perfil p = pm.getObjectById(Perfil.class, new Long(id));
-
+        // Perfil p = pm.getObjectById(Perfil.class, new Long(id));
         try {
             distance = Integer.parseInt(request.getParameter("d"));
         } catch (NumberFormatException e) {
@@ -441,14 +442,14 @@ public class PerfilController {
         lSOcorrencias.addAll((List<Registro>) q.execute(latMin, latMax));
         //se tiver checkado mine carrega 50 do cara que devem ser do mesmo tipo filtrado
         //Recupera as ocorrencias do perfil.
-        if (request.getParameter("mine") != null) {//
-            filter = "this.perfilUsuario==pPerfil";
-            Query q2 = pm.newQuery(Registro.class, filter);
-            q2.declareParameters("Long pPerfil");
-            //q2.setOrdering("dtOcorrencia desc");
-            q2.setRange(0, 50);//TOP
-            lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
-        }
+       /* if (request.getParameter("mine") != null) {//
+         filter = "this.perfilUsuario==pPerfil";
+         Query q2 = pm.newQuery(Registro.class, filter);
+         q2.declareParameters("Long pPerfil");
+         //q2.setOrdering("dtOcorrencia desc");
+         q2.setRange(0, 50);//TOP
+         lSOcorrencias.addAll((Collection<? extends Registro>) q2.execute(p.getKey()));
+         }*/
         //Lon max com base no raio da distância
         double lonMax = lon + (distance * 0.0009);
         double lonMin = lon - (distance * 0.0009);
@@ -1137,7 +1138,7 @@ public class PerfilController {
         return js;
     }
 
-    private static final String getUrlFromImage(PersistenceManager pm, Long id) {
+    public static final String getUrlFromImage(PersistenceManager pm, Long id) {
         Imagem m = pm.getObjectById(Imagem.class, id);
 
         String imgToken = m.getImage().substring(0, m.getImage().length() - 2);
@@ -1683,8 +1684,10 @@ public class PerfilController {
                 }
                 js.put("config", ja);
 
+            } catch (javax.jdo.JDOObjectNotFoundException e1) {
+                Logger.getAnonymousLogger().log(Level.SEVERE, e1.getMessage());
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage());
             }
 
         } else {

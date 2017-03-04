@@ -7,6 +7,7 @@ package br.com.morettic.gaelogin;
 
 import br.com.morettic.gaelogin.smartcities.control.AirbnbController;
 import br.com.morettic.gaelogin.smartcities.control.ConfigController;
+import br.com.morettic.gaelogin.smartcities.control.ManguevivoController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
 import br.com.morettic.gaelogin.smartcities.control.URLReader;
@@ -151,6 +152,7 @@ public class InfoSegController extends HttpServlet {
                     retJSon = getMyTypes();
                     break;
                 case 30:
+
                     retJSon = PerfilController.perfilExists(request, getMyTypes());
                     break;
                 case 31:
@@ -168,6 +170,10 @@ public class InfoSegController extends HttpServlet {
                 case 35://AIRBNB TEST ONLY
                     AirbnbController airbnbController = new AirbnbController(request.getParameter("city"), Double.parseDouble(request.getParameter("lat")), Double.parseDouble(request.getParameter("lon")));
                     retJSon = js.put("result", airbnbController.doSearch());
+                    break;
+                case 36://MANGUE VIVO
+                    ManguevivoController mvController = new ManguevivoController();
+                    retJSon = js.put("result", mvController.doSearch());
                     break;
                 case 99:
 
