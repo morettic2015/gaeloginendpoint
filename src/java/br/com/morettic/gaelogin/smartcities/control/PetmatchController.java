@@ -91,6 +91,9 @@ public class PetmatchController {
                 pm.makePersistent(p1);
 
                 js.put("in", true);
+                js.put("name", p1.getNome());
+                js.put("email", p1.getEmail());
+                js.put("id", p1.getKey());
 
             }
         } else {
@@ -99,10 +102,16 @@ public class PetmatchController {
              */
             js.put("new", false);
             p1 = lRet.get(0);
-            String passwd = req.getParameter("pass");
+            js.put("name", p1.getNome());
+            js.put("email", p1.getEmail());
+            js.put("id", p1.getKey());
+            js.put("cpf", p1.getCpfCnpj());
+            js.put("cep", p1.getCep());
+            js.put("fone", "999999"); //TODO FONE
+            String passwd = req.getParameter("pass") == null ? "###################################################" : req.getParameter("pass");
             if (passwd.equals(p1.getPassWd())) {
                 js.put("in", true);
-            } else if (id.equals(p1.getKey().toString())) {
+            } else if (id != null && id.equals(p1.getKey().toString())) {
                 js.put("in", true);
             } else {
                 js.put("in", false);
