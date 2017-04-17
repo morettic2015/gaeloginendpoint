@@ -51,16 +51,17 @@ public class PetmatchController {
         List<Perfil> lRet = (List<Perfil>) q.execute(email.toUpperCase());
         //Nao tem nenhum com o email pesquisado....
         Perfil p1;
+        String id = req.getParameter("id");
         js.put("in", false);
         if ((lRet.size() < 1)) {
             /**
              * Não existe veio do facebook
              */
             js.put("new", true);
-            if (req.getParameter("id") != null) {
+            if (id != null) {
 
                 p1 = new Perfil();
-                p1.setKey(Long.parseLong(req.getParameter("id")));
+                p1.setKey(Long.parseLong(id));
                 p1.setEmail(email);
                 p1.setNome(req.getParameter("name"));
                 p1.setPassWd(java.util.UUID.randomUUID().toString());
@@ -100,6 +101,8 @@ public class PetmatchController {
             p1 = lRet.get(0);
             String passwd = req.getParameter("pass");
             if (passwd.equals(p1.getPassWd())) {
+                js.put("in", true);
+            } else if (id.equals(p1.getKey().toString())) {
                 js.put("in", true);
             } else {
                 js.put("in", false);
