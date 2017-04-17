@@ -281,7 +281,7 @@ public class PerfilController {
     public static final String ERROR = "error";
     public static final String EMAIL_JÁ_EXISTE_NA_BASE_DE_DADOS = "email já existe na base de dados!";
     public static final String UM_FILHO_DA_PUTA_TENTOU_HACKER_OU_BUG_DE_ = "Um filho da puta tentou hacker ou bug de uma client maldito. Email ja existente porra!!!!";
-    public static final String HTTPSVIACEPCOMBRWS = "http://smartapp.morettic.com.br/postalcode/?code=";
+    public static final String HTTPSVIACEPCOMBRWS = "https://morettic.com.br/smartapp/postalcode/?code=";
 
     public static JSONObject getUploadPath(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();

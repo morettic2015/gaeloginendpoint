@@ -9,8 +9,10 @@ import br.com.morettic.gaelogin.smartcities.control.AirbnbController;
 import br.com.morettic.gaelogin.smartcities.control.ConfigController;
 import br.com.morettic.gaelogin.smartcities.control.ManguevivoController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
+import br.com.morettic.gaelogin.smartcities.control.PetmatchController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
 import br.com.morettic.gaelogin.smartcities.control.URLReader;
+import br.com.morettic.gaelogin.smartcities.vo.PetmatchAction;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -52,7 +54,8 @@ public class InfoSegController extends HttpServlet {
             throws ServletException, IOException, JSONException {
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
-
+        PetmatchAction pma = PetmatchAction.SIGNIN;
+        int responseType = 0;
         try {
             JSONObject js = new JSONObject();
             String action = request.getParameter("action");
@@ -175,8 +178,20 @@ public class InfoSegController extends HttpServlet {
                     ManguevivoController mvController = new ManguevivoController();
                     retJSon = js.put("result", mvController.doSearch());
                     break;
+                /**
+                 * @petmatchController with JSONP
+                 */
+                case 37:
+                    response.setContentType("text/javascript");
+                    PetmatchController pt = new PetmatchController();
+                    retJSon = pt.loginProfile(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.SIGNIN;
+                    break;
+                /**
+                 * @testes
+                 */
                 case 99:
-
                     js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
                     retJSon = js;
                     break;
@@ -193,8 +208,11 @@ public class InfoSegController extends HttpServlet {
         } finally {
             if (retJSon != null) {
                 //log.info(retJSon.toString());
-
-                out.print(retJSon);
+                if (responseType == 0) {
+                    out.print(retJSon);
+                } else {
+                    out.print(pma.toString() + "(" + retJSon.toString() + ")");
+                }
             }
 
             out.close();

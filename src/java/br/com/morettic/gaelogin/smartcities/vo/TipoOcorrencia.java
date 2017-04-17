@@ -37,6 +37,7 @@ public enum TipoOcorrencia {
     TEATRO(false),
     FETAESC(true),
     MANGUE_VIVO(true),
+    PET_MATCH(false),
     INFRAESTRUTURA(true);
 
     private TipoOcorrencia(Boolean visible) {
