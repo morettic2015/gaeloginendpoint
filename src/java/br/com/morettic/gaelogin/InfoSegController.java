@@ -188,6 +188,13 @@ public class InfoSegController extends HttpServlet {
                     responseType = 1;
                     pma = PetmatchAction.SIGNIN;
                     break;
+                case 38:
+                    response.setContentType("text/javascript");
+                    PetmatchController pt1 = new PetmatchController();
+                    retJSon = pt1.updateProfile(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.UPDATE_PROFILE;
+                    break;
                 /**
                  * @testes
                  */

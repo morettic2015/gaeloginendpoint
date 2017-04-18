@@ -11,5 +11,6 @@ package br.com.morettic.gaelogin.smartcities.vo;
  */
 public enum PetmatchAction {
 
+    UPDATE_PROFILE,
     SIGNIN;
 }

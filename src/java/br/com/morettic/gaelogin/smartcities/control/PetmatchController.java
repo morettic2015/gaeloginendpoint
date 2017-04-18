@@ -5,6 +5,9 @@
  */
 package br.com.morettic.gaelogin.smartcities.control;
 
+import static br.com.morettic.gaelogin.smartcities.control.PerfilController.HTTPSVIACEPCOMBRWS;
+import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
+import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
 import com.google.appengine.api.blobstore.BlobKey;
@@ -26,6 +29,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,10 +40,58 @@ import javax.servlet.http.HttpServletResponse;
 public class PetmatchController {
 
     private static PersistenceManager pm = null;
-    private static BlobstoreService blobstoreService;
-    private static final Double UMK = 0.1570d;
-    private static UserService userService;
-    private static User user;
+    /* private static BlobstoreService blobstoreService;
+     private static final Double UMK = 0.1570d;
+     private static UserService userService;
+     private static User user;*/
+
+    public static JSONObject updateProfile(HttpServletRequest req, HttpServletResponse res) throws JSONException, IOException {
+        JSONObject js = new JSONObject();
+        pm = PMF.get().getPersistenceManager();
+        //Get parameters
+        String id = req.getParameter("id");
+        String nm = req.getParameter("name");
+        String cep = req.getParameter("cep");
+        String cpf = req.getParameter("cpf");
+        String rua = req.getParameter("rua");
+        String fone = req.getParameter("fone");
+        String pass = req.getParameter("pass");
+        //String bairro = req.getParameter("bairro");
+        String complemento = req.getParameter("complemento");
+        //CEP WEBSERVICE
+        JSONObject address = readJSONUrl(HTTPSVIACEPCOMBRWS + cep.replace("-", ""));
+        js.append("addrs", address);
+        //Find perfil byID
+        Perfil p1 = pm.getObjectById(Perfil.class, Long.parseLong(id));
+        //Set profile
+        p1.setRua(address.getString("state"));
+        p1.setCidade(address.getString("city"));
+        p1.setBairro(address.getString("bairro"));
+        p1.setPais(address.getString("country"));
+        p1.setNome(nm);
+        p1.setRua(rua);
+        p1.setCep(cep);
+        p1.setCpfCnpj(cpf);
+        p1.setComplemento(complemento);
+        p1.setPassWd(pass);
+        //COnfiguração novo ou nao
+        Configuracao cfg = p1.getConfig() == null ? new Configuracao() : pm.getObjectById(Configuracao.class, p1.getConfig());
+        //Update conf
+        cfg.setCellPhone(fone);
+        cfg.setOwner(p1.getKey());
+        //Save conf
+        pm.makePersistent(cfg);
+        //Set p1 conf id
+        p1.setConfig(cfg.getKey());
+        //Save profile
+
+        pm.makePersistent(p1);
+        pm.close();
+
+        js.put("conf", cfg.getKey());
+
+        return js;
+    }
 
     public static JSONObject loginProfile(HttpServletRequest req, HttpServletResponse res) throws JSONException, IOException {
         JSONObject js = new JSONObject();
@@ -100,6 +152,7 @@ public class PetmatchController {
             /**
              * Fazendo login ja e cadastrado
              */
+
             js.put("new", false);
             p1 = lRet.get(0);
             js.put("name", p1.getNome());
@@ -107,7 +160,22 @@ public class PetmatchController {
             js.put("id", p1.getKey());
             js.put("cpf", p1.getCpfCnpj());
             js.put("cep", p1.getCep());
-            js.put("fone", "999999"); //TODO FONE
+            js.put("rua", p1.getRua());
+            js.put("bairro", p1.getBairro());
+            js.put("complemento", p1.getComplemento());
+
+            Configuracao cfg;
+            if (p1.getConfig() != null) {
+                try {
+                    cfg = pm.getObjectById(Configuracao.class, p1.getConfig());
+                    js.put("fone", cfg.getCellPhone()); //TODO FONE
+                } catch (EntityNotFoundException e) {
+                    cfg = new Configuracao();
+                }
+            } else {
+                js.put("fone", ""); //TODO FONE
+            }
+
             String passwd = req.getParameter("pass") == null ? "###################################################" : req.getParameter("pass");
             if (passwd.equals(p1.getPassWd())) {
                 js.put("in", true);
