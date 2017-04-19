@@ -181,26 +181,38 @@ public class InfoSegController extends HttpServlet {
                 /**
                  * @petmatchController with JSONP
                  */
-                case 37:
+                case 37://Login facebook normal
                     response.setContentType("text/javascript");
-                    PetmatchController pt = new PetmatchController();
-                    retJSon = pt.loginProfile(request, response);
+                    retJSon = PetmatchController.loginProfile(request, response);
                     responseType = 1;
                     pma = PetmatchAction.SIGNIN;
                     break;
-                case 38:
+                case 38://Update profile
                     response.setContentType("text/javascript");
-                    PetmatchController pt1 = new PetmatchController();
-                    retJSon = pt1.updateProfile(request, response);
+                    retJSon = PetmatchController.updateProfile(request, response);
                     responseType = 1;
                     pma = PetmatchAction.UPDATE_PROFILE;
                     break;
+                case 39://register user devoxe
+                    response.setContentType("text/javascript");
+                    retJSon = PetmatchController.registerUserDevice(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.PUSH_REGISTER;
+                    break;
+                case 40://register user devoxe
+                    response.setContentType("text/javascript");
+                    retJSon = PerfilController.getUploadPath(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.UPLOAD_PATH;
+                    break;
                 /**
+                 *
+                 *
                  * @testes
                  */
                 case 99:
-                    js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
-                    retJSon = js;
+                    //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
+                    retJSon = PetmatchController.savePet(request, response);
                     break;
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");

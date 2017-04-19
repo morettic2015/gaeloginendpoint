@@ -29,8 +29,17 @@ public class PushDevice implements Serializable {
     @Persistent(name = "idProfile")
     private Long idProfile;
     @Persistent(name = "deviceToken")
-    @Column(allowsNull = "false")
-    private String deviceToken;
+    @Column(allowsNull = "true")
+    private String deviceToken = null;
+
+    @Persistent(name = "petToken")
+    @Column(allowsNull = "true")
+    private String petToken = null;
+
+    @Persistent(name = "oneSignalID")
+    @Column(allowsNull = "true")
+    private String oneSignalID = null;
+
     @Persistent
     private DeviceType so;
 
@@ -66,6 +75,14 @@ public class PushDevice implements Serializable {
         return true;
     }
 
+    public String getOneSignalID() {
+        return oneSignalID;
+    }
+
+    public void setOneSignalID(String oneSignalID) {
+        this.oneSignalID = oneSignalID;
+    }
+
     @Override
     public String toString() {
         return "PushDevice{" + "key=" + key + ", idProfile=" + idProfile + ", deviceToken=" + deviceToken + ", so=" + so + '}';
@@ -76,6 +93,15 @@ public class PushDevice implements Serializable {
         this.deviceToken = deviceToken;
         this.so = so;
         this.key = idProfile;
+    }
+
+    public PushDevice(Long idProfile, DeviceType so, String pet, String oneSignalID) {
+        this.idProfile = idProfile;
+        //this.deviceToken = deviceToken;
+        this.petToken = pet;
+        this.so = so;
+        this.key = idProfile;
+        this.oneSignalID = oneSignalID;
     }
 
     public String getDeviceToken() {
@@ -100,6 +126,14 @@ public class PushDevice implements Serializable {
 
     public void setIdProfile(Long idProfile) {
         this.idProfile = idProfile;
+    }
+
+    public String getPetToken() {
+        return petToken;
+    }
+
+    public void setPetToken(String petToken) {
+        this.petToken = petToken;
     }
 
 }

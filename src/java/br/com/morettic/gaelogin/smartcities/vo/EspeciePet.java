@@ -9,10 +9,8 @@ package br.com.morettic.gaelogin.smartcities.vo;
  *
  * @author LuisAugusto
  */
-public enum PetmatchAction {
+public enum EspeciePet {
 
-    UPLOAD_PATH,
-    PUSH_REGISTER,
-    UPDATE_PROFILE,
-    SIGNIN;
+    CAO,
+    GATO;
 }

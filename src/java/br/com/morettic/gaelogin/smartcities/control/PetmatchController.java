@@ -8,8 +8,12 @@ package br.com.morettic.gaelogin.smartcities.control;
 import static br.com.morettic.gaelogin.smartcities.control.PerfilController.HTTPSVIACEPCOMBRWS;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
+import br.com.morettic.gaelogin.smartcities.vo.DeviceType;
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
+import br.com.morettic.gaelogin.smartcities.vo.Pet;
+import br.com.morettic.gaelogin.smartcities.vo.PushDevice;
+import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.api.blobstore.BlobKey;
 import com.google.appengine.api.blobstore.BlobstoreService;
 import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
@@ -26,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -62,7 +67,13 @@ public class PetmatchController {
         JSONObject address = readJSONUrl(HTTPSVIACEPCOMBRWS + cep.replace("-", ""));
         js.append("addrs", address);
         //Find perfil byID
-        Perfil p1 = pm.getObjectById(Perfil.class, Long.parseLong(id));
+
+        Query q = pm.newQuery(Perfil.class);
+        String pQuery = "email == :pEmail";
+        q.setFilter(pQuery);
+        String email = req.getParameter("email");
+        List<Perfil> lRet = (List<Perfil>) q.execute(email.toUpperCase());
+        Perfil p1 = lRet.get(0);
         //Set profile
         p1.setRua(address.getString("state"));
         p1.setCidade(address.getString("city"));
@@ -179,7 +190,7 @@ public class PetmatchController {
             String passwd = req.getParameter("pass") == null ? "###################################################" : req.getParameter("pass");
             if (passwd.equals(p1.getPassWd())) {
                 js.put("in", true);
-            } else if (id != null && id.equals(p1.getKey().toString())) {
+            } else if (id != null) {
                 js.put("in", true);
             } else {
                 js.put("in", false);
@@ -200,6 +211,64 @@ public class PetmatchController {
             os.flush();
 
             return os.toByteArray();
+        }
+    }
+
+    public static final JSONObject savePet(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        JSONObject js = new JSONObject();
+        pm = PMF.get().getPersistenceManager();
+
+        Pet p = new Pet();
+        p.setAdress("");
+        p.setEnabledData(true);
+        p.setCastrado(1);
+        p.setIdade(11);
+        p.setLatitude("123");
+        p.setLongitude("123");
+        p.setDtOcorrencia(new Date());
+        p.setAvatar(1l);
+        p.setTitulo("TIT");
+        p.setDescricao("DESC");
+        p.setIp("123123123");
+        p.setAdress("123");
+        p.setPerfil(1l);
+        p.setTipo(TipoOcorrencia.PET_MATCH);
+
+        pm.makePersistent(p);
+
+        return js;
+
+    }
+
+    public static final JSONObject registerUserDevice(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        JSONObject js = new JSONObject();
+
+        pm = PMF.get().getPersistenceManager();
+
+        Long idUser = Long.parseLong(req.getParameter("id"));
+        String token = req.getParameter("token");
+        String oneSignalUserId = req.getParameter("one");
+        //String so = req.getParameter("so");
+
+        PushDevice myDevice = null;
+        try {
+            myDevice = (PushDevice) pm.getObjectById(idUser);
+        } catch (Exception e) {
+            myDevice = new PushDevice(idUser, DeviceType.ANDROID, token, oneSignalUserId);
+            if (myDevice.getDeviceToken() == null) {//Its new no at city watch
+                myDevice.setDeviceToken(token);
+            }
+        } finally {
+
+            pm.makePersistent(myDevice);
+            pm.close();
+
+            js.put("id", myDevice.getKey());
+            js.put("token", myDevice.getDeviceToken());
+            js.put("so", myDevice.getSo().toString());
+            js.put("user", myDevice.getIdProfile());
+///////
+            return js;
         }
     }
 }
