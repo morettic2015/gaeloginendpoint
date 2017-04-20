@@ -11,7 +11,6 @@ import br.com.morettic.gaelogin.smartcities.control.ManguevivoController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PetmatchController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
-import br.com.morettic.gaelogin.smartcities.control.URLReader;
 import br.com.morettic.gaelogin.smartcities.vo.PetmatchAction;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
@@ -20,10 +19,8 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -182,38 +179,34 @@ public class InfoSegController extends HttpServlet {
                  * @petmatchController with JSONP
                  */
                 case 37://Login facebook normal
-                    response.setContentType("text/javascript");
                     retJSon = PetmatchController.loginProfile(request, response);
                     responseType = 1;
                     pma = PetmatchAction.SIGNIN;
                     break;
                 case 38://Update profile
-                    response.setContentType("text/javascript");
                     retJSon = PetmatchController.updateProfile(request, response);
                     responseType = 1;
                     pma = PetmatchAction.UPDATE_PROFILE;
                     break;
                 case 39://register user devoxe
-                    response.setContentType("text/javascript");
                     retJSon = PetmatchController.registerUserDevice(request, response);
                     responseType = 1;
                     pma = PetmatchAction.PUSH_REGISTER;
                     break;
                 case 40://register user devoxe
-                    response.setContentType("text/javascript");
                     retJSon = PerfilController.getUploadPath(request, response);
                     responseType = 1;
                     pma = PetmatchAction.UPLOAD_PATH;
                     break;
-                /**
-                 *
-                 *
-                 * @testes
-                 */
-                case 99:
-                    //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
-                    retJSon = PetmatchController.savePet(request, response);
+                case 41://register user devoxe
+                    retJSon = PetmatchController.saveUpdatePet(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.UPDATE_PET;
                     break;
+                /* case 99:
+                 //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
+                 retJSon =
+                 break;*/
                 default://LOGA NO GOOGLE E CRIA UM USUARIO MAN
                     response.setContentType("text/html; charset=UTF-8");
                     PerfilController.autenticaUsuarioGoogle(request, response);
@@ -221,7 +214,7 @@ public class InfoSegController extends HttpServlet {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage());
             Logger.getAnonymousLogger().log(Level.SEVERE, e.toString());
         } finally {
@@ -230,6 +223,7 @@ public class InfoSegController extends HttpServlet {
                 if (responseType == 0) {
                     out.print(retJSon);
                 } else {
+                    response.setContentType("text/javascript");
                     out.print(pma.toString() + "(" + retJSon.toString() + ")");
                 }
             }

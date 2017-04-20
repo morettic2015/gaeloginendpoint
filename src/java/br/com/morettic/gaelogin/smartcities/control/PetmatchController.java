@@ -6,30 +6,23 @@
 package br.com.morettic.gaelogin.smartcities.control;
 
 import static br.com.morettic.gaelogin.smartcities.control.PerfilController.HTTPSVIACEPCOMBRWS;
+import static br.com.morettic.gaelogin.smartcities.control.URLReader.getClientIpAddress;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.DeviceType;
+import br.com.morettic.gaelogin.smartcities.vo.EspeciePet;
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
 import br.com.morettic.gaelogin.smartcities.vo.Pet;
 import br.com.morettic.gaelogin.smartcities.vo.PushDevice;
+import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
-import com.google.appengine.api.blobstore.BlobKey;
-import com.google.appengine.api.blobstore.BlobstoreService;
-import com.google.appengine.api.blobstore.BlobstoreServiceFactory;
-import com.google.appengine.api.files.AppEngineFile;
-import com.google.appengine.api.files.FileService;
-import com.google.appengine.api.files.FileServiceFactory;
-import com.google.appengine.api.files.FileWriteChannel;
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
+import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import javax.jdo.PersistenceManager;
@@ -134,10 +127,9 @@ public class PetmatchController {
 
                 String imgPath = "http://graph.facebook.com/" + req.getParameter("id") + "/picture?type=large";
 
-                URL url = new URL(imgPath);
-                InputStream input = url.openStream();
-                byte[] imageData = getBytesFromInputStream(input);
-
+                //URL url = new URL(imgPath);
+                //InputStream input = url.openStream();
+                //byte[] imageData = getBytesFromInputStream(input);
                 //FileService fileService = FileServiceFactory.getFileService();
                 //blobstoreService = BlobstoreServiceFactory.getBlobstoreService();
                 //blobstoreService.
@@ -214,28 +206,83 @@ public class PetmatchController {
         }
     }
 
-    public static final JSONObject savePet(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+    public static final JSONObject saveUpdatePet(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
 
+        //Cria se for diferente de -1 recupera da Datastore
         Pet p = new Pet();
-        p.setAdress("");
+        if (!req.getParameter("id").equals("0")) {
+            Long idPet = Long.parseLong(req.getParameter("id"));
+            p = pm.getObjectById(Pet.class, idPet);
+        }
+        p.setIdOwner(Long.parseLong(req.getParameter("idOwner")));
         p.setEnabledData(true);
-        p.setCastrado(1);
-        p.setIdade(11);
-        p.setLatitude("123");
-        p.setLongitude("123");
+        p.setCastrado(Integer.parseInt(req.getParameter("castrado")));
+        p.setIdade(Integer.parseInt(req.getParameter("idade")));
+        p.setPorte(Integer.parseInt(req.getParameter("porte")));
+        p.setLatitude(req.getParameter("lat"));
+        p.setLongitude(req.getParameter("lon"));
         p.setDtOcorrencia(new Date());
         p.setAvatar(1l);
-        p.setTitulo("TIT");
-        p.setDescricao("DESC");
-        p.setIp("123123123");
-        p.setAdress("123");
+        p.setTitulo(req.getParameter("tit"));
+        p.setDescricao(req.getParameter("desc"));
+        p.setIp(getClientIpAddress(req));
+        p.setAdress("addrs");
         p.setPerfil(1l);
         p.setTipo(TipoOcorrencia.PET_MATCH);
 
+        //Apenas cão e gato.....
+        EspeciePet e1 = req.getParameter("especie").equals("1") ? EspeciePet.CAO : EspeciePet.GATO;
+
+        p.setEspecie(e1);
+        p.setSexo(Integer.parseInt(req.getParameter("sexo")));
+        p.setVacinado(Integer.parseInt(req.getParameter("vacinado")));
+        /**
+         * @vincula o avatar do PET
+         *
+         */
+        Imagem avatar = new Imagem();
+        String avatarToken = req.getParameter("token");
+        avatar.setPath("https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + avatarToken);
+        avatar.setImage("https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + avatarToken);
+
+        pm.makePersistent(avatar);
+
+        p.setAvatar(avatar.getKey());
+
         pm.makePersistent(p);
 
+        js.put("idPet", p.getKey());
+        js.put("idOwner", p.getIdOwner());
+        js.put("avatar", "https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + avatarToken);
+
+        String filter = "this.idOwner==id";
+        Query q = pm.newQuery(Pet.class, filter);
+        q.declareParameters("Long id");
+        List<Pet> lPets = (List<Pet>) q.execute(p.getIdOwner());
+
+        JSONArray ja = new JSONArray();
+        for (Pet pet : lPets) {
+
+            Imagem m = pm.getObjectById(Imagem.class, pet.getAvatar());
+            JSONObject j1 = new JSONObject();
+            j1.put("getAvatar", m.getPath());
+            j1.put("getEspecie", pet.getEspecie().getId());
+            j1.put("getIdade", pet.getIdade().toString());
+            j1.put("getTitulo", pet.getTitulo());
+            j1.put("getDescricao", pet.getDescricao());
+            j1.put("getDtOcorrencia", pet.getDtOcorrencia().toString());
+            j1.put("getPorte", pet.getPorte().toString());
+            j1.put("getVacinado", pet.getVacinado().toString());
+            j1.put("getCastrado", pet.getCastrado().toString());
+            j1.put("id", pet.getKey());
+            ja.put(j1);
+        }
+
+        js.put("mine", ja);
+
+        pm.close();
         return js;
 
     }

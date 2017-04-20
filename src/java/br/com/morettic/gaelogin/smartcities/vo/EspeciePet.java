@@ -11,6 +11,21 @@ package br.com.morettic.gaelogin.smartcities.vo;
  */
 public enum EspeciePet {
 
-    CAO,
-    GATO;
+    CAO(1),
+    GATO(2);
+
+    private final int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        id = id;
+    }
+
+    EspeciePet(int idp) {
+        id = idp;
+    }
+
 }

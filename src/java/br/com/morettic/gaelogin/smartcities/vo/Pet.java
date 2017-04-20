@@ -32,6 +32,9 @@ public class Pet extends Registro {
     @Persistent(name = "castrado")
     private Integer castrado;
 
+    @Persistent(name = "owner")
+    private Long idOwner;
+
     public Pet() {
         this.setTipo(TipoOcorrencia.PET_MATCH);
     }
@@ -82,6 +85,14 @@ public class Pet extends Registro {
 
     public void setCastrado(Integer castrado) {
         this.castrado = castrado;
+    }
+
+    public Long getIdOwner() {
+        return idOwner;
+    }
+
+    public void setIdOwner(Long idOwner) {
+        this.idOwner = idOwner;
     }
 
 }

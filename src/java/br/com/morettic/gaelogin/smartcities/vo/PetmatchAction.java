@@ -14,5 +14,6 @@ public enum PetmatchAction {
     UPLOAD_PATH,
     PUSH_REGISTER,
     UPDATE_PROFILE,
-    SIGNIN;
+    SIGNIN,
+    UPDATE_PET;
 }
