@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.persistence.EntityNotFoundException;
@@ -206,6 +208,54 @@ public class PetmatchController {
         }
     }
 
+    public static final JSONObject removePet(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        JSONObject js = new JSONObject();
+        pm = PMF.get().getPersistenceManager();
+
+        //Id Pet
+        String idPet = req.getParameter("idPet");
+        //Retrieve objetc toremove
+        Pet p1 = pm.getObjectById(Pet.class, new Long(idPet));
+
+        //Remove pet
+        pm.deletePersistent(p1);
+        pm.close();
+
+        pm = PMF.get().getPersistenceManager();
+
+        //Get id Owner
+        String idOwner = req.getParameter("idOwner");
+
+        String filter = "this.idOwner==id";
+        Query q = pm.newQuery(Pet.class, filter);
+        q.declareParameters("Long id");
+        List<Pet> lPets = (List<Pet>) q.execute(new Long(idOwner));
+
+        JSONArray ja = new JSONArray();
+        for (Pet pet : lPets) {
+
+            Imagem m = pm.getObjectById(Imagem.class, pet.getAvatar());
+            JSONObject j1 = new JSONObject();
+            j1.put("getAvatar", m.getPath());
+            j1.put("getEspecie", pet.getEspecie().getId());
+            j1.put("getIdade", pet.getIdade().toString());
+            j1.put("getTitulo", pet.getTitulo());
+            j1.put("getDescricao", pet.getDescricao());
+            j1.put("getDtOcorrencia", pet.getDtOcorrencia().toString());
+            j1.put("getPorte", pet.getPorte().toString());
+            j1.put("getVacinado", pet.getVacinado().toString());
+            j1.put("getCastrado", pet.getCastrado().toString());
+            j1.put("getSexo", pet.getSexo().toString());
+            j1.put("id", pet.getKey());
+            ja.put(j1);
+        }
+
+        js.put("mine", ja);
+
+        pm.close();
+        return js;
+    }
+
     public static final JSONObject saveUpdatePet(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         JSONObject js = new JSONObject();
         pm = PMF.get().getPersistenceManager();
@@ -213,8 +263,8 @@ public class PetmatchController {
         //Cria se for diferente de -1 recupera da Datastore
         Pet p = new Pet();
         if (!req.getParameter("id").equals("0")) {
-            Long idPet = Long.parseLong(req.getParameter("id"));
-            p = pm.getObjectById(Pet.class, idPet);
+            p = pm.getObjectById(Pet.class, new Long(req.getParameter("id")));
+            js.put("shitr", p.getKey());
         }
         p.setIdOwner(Long.parseLong(req.getParameter("idOwner")));
         p.setEnabledData(true);
@@ -253,6 +303,10 @@ public class PetmatchController {
 
         pm.makePersistent(p);
 
+        pm.close();
+
+        pm = PMF.get().getPersistenceManager();
+        //  pm.currentTransaction().commit();
         js.put("idPet", p.getKey());
         js.put("idOwner", p.getIdOwner());
         js.put("avatar", "https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + avatarToken);
@@ -276,6 +330,7 @@ public class PetmatchController {
             j1.put("getPorte", pet.getPorte().toString());
             j1.put("getVacinado", pet.getVacinado().toString());
             j1.put("getCastrado", pet.getCastrado().toString());
+            j1.put("getSexo", pet.getSexo().toString());
             j1.put("id", pet.getKey());
             ja.put(j1);
         }

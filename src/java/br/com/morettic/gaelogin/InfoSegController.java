@@ -203,6 +203,11 @@ public class InfoSegController extends HttpServlet {
                     responseType = 1;
                     pma = PetmatchAction.UPDATE_PET;
                     break;
+                case 42://register user devoxe
+                    retJSon = PetmatchController.removePet(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.REMOVE;
+                    break;
                 /* case 99:
                  //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
                  retJSon =
