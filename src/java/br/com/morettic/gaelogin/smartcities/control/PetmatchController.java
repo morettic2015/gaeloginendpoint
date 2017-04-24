@@ -6,6 +6,7 @@
 package br.com.morettic.gaelogin.smartcities.control;
 
 import static br.com.morettic.gaelogin.smartcities.control.PerfilController.HTTPSVIACEPCOMBRWS;
+import static br.com.morettic.gaelogin.smartcities.control.PerfilController.calcLat;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.getClientIpAddress;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
@@ -24,7 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
@@ -32,6 +35,7 @@ import javax.jdo.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.tools.ant.taskdefs.condition.Http;
 
 /**
  *
@@ -206,6 +210,62 @@ public class PetmatchController {
 
             return os.toByteArray();
         }
+    }
+
+    public static final JSONObject findPetsNearBy(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+        Set<Pet> lSOcorrencias = new HashSet<Pet>();
+        //String id = request.getParameter("id");
+        double lat = Double.parseDouble(req.getParameter("lat"));
+        double lon = Double.parseDouble(req.getParameter("lon"));
+        double latMax, latMin, q1;
+        //Recupera a variação da latitude
+        Integer distance = 0;
+
+        //recupera perfil
+        // Perfil p = pm.getObjectById(Perfil.class, new Long(id));
+        try {
+            distance = Integer.parseInt(req.getParameter("d"));
+        } catch (NumberFormatException e) {
+            distance = 10;//Distancia = 0
+        }
+
+        //Calc da latitude variacao
+        q1 = calcLat(distance);
+        latMax = (lat + q1);
+        latMin = (lat - q1);
+
+        String filter = "this.latitude>=latMin && this.latitude<=latMax ";
+        Query q = pm.newQuery(Pet.class, filter);
+        q.declareParameters("Float latMin,Float latMax");
+        //Adiciona todos
+        lSOcorrencias.addAll((List<Pet>) q.execute(latMin, latMax));
+        JSONArray ja = new JSONArray();
+        JSONObject js = new JSONObject();
+
+        for (Pet pet : lSOcorrencias) {
+            JSONObject j1 = new JSONObject();
+
+            Imagem m = pm.getObjectById(Imagem.class, pet.getAvatar());
+
+            j1.put("getAvatar", m.getPath());
+            j1.put("getEspecie", pet.getEspecie().getId());
+            j1.put("getIdade", pet.getIdade().toString());
+            j1.put("getTitulo", pet.getTitulo());
+            j1.put("getDescricao", pet.getDescricao());
+            j1.put("getDtOcorrencia", pet.getDtOcorrencia().toString());
+            j1.put("getPorte", pet.getPorte().toString());
+            j1.put("getVacinado", pet.getVacinado().toString());
+            j1.put("getCastrado", pet.getCastrado().toString());
+            j1.put("getSexo", pet.getSexo().toString());
+            j1.put("id", pet.getKey());
+            ja.put(j1);
+
+        }
+        js.put("result", ja);
+
+        return js;
+
     }
 
     public static final JSONObject removePet(HttpServletRequest req, HttpServletResponse res) throws JSONException {

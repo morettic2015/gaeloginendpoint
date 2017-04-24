@@ -11,6 +11,7 @@ package br.com.morettic.gaelogin.smartcities.vo;
  */
 public enum PetmatchAction {
 
+    SEARCH,
     REMOVE,
     UPLOAD_PATH,
     PUSH_REGISTER,

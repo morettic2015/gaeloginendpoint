@@ -17,6 +17,9 @@ import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
 import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import static java.net.URLEncoder.encode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Scanner;
 
 /**
  *
@@ -252,14 +256,14 @@ public class PushController {
             Perfil p = pm.getObjectById(Perfil.class, c.getFrom());
             promo.put("author", p.getNome());
             promo.put("email", p.getEmail());
-            
+
             JSONArray jT = new JSONArray();
-            
+
             List<String> lTipos = c.getlTipos();
-            for(String tp:lTipos){
+            for (String tp : lTipos) {
                 jT.put(tp);
             }
-            promo.put("canais",jT);
+            promo.put("canais", jT);
 
             ja.put(promo);
         }
@@ -358,13 +362,67 @@ public class PushController {
             lIds.add(Long.parseLong(id));
             ja.put(Long.parseLong(id));
         }
-        
+
         contact.getlPropriedades().addAll(lIds);
         pm.makePersistent(contact);
-        
+
         js.put("contactsAdded", ja);
         pm.close();
         return js;
+    }
+
+    public static final JSONObject sendOneSignalPushToUser() throws JSONException {
+        String strJsonBody = "";
+        try {
+            String jsonResponse;
+
+            URL url = new URL("https://onesignal.com/api/v1/notifications");
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setUseCaches(false);
+            con.setDoOutput(true);
+            con.setDoInput(true);
+
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setRequestProperty("Authorization", "Basic NGEwMGZmMjItY2NkNy0xMWUzLTk5ZDUtMDAwYzI5NDBlNjJj");
+            con.setRequestMethod("POST");
+
+            strJsonBody = "{"
+                    + "\"app_id\": \"5eb5a37e-b458-11e3-ac11-000c2940e62c\","
+                    + "\"include_player_ids\": [\"6392d91a-b206-4b7b-a620-cd68e32c3a76\"],"
+                    + "\"data\": {\"foo\": \"bar\"},"
+                    + "\"contents\": {\"en\": \"English Message\"}"
+                    + "}";
+
+            System.out.println("strJsonBody:\n" + strJsonBody);
+
+            byte[] sendBytes = strJsonBody.getBytes("UTF-8");
+            con.setFixedLengthStreamingMode(sendBytes.length);
+
+            OutputStream outputStream = con.getOutputStream();
+            outputStream.write(sendBytes);
+
+            int httpResponse = con.getResponseCode();
+            System.out.println("httpResponse: " + httpResponse);
+
+            if (httpResponse >= HttpURLConnection.HTTP_OK
+                    && httpResponse < HttpURLConnection.HTTP_BAD_REQUEST) {
+                Scanner scanner = new Scanner(con.getInputStream(), "UTF-8");
+                jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                scanner.close();
+            } else {
+                Scanner scanner = new Scanner(con.getErrorStream(), "UTF-8");
+                jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                scanner.close();
+            }
+            System.out.println("jsonResponse:\n" + jsonResponse);
+
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        JSONObject js = new JSONObject(strJsonBody);
+
+        return js;
+
     }
 
 }
