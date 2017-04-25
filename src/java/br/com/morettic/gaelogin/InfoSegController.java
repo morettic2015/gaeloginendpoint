@@ -213,6 +213,11 @@ public class InfoSegController extends HttpServlet {
                     responseType = 1;
                     pma = PetmatchAction.SEARCH;
                     break;
+                case 44://register user devoxe
+                    retJSon = PetmatchController.getMyPets(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.MINE;
+                    break;
                 /* case 99:
                  //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
                  retJSon =
