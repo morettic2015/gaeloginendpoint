@@ -371,7 +371,7 @@ public class PushController {
         return js;
     }
 
-    public static final JSONObject sendOneSignalPushToUser() throws JSONException {
+    public static final JSONObject sendOneSignalPushToUser(String user, String tit, String msg) throws JSONException {
         String strJsonBody = "";
         try {
             String jsonResponse;
@@ -383,14 +383,14 @@ public class PushController {
             con.setDoInput(true);
 
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-            con.setRequestProperty("Authorization", "Basic NGEwMGZmMjItY2NkNy0xMWUzLTk5ZDUtMDAwYzI5NDBlNjJj");
+            con.setRequestProperty("Authorization", "Basic ODZkOGJlMjItNzAwMy00MzRiLWFkYTMtYzZkYzM4YjAyNzAx");
             con.setRequestMethod("POST");
 
             strJsonBody = "{"
-                    + "\"app_id\": \"5eb5a37e-b458-11e3-ac11-000c2940e62c\","
-                    + "\"include_player_ids\": [\"6392d91a-b206-4b7b-a620-cd68e32c3a76\"],"
-                    + "\"data\": {\"foo\": \"bar\"},"
-                    + "\"contents\": {\"en\": \"English Message\"}"
+                    + "\"app_id\": \"cb2da5f1-6c1e-4692-814e-01fd3c11b10d\","
+                    + "\"include_player_ids\": [\"" + user + "\"],"
+                    + "\"data\": {\"" + tit + "\": \"" + msg + "\"},"
+                    + "\"contents\": {\"en\": \"" + msg + "\"}"
                     + "}";
 
             System.out.println("strJsonBody:\n" + strJsonBody);
@@ -414,7 +414,7 @@ public class PushController {
                 jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
                 scanner.close();
             }
-            System.out.println("jsonResponse:\n" + jsonResponse);
+            // System.out.println("jsonResponse:\n" + jsonResponse);
 
         } catch (Throwable t) {
             t.printStackTrace();

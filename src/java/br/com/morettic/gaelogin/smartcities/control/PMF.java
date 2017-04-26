@@ -17,24 +17,26 @@ import javax.persistence.Persistence;
 
 public final class PMF {
 
-    private static final PersistenceManagerFactory pmfInstance
-            = JDOHelper.getPersistenceManagerFactory("transactions-optional");
-   /* private static final EntityManagerFactory emfInstance
-            = Persistence.createEntityManagerFactory("transactions-optional");*/
+    private static PersistenceManagerFactory pmfInstance;
 
-
-   /* public static EntityManagerFactory getEntityManagerFactory() {
-        return emfInstance;
-    }*/
-
+    /* private static final EntityManagerFactory emfInstance
+     = Persistence.createEntityManagerFactory("transactions-optional");*/
+    /* public static EntityManagerFactory getEntityManagerFactory() {
+     return emfInstance;
+     }*/
     private PMF() {
     }
 
     public static PersistenceManagerFactory get() {
+        if (pmfInstance == null) {
+            pmfInstance = JDOHelper.getPersistenceManagerFactory("transactions-optional");
+        } else if (pmfInstance.isClosed()) {
+            pmfInstance = JDOHelper.getPersistenceManagerFactory("transactions-optional");
+        }
         return pmfInstance;
     }
-    
-  /*  public static  EntityManager getEntityManager(){
-        return emfInstance.createEntityManager();
-    }*/
+
+    /*  public static  EntityManager getEntityManager(){
+     return emfInstance.createEntityManager();
+     }*/
 }

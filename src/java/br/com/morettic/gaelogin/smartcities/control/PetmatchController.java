@@ -9,6 +9,7 @@ import static br.com.morettic.gaelogin.smartcities.control.PerfilController.HTTP
 import static br.com.morettic.gaelogin.smartcities.control.PerfilController.calcLat;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.getClientIpAddress;
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
+import br.com.morettic.gaelogin.smartcities.vo.Chat;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.DeviceType;
 import br.com.morettic.gaelogin.smartcities.vo.EspeciePet;
@@ -24,6 +25,8 @@ import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -194,7 +197,7 @@ public class PetmatchController {
                 js.put("in", false);
             }
         }
-        pm.close();
+        //pm.close();
         return js;
     }
 
@@ -210,6 +213,94 @@ public class PetmatchController {
 
             return os.toByteArray();
         }
+    }
+
+    /**
+     *
+     * Save Chat Message
+     *
+     * @param req HttpServletRequest
+     * @param res HttpServletResponse
+     * @return JSONObject
+     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     */
+    public static final JSONObject saveChat(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+
+        String message = req.getParameter("message");
+        String from = req.getParameter("from");
+        String to = req.getParameter("to");
+        String pet = req.getParameter("pet");
+        Long idFrom = new Long(from);
+
+        Pet p = pm.getObjectById(Pet.class, new Long(pet));
+
+        Long idTo = to == null ? p.getIdOwner() : new Long(to);
+
+        Chat c = new Chat(p.getTitulo(), message, from, idTo.toString(), pet);
+
+        pm.makePersistent(c);
+        pm.close();
+
+        /**
+         * Send push
+         */
+        pm = PMF.get().getPersistenceManager();
+
+        PushDevice pd = pm.getObjectById(PushDevice.class, idTo);
+        //PushDevice pd1 = pm.getObjectById(PushDevice.class, p.getIdOwner());
+
+        JSONObject js = new JSONObject();
+        js.put("device", PushController.sendOneSignalPushToUser(pd.getOneSignalID(), "Mensagem de Adoção", message));
+
+        //Carrega as mensagem que o usuario enviou para esse pet
+        String filter = "this.petKey==petKey";
+        Query q = pm.newQuery(Chat.class, filter);
+        q.declareParameters("Float petKey");
+        //Adiciona todos
+        List<Chat> lChats = (List<Chat>) q.execute(p.getKey());
+        //Adiciona na lista para ordenar
+        //  List<Chat> lAll = new ArrayList((List<Chat>) lChats.iterator());
+        //Ordena lista
+        Collections.sort(lChats);
+        JSONArray ja = new JSONArray();
+        for (Chat c1 : lChats) {
+            if (!c1.getFrom().equals(idFrom) && !c1.getTo().equals(idFrom)) {
+                continue;
+            }
+            JSONObject js1 = new JSONObject();
+
+            js1.put("getKey", c1.getKey());
+            js1.put("getEnabled", c1.getEnabled());
+            js1.put("getFrom", c1.getFrom());
+            js1.put("getMsg", c1.getMsg());
+            js1.put("getTit", c1.getTit());
+            js1.put("getTo", c1.getTo());
+            js1.put("getTimestampChat", c1.getTimestampChat());
+            try {
+                Imagem m = pm.getObjectById(Imagem.class, c1.getFrom());
+                js1.put("getImage", m.getImage());
+                js1.put("getPath", m.getPath());
+
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+            try {
+
+                Perfil perfil = pm.getObjectById(Perfil.class, c1.getFrom());
+                js1.put("getNome", perfil.getNome());
+
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+
+            ja.put(js1);
+        }
+
+        js.put("chats", ja);
+
+        return js;
+
     }
 
     public static final JSONObject findPetsNearBy(HttpServletRequest req, HttpServletResponse res) throws JSONException {

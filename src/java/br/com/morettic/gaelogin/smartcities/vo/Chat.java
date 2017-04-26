@@ -5,14 +5,13 @@
  */
 package br.com.morettic.gaelogin.smartcities.vo;
 
-import com.google.appengine.api.datastore.Blob;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 import javax.jdo.annotations.Cacheable;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Key;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
@@ -24,8 +23,8 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable(identityType = IdentityType.APPLICATION, detachable = "true")
 @Cacheable("true")
 public class Chat implements Serializable, Comparable<Chat> {
-    
-    public Chat(String t,String m, String fo, String to){
+
+    public Chat(String t, String m, String fo, String to) {
         this.tit = t;
         this.msg = m;
         this.from = Long.parseLong(fo);
@@ -33,7 +32,21 @@ public class Chat implements Serializable, Comparable<Chat> {
         this.timestampChat = new Date();
         enabled = true;
     }
-    
+
+    public Chat(String t, String m, String fo, String to, String pet) {
+        this.tit = t;
+        this.msg = m;
+        this.from = Long.parseLong(fo);
+        this.to = Long.parseLong(to);
+        this.timestampChat = new Date();
+        enabled = true;
+        this.petKey = new Long(pet);
+    }
+
+    @Column(allowsNull = "true", name = "pet")
+    @Persistent
+    private Long petKey;
+
     @PrimaryKey
     @Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
     private Long key;
@@ -86,7 +99,6 @@ public class Chat implements Serializable, Comparable<Chat> {
         this.msg = msg.toUpperCase();
     }
 
-  
     public Long getFrom() {
         return from;
     }
@@ -120,8 +132,38 @@ public class Chat implements Serializable, Comparable<Chat> {
     }
 
     @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + Objects.hashCode(this.petKey);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Chat other = (Chat) obj;
+        if (!Objects.equals(this.petKey, other.petKey)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public int compareTo(Chat o) {
         return this.timestampChat.toString().compareTo(o.getTimestampChat().toString());
+    }
+
+    public Long getPetKey() {
+        return petKey;
+    }
+
+    public void setPetKey(Long petKey) {
+        this.petKey = petKey;
     }
 
 }
