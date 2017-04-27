@@ -11,6 +11,7 @@ import static br.com.morettic.gaelogin.smartcities.control.URLReader.getClientIp
 import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
 import br.com.morettic.gaelogin.smartcities.vo.Chat;
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
+import br.com.morettic.gaelogin.smartcities.vo.Contato;
 import br.com.morettic.gaelogin.smartcities.vo.DeviceType;
 import br.com.morettic.gaelogin.smartcities.vo.EspeciePet;
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -224,6 +226,63 @@ public class PetmatchController {
      * @return JSONObject
      * @throws com.google.appengine.labs.repackaged.org.json.JSONException
      */
+    private static <Long> Set<Long> setFromIterable(Iterable<Long> i) {
+        HashSet<Long> set = new HashSet<Long>();
+        Iterator<Long> it = i.iterator();
+        while (it.hasNext()) {
+            set.add(it.next());
+        }
+        return set;
+    }
+
+    private static JSONObject createContato(PersistenceManager pm, Long idOwner, Long idDestiny) throws JSONException {
+
+        Contato from;
+
+        try {
+            Query q = pm.newQuery(Contato.class);
+            String pQuery = "perfil == :pperfil";
+            q.setFilter(pQuery);
+            List<Contato> ffrom = (List<Contato>) q.execute(idOwner);
+            from = ffrom.get(0);
+        } catch (Exception e) {
+            from = new Contato();
+            from.setPerfil(idOwner);
+        }
+        Iterator<Long> it = from.getlPropriedades().iterator();
+        Set<Long> seLong = new HashSet<>();
+
+        while (it.hasNext()) {
+            seLong.add(it.next());
+        }
+
+        if (!seLong.contains(idDestiny)) {
+            from.getlPropriedades().add(idDestiny);
+            pm.makePersistent(from);
+        }
+
+        JSONArray ja = new JSONArray();
+
+        for (Long i : seLong) {
+            JSONObject js123 = new JSONObject();
+            Perfil p1 = pm.getObjectById(Perfil.class, i);
+            js123.put("getKey", p1.getKey());
+            js123.put("getNome", p1.getNome());
+
+            Imagem m = pm.getObjectById(Imagem.class, p1.getAvatar());
+
+            js123.put("getImage", m.getImage());
+            js123.put("getPath", m.getPath());
+
+            ja.put(js123);
+
+        }
+        JSONObject js = new JSONObject();
+        js.put("contatos", ja);
+
+        return js;
+    }
+
     public static final JSONObject saveChat(HttpServletRequest req, HttpServletResponse res) throws JSONException {
         pm = PMF.get().getPersistenceManager();
 
@@ -232,12 +291,15 @@ public class PetmatchController {
         String to = req.getParameter("to");
         String pet = req.getParameter("pet");
         Long idFrom = new Long(from);
-
+        JSONObject js = new JSONObject();
         Pet p = pm.getObjectById(Pet.class, new Long(pet));
 
         Long idTo = to == null ? p.getIdOwner() : new Long(to);
 
         Chat c = new Chat(p.getTitulo(), message, from, idTo.toString(), pet);
+
+        js.put("contactList", createContato(pm, idFrom, idTo));
+        createContato(pm, idTo, idFrom);
 
         pm.makePersistent(c);
         pm.close();
@@ -246,12 +308,14 @@ public class PetmatchController {
          * Send push
          */
         pm = PMF.get().getPersistenceManager();
+        try {
+            PushDevice pd = pm.getObjectById(PushDevice.class, idTo);
+            //PushDevice pd1 = pm.getObjectById(PushDevice.class, p.getIdOwner());
 
-        PushDevice pd = pm.getObjectById(PushDevice.class, idTo);
-        //PushDevice pd1 = pm.getObjectById(PushDevice.class, p.getIdOwner());
-
-        JSONObject js = new JSONObject();
-        js.put("device", PushController.sendOneSignalPushToUser(pd.getOneSignalID(), "Mensagem de Adoção", message));
+            js.put("device", PushController.sendOneSignalPushToUser(pd.getOneSignalID(), "Mensagem de Adoção", message));
+        } catch (Exception e) {
+            Logger.getAnonymousLogger().log(Level.WARNING, e.getMessage());
+        }
 
         //Carrega as mensagem que o usuario enviou para esse pet
         String filter = "this.petKey==petKey";
@@ -348,6 +412,7 @@ public class PetmatchController {
             j1.put("getPorte", pet.getPorte().toString());
             j1.put("getVacinado", pet.getVacinado().toString());
             j1.put("getCastrado", pet.getCastrado().toString());
+            j1.put("getIdOwner", pet.getIdOwner());
             j1.put("getSexo", pet.getSexo().toString());
             j1.put("id", pet.getKey());
             ja.put(j1);

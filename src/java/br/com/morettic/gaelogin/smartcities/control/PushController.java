@@ -27,10 +27,11 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import static java.net.URLEncoder.encode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -373,6 +374,7 @@ public class PushController {
 
     public static final JSONObject sendOneSignalPushToUser(String user, String tit, String msg) throws JSONException {
         String strJsonBody = "";
+        JSONObject js = null;
         try {
             String jsonResponse;
 
@@ -389,11 +391,11 @@ public class PushController {
             strJsonBody = "{"
                     + "\"app_id\": \"cb2da5f1-6c1e-4692-814e-01fd3c11b10d\","
                     + "\"include_player_ids\": [\"" + user + "\"],"
-                    + "\"data\": {\"" + tit + "\": \"" + msg + "\"},"
+                    + "\"data\": {\"msg\": \"tit\"},"
                     + "\"contents\": {\"en\": \"" + msg + "\"}"
                     + "}";
-
-            System.out.println("strJsonBody:\n" + strJsonBody);
+            js = new JSONObject(strJsonBody);
+            //System.out.println("strJsonBody:\n" + strJsonBody);
 
             byte[] sendBytes = strJsonBody.getBytes("UTF-8");
             con.setFixedLengthStreamingMode(sendBytes.length);
@@ -402,24 +404,25 @@ public class PushController {
             outputStream.write(sendBytes);
 
             int httpResponse = con.getResponseCode();
-            System.out.println("httpResponse: " + httpResponse);
+            //System.out.println("httpResponse: " + httpResponse);
 
             if (httpResponse >= HttpURLConnection.HTTP_OK
                     && httpResponse < HttpURLConnection.HTTP_BAD_REQUEST) {
                 Scanner scanner = new Scanner(con.getInputStream(), "UTF-8");
                 jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
                 scanner.close();
+                js.put("response", new JSONObject(jsonResponse));
             } else {
                 Scanner scanner = new Scanner(con.getErrorStream(), "UTF-8");
                 jsonResponse = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+                js.put("response", new JSONObject(jsonResponse));
                 scanner.close();
             }
             // System.out.println("jsonResponse:\n" + jsonResponse);
 
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logger.getAnonymousLogger().log(Level.WARNING, t.getLocalizedMessage());
         }
-        JSONObject js = new JSONObject(strJsonBody);
 
         return js;
 

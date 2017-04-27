@@ -7,11 +7,8 @@ package br.com.morettic.gaelogin.smartcities.vo;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import javax.jdo.annotations.Cacheable;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -96,8 +93,5 @@ public class Contato implements Serializable {
     public String toString() {
         return "Contato{" + "key=" + key + ", lPropriedades=" + lPropriedades + ", perfil=" + perfil + '}';
     }
-    
-    
-    
 
 }

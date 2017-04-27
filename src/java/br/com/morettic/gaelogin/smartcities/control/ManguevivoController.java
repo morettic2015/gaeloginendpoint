@@ -5,18 +5,9 @@
  */
 package br.com.morettic.gaelogin.smartcities.control;
 
-import static br.com.morettic.gaelogin.smartcities.control.PerfilController.calcLat;
-import br.com.morettic.gaelogin.smartcities.vo.Perfil;
-import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
-import java.util.List;
-import static br.com.morettic.gaelogin.smartcities.control.PerfilController.getUrlFromImage;
-import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
-import java.util.Date;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 /**
  * Query q = pm.newQuery("select from
