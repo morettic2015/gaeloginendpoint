@@ -5,6 +5,8 @@
  */
 package br.com.morettic.gaelogin.smartcities.vo;
 
+import java.util.Comparator;
+import java.util.Objects;
 import javax.jdo.annotations.Discriminator;
 import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
@@ -93,6 +95,46 @@ public class Pet extends Registro {
 
     public void setIdOwner(Long idOwner) {
         this.idOwner = idOwner;
+    }
+
+    @Override
+    public String toString() {
+        return "Pet{" + "especie=" + especie + ", idade=" + idade + ", sexo=" + sexo + ", porte=" + porte + ", vacinado=" + vacinado + ", castrado=" + castrado + ", idOwner=" + idOwner + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.getKey());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Pet other = (Pet) obj;
+        if (!Objects.equals(this.getKey(), other.getKey())) {
+            return false;
+        }
+        return true;
+    }
+
+    public static final Comparator<Pet> getPetComparator() {
+        class MyComparator implements Comparator<Pet> {
+
+            @Override
+            public int compare(Pet o1, Pet o2) {
+                return o1.getEspecie().toString().compareToIgnoreCase(o2.getEspecie().toString());
+            }
+        };
+
+        MyComparator c = new MyComparator();
+        return c;
     }
 
 }

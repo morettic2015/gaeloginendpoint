@@ -155,7 +155,7 @@ public class Chat implements Serializable, Comparable<Chat> {
 
     @Override
     public int compareTo(Chat o) {
-        return this.timestampChat.toString().compareTo(o.getTimestampChat().toString());
+        return this.getTimestampChat().toString().compareTo(o.getTimestampChat().toString());
     }
 
     public Long getPetKey() {

@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -159,7 +160,7 @@ public class PetmatchController {
                 js.put("in", true);
                 js.put("name", p1.getNome());
                 js.put("email", p1.getEmail());
-                js.put("id", p1.getKey());
+                js.put("id", p1.getKey().toString());
 
             }
         } else {
@@ -171,7 +172,7 @@ public class PetmatchController {
             p1 = lRet.get(0);
             js.put("name", p1.getNome());
             js.put("email", p1.getEmail());
-            js.put("id", p1.getKey());
+            js.put("id", p1.getKey().toString());
             js.put("cpf", p1.getCpfCnpj());
             js.put("cep", p1.getCep());
             js.put("rua", p1.getRua());
@@ -266,7 +267,7 @@ public class PetmatchController {
         for (Long i : seLong) {
             JSONObject js123 = new JSONObject();
             Perfil p1 = pm.getObjectById(Perfil.class, i);
-            js123.put("getKey", p1.getKey());
+            js123.put("getKey", p1.getKey().toString());
             js123.put("getNome", p1.getNome());
 
             Imagem m = pm.getObjectById(Imagem.class, p1.getAvatar());
@@ -295,6 +296,8 @@ public class PetmatchController {
         Pet p = pm.getObjectById(Pet.class, new Long(pet));
 
         Long idTo = to == null ? p.getIdOwner() : new Long(to);
+
+        js.put("idToShit", idTo);
 
         Chat c = new Chat(p.getTitulo(), message, from, idTo.toString(), pet);
 
@@ -334,12 +337,12 @@ public class PetmatchController {
             }
             JSONObject js1 = new JSONObject();
 
-            js1.put("getKey", c1.getKey());
+            js1.put("getKey", c1.getKey().toString());
             js1.put("getEnabled", c1.getEnabled());
-            js1.put("getFrom", c1.getFrom());
+            js1.put("getFrom", c1.getFrom().toString());
             js1.put("getMsg", c1.getMsg());
             js1.put("getTit", c1.getTit());
-            js1.put("getTo", c1.getTo());
+            js1.put("getTo", c1.getTo().toString());
             js1.put("getTimestampChat", c1.getTimestampChat());
             try {
                 Imagem m = pm.getObjectById(Imagem.class, c1.getFrom());
@@ -347,7 +350,8 @@ public class PetmatchController {
                 js1.put("getPath", m.getPath());
 
             } catch (Exception e) {
-                //e.printStackTrace();
+                js1.put("getImage", "img/avatar.png");
+                js1.put("getImage", "img/avatar.png");
             }
             try {
 
@@ -412,9 +416,9 @@ public class PetmatchController {
             j1.put("getPorte", pet.getPorte().toString());
             j1.put("getVacinado", pet.getVacinado().toString());
             j1.put("getCastrado", pet.getCastrado().toString());
-            j1.put("getIdOwner", pet.getIdOwner());
+            j1.put("getIdOwner", pet.getIdOwner().toString());
             j1.put("getSexo", pet.getSexo().toString());
-            j1.put("id", pet.getKey());
+            j1.put("id", pet.getKey().toString());
             ja.put(j1);
 
         }
@@ -462,7 +466,7 @@ public class PetmatchController {
             j1.put("getVacinado", pet.getVacinado().toString());
             j1.put("getCastrado", pet.getCastrado().toString());
             j1.put("getSexo", pet.getSexo().toString());
-            j1.put("id", pet.getKey());
+            j1.put("id", pet.getKey().toString());
             ja.put(j1);
         }
 
@@ -497,7 +501,7 @@ public class PetmatchController {
             j1.put("getVacinado", pet.getVacinado().toString());
             j1.put("getCastrado", pet.getCastrado().toString());
             j1.put("getSexo", pet.getSexo().toString());
-            j1.put("id", pet.getKey());
+            j1.put("id", pet.getKey().toString());
             ja.put(j1);
         }
         JSONObject js = new JSONObject();
@@ -515,7 +519,7 @@ public class PetmatchController {
         Pet p = new Pet();
         if (!req.getParameter("id").equals("0")) {
             p = pm.getObjectById(Pet.class, new Long(req.getParameter("id")));
-            js.put("shitr", p.getKey());
+            // js.put("shitr", p.getKey());
         }
         p.setIdOwner(Long.parseLong(req.getParameter("idOwner")));
         p.setEnabledData(true);
@@ -558,8 +562,8 @@ public class PetmatchController {
 
         pm = PMF.get().getPersistenceManager();
         //  pm.currentTransaction().commit();
-        js.put("idPet", p.getKey());
-        js.put("idOwner", p.getIdOwner());
+        js.put("idPet", p.getKey().toString());
+        js.put("idOwner", p.getIdOwner().toString());
         js.put("avatar", "https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + avatarToken);
 
         String filter = "this.idOwner==id";
@@ -582,7 +586,7 @@ public class PetmatchController {
             j1.put("getVacinado", pet.getVacinado().toString());
             j1.put("getCastrado", pet.getCastrado().toString());
             j1.put("getSexo", pet.getSexo().toString());
-            j1.put("id", pet.getKey());
+            j1.put("id", pet.getKey().toString());
             ja.put(j1);
         }
 
@@ -616,12 +620,191 @@ public class PetmatchController {
             pm.makePersistent(myDevice);
             pm.close();
 
-            js.put("id", myDevice.getKey());
+            js.put("id", myDevice.getKey().toString());
             js.put("token", myDevice.getDeviceToken());
             js.put("so", myDevice.getSo().toString());
             js.put("user", myDevice.getIdProfile());
 ///////
             return js;
         }
+    }
+
+    class PetList {
+
+        Long idOwner;
+        Long imagem;
+        Long pet;
+
+    }
+
+    private static final List<Chat> getChatsByPetId(PersistenceManager pm, Long id) {
+        String filter = "this.petKey==id";
+        Query qc = pm.newQuery(Chat.class, filter);
+        qc.declareParameters("Long id");
+        return (List<Chat>) qc.execute(id);
+    }
+
+    public static final JSONObject getChatMessages(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        pm = PMF.get().getPersistenceManager();
+        String from = req.getParameter("from");
+        String to = req.getParameter("to");
+        String pet = req.getParameter("pet");
+
+        List<Chat> lChats = getChatsByPetId(pm, new Long(pet));
+        Collections.sort(lChats);
+
+        Long idFrom, idTo;
+
+        idFrom = new Long(from);
+        idTo = new Long(to);
+
+        JSONObject js = new JSONObject();
+        JSONArray ja = new JSONArray();
+
+        for (Chat c1 : lChats) {
+            if (!((c1.getFrom().equals(idFrom) && c1.getTo().equals(idTo)) || (c1.getFrom().equals(idTo) && c1.getTo().equals(idFrom)))) {
+                continue;
+            }
+            JSONObject js1 = new JSONObject();
+
+            js1.put("getKey", c1.getKey().toString());
+            js1.put("getEnabled", c1.getEnabled());
+            js1.put("getFrom", c1.getFrom().toString());
+            js1.put("getMsg", c1.getMsg());
+            js1.put("getTit", c1.getTit());
+            js1.put("getTo", c1.getTo().toString());
+            js1.put("getTimestampChat", c1.getTimestampChat());
+            try {
+                Imagem m = pm.getObjectById(Imagem.class, c1.getFrom());
+                js1.put("getImage", m.getImage());
+                js1.put("getPath", m.getPath());
+
+            } catch (Exception e) {
+                js1.put("getImage", "img/avatar.png");
+                js1.put("getPath", "img/avatar.png");
+            }
+            try {
+
+                Perfil perfil = pm.getObjectById(Perfil.class, c1.getFrom());
+                js1.put("getNome", perfil.getNome());
+
+            } catch (Exception e) {
+                //e.printStackTrace();
+            }
+
+            ja.put(js1);
+        }
+
+        js.put("chats", ja);
+
+        return js;
+
+    }
+
+    public static final JSONObject getChatAvatarToOwner(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        JSONObject js = new JSONObject();
+        Long idPet = new Long(req.getParameter("idPet"));
+        pm = PMF.get().getPersistenceManager();
+        HashMap<Long, Boolean> profiles = new HashMap<>();
+
+        //Monta a lista de pets
+        JSONArray ja = new JSONArray();
+        Set<Chat> lChats = new HashSet<>();
+        lChats.addAll(getChatsByPetId(pm, idPet));
+
+        for (Chat c : lChats) {
+            JSONObject avatars = new JSONObject();
+            if (!profiles.containsKey(c.getFrom())) {
+
+                Perfil perfil = pm.getObjectById(Perfil.class, c.getFrom());
+                avatars.put("getNome", perfil.getNome());
+                avatars.put("getKey", perfil.getKey().toString());
+
+                try {
+                    Imagem m = pm.getObjectById(Imagem.class, perfil.getAvatar());
+                    avatars.put("getImage", m.getImage());
+                    avatars.put("getPath", m.getPath());
+
+                } catch (Exception e) {
+                    avatars.put("getImage", "img/avatar.png");
+                    avatars.put("getPath", "img/avatar.png");
+                }
+                profiles.put(perfil.getKey(), Boolean.TRUE);
+                ja.put(avatars);
+            }
+        }
+        js.put("result", ja);
+        return js;
+    }
+
+    public static final JSONObject getPetMessages(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+        JSONObject js = new JSONObject();
+        Long idProfile = new Long(req.getParameter("idProfile"));
+
+        pm = PMF.get().getPersistenceManager();
+        HashMap<Long, Perfil> mapaProf = new HashMap<>();
+        HashMap<Long, List<JSONObject>> mapaChat = new HashMap<>();
+        HashMap<Long, Imagem> mapaImagem = new HashMap<>();
+
+        //Filter chat sent
+        String filter = "this.to==id";
+        Query qc = pm.newQuery(Chat.class, filter);
+        qc.declareParameters("Long id");
+        // HashMap<Long, Perfil> mp = new HashMap<>();
+        //  HashMap<Long, Imagem> im = new HashMap<>();
+        // HashMap<Long, Pet> lp = new HashMap<>();
+        HashMap<Long, JSONArray> pets = new HashMap<>();
+
+        //Monta a lista de pets
+        JSONArray ja = new JSONArray();
+        Set<Chat> lChats = new HashSet<>();
+        lChats.addAll((List<Chat>) qc.execute(idProfile));
+
+        filter = "this.idOwner==id";
+        Query qf = pm.newQuery(Pet.class, filter);
+        qf.declareParameters("Long id");
+        List<Pet> myPets = (List<Pet>) qf.execute(idProfile);
+
+        for (Pet p : myPets) {
+            JSONObject chat = new JSONObject();
+            Imagem m = pm.getObjectById(Imagem.class, p.getAvatar());
+
+            chat.put("mine", true);
+            chat.put("getKey", p.getKey().toString());
+            chat.put("getIdOwner", p.getIdOwner().toString());
+            chat.put("getPath", m.getPath());
+            chat.put("getTitulo", p.getTitulo());
+            //chat.put("", p.getKey());
+            //chat.put("", p.getKey());
+            ja.put(chat);
+            pets.put(p.getKey(), null);
+        }
+
+        for (Chat c : lChats) {
+            JSONObject chat = new JSONObject();
+            if (pets.containsKey(c.getPetKey())) {
+                continue;
+            }
+            try {
+                Pet p = pm.getObjectById(Pet.class, c.getPetKey());
+                Imagem m = pm.getObjectById(Imagem.class, p.getAvatar());
+                boolean mine = p.getIdOwner().equals(idProfile);
+
+                chat.put("mine", mine);
+                chat.put("getKey", p.getKey().toString());
+                chat.put("getIdOwner", p.getIdOwner().toString());
+                chat.put("getPath", m.getPath());
+                chat.put("getTitulo", p.getTitulo());
+                //chat.put("", p.getKey());
+                //chat.put("", p.getKey());
+                ja.put(chat);
+
+                pets.put(c.getPetKey(), null);
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        js.put("petMessages", ja);
+        return js;
     }
 }

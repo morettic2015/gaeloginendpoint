@@ -27,4 +27,8 @@
         <property name="idOcorrencia" direction="asc"/>
         <property name="idProfile" direction="asc"/>
     </datastore-index>
+    <datastore-index kind="Chat" ancestor="false" source="manual">
+        <property name="from" direction="asc"/>
+        <property name="to" direction="asc"/>
+    </datastore-index>
 </datastore-indexes>

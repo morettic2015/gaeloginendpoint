@@ -223,6 +223,21 @@ public class InfoSegController extends HttpServlet {
                     responseType = 1;
                     pma = PetmatchAction.CHAT;
                     break;
+                case 46://register user devoxe
+                    retJSon = PetmatchController.getPetMessages(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.CHAT_LIST;
+                    break;
+                case 47://register user devoxe
+                    retJSon = PetmatchController.getChatAvatarToOwner(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.CHAT_AVATAR;
+                    break;
+                case 48://register user devoxe
+                    retJSon = PetmatchController.getChatMessages(request, response);
+                    responseType = 1;
+                    pma = PetmatchAction.CHAT_MSG;
+                    break;
                 /* case 99:
                  //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));
                  retJSon =
