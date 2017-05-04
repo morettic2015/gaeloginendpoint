@@ -332,7 +332,7 @@ public class PetmatchController {
         Collections.sort(lChats);
         JSONArray ja = new JSONArray();
         for (Chat c1 : lChats) {
-            if (!c1.getFrom().equals(idFrom) && !c1.getTo().equals(idFrom)) {
+            if (!((c1.getFrom().equals(idFrom) && c1.getTo().equals(idTo) || (c1.getFrom().equals(idTo) && c1.getTo().equals(idFrom))))) {
                 continue;
             }
             JSONObject js1 = new JSONObject();
@@ -345,21 +345,20 @@ public class PetmatchController {
             js1.put("getTo", c1.getTo().toString());
             js1.put("getTimestampChat", c1.getTimestampChat());
             try {
-                Imagem m = pm.getObjectById(Imagem.class, c1.getFrom());
-                js1.put("getImage", m.getImage());
-                js1.put("getPath", m.getPath());
-
-            } catch (Exception e) {
-                js1.put("getImage", "img/avatar.png");
-                js1.put("getImage", "img/avatar.png");
-            }
-            try {
-
                 Perfil perfil = pm.getObjectById(Perfil.class, c1.getFrom());
                 js1.put("getNome", perfil.getNome());
+                Imagem m = pm.getObjectById(Imagem.class, perfil.getAvatar());
+
+                String img = m.getImage().charAt(0) == '['
+                        ? "https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + m.getImage().substring(2, +m.getImage().length() - 2)
+                        : m.getImage();
+
+                js1.put("getImage", img.replaceAll("http:", "https:"));
+                js1.put("getPath", img.replaceAll("http:", "https:"));
 
             } catch (Exception e) {
-                //e.printStackTrace();
+                js1.put("getImage", "img/avatar.png");
+                js1.put("getImage", "img/avatar.png");
             }
 
             ja.put(js1);
@@ -672,24 +671,24 @@ public class PetmatchController {
             js1.put("getFrom", c1.getFrom().toString());
             js1.put("getMsg", c1.getMsg());
             js1.put("getTit", c1.getTit());
+            js1.put("getMsg", c1.getMsg());
             js1.put("getTo", c1.getTo().toString());
             js1.put("getTimestampChat", c1.getTimestampChat());
             try {
-                Imagem m = pm.getObjectById(Imagem.class, c1.getFrom());
-                js1.put("getImage", m.getImage());
-                js1.put("getPath", m.getPath());
+                Perfil pp = pm.getObjectById(Perfil.class, c1.getFrom());
+                js1.put("getNome", pp.getNome());
+                Imagem m = pm.getObjectById(Imagem.class, pp.getAvatar());
+
+                String img = m.getImage().charAt(0) == '['
+                        ? "https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + m.getImage().substring(2, +m.getImage().length() - 2)
+                        : m.getImage();
+
+                js1.put("getImage", img.replaceAll("http:", "https:"));
+                js1.put("getPath", img.replaceAll("http:", "https:"));
 
             } catch (Exception e) {
                 js1.put("getImage", "img/avatar.png");
                 js1.put("getPath", "img/avatar.png");
-            }
-            try {
-
-                Perfil perfil = pm.getObjectById(Perfil.class, c1.getFrom());
-                js1.put("getNome", perfil.getNome());
-
-            } catch (Exception e) {
-                //e.printStackTrace();
             }
 
             ja.put(js1);
@@ -707,28 +706,43 @@ public class PetmatchController {
         pm = PMF.get().getPersistenceManager();
         HashMap<Long, Boolean> profiles = new HashMap<>();
 
+        Pet p = pm.getObjectById(Pet.class, idPet);
+
         //Monta a lista de pets
         JSONArray ja = new JSONArray();
-        Set<Chat> lChats = new HashSet<>();
+        List<Chat> lChats = new ArrayList<>();
         lChats.addAll(getChatsByPetId(pm, idPet));
-
+        js.put("lSize", lChats.size());
         for (Chat c : lChats) {
+
             JSONObject avatars = new JSONObject();
             if (!profiles.containsKey(c.getFrom())) {
 
                 Perfil perfil = pm.getObjectById(Perfil.class, c.getFrom());
+                //Não apresenta o proprio avatar ne maluco.....
+                if (perfil.getKey().equals(p.getIdOwner())) {
+                    continue;
+                }
+
                 avatars.put("getNome", perfil.getNome());
                 avatars.put("getKey", perfil.getKey().toString());
 
-                try {
-                    Imagem m = pm.getObjectById(Imagem.class, perfil.getAvatar());
-                    avatars.put("getImage", m.getImage());
-                    avatars.put("getPath", m.getPath());
+                //try {
+                Imagem m = pm.getObjectById(Imagem.class, perfil.getAvatar());
 
-                } catch (Exception e) {
-                    avatars.put("getImage", "img/avatar.png");
-                    avatars.put("getPath", "img/avatar.png");
-                }
+                String img = m.getImage().charAt(0) == '['
+                        ? "https://gaeloginendpoint.appspot.com/infosegcontroller.exec?action=5&blob-key=" + m.getImage().substring(2, +m.getImage().length() - 2)
+                        : m.getImage();
+
+                avatars.put("getImage", img);
+                avatars.put("getPath", img);
+
+                //avatars.put("getPath1", m.getImage());
+
+                /*  } catch (Exception e) {
+                 avatars.put("getImage", "img/avatar.png");
+                 avatars.put("getPath", "img/avatar.png");*/
+                //}
                 profiles.put(perfil.getKey(), Boolean.TRUE);
                 ja.put(avatars);
             }
@@ -764,6 +778,11 @@ public class PetmatchController {
         Query qf = pm.newQuery(Pet.class, filter);
         qf.declareParameters("Long id");
         List<Pet> myPets = (List<Pet>) qf.execute(idProfile);
+
+        filter = "this.from==id";
+        Query qc1 = pm.newQuery(Chat.class, filter);
+        qc1.declareParameters("Long id");
+        lChats.addAll((List<Chat>) qc1.execute(idProfile));
 
         for (Pet p : myPets) {
             JSONObject chat = new JSONObject();
