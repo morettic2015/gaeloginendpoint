@@ -33,6 +33,16 @@ public class Pet extends Registro {
     private Integer vacinado;
     @Persistent(name = "castrado")
     private Integer castrado;
+    @Persistent(name = "adoptedBy")
+    private Long adoptedBy = null;
+
+    public Long getAdoptedBy() {
+        return adoptedBy;
+    }
+
+    public void setAdoptedBy(Long adoptedBy) {
+        this.adoptedBy = adoptedBy;
+    }
 
     @Persistent(name = "owner")
     private Long idOwner;

@@ -11,6 +11,7 @@ package br.com.morettic.gaelogin.smartcities.vo;
  */
 public enum PetmatchAction {
 
+    ADOPT_BY,
     CHAT_MSG,
     CHAT_AVATAR,
     CHAT,

@@ -218,24 +218,6 @@ public class PetmatchController {
         }
     }
 
-    /**
-     *
-     * Save Chat Message
-     *
-     * @param req HttpServletRequest
-     * @param res HttpServletResponse
-     * @return JSONObject
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
-     */
-    private static <Long> Set<Long> setFromIterable(Iterable<Long> i) {
-        HashSet<Long> set = new HashSet<Long>();
-        Iterator<Long> it = i.iterator();
-        while (it.hasNext()) {
-            set.add(it.next());
-        }
-        return set;
-    }
-
     private static JSONObject createContato(PersistenceManager pm, Long idOwner, Long idDestiny) throws JSONException {
 
         Contato from;
@@ -403,6 +385,10 @@ public class PetmatchController {
 
         for (Pet pet : lSOcorrencias) {
             JSONObject j1 = new JSONObject();
+
+            if (pet.getAdoptedBy() != null) {
+                continue;
+            }
 
             Imagem m = pm.getObjectById(Imagem.class, pet.getAvatar());
 
@@ -712,6 +698,7 @@ public class PetmatchController {
         JSONArray ja = new JSONArray();
         List<Chat> lChats = new ArrayList<>();
         lChats.addAll(getChatsByPetId(pm, idPet));
+        Collections.sort(lChats);
         js.put("lSize", lChats.size());
         for (Chat c : lChats) {
 
@@ -793,7 +780,7 @@ public class PetmatchController {
             chat.put("getIdOwner", p.getIdOwner().toString());
             chat.put("getPath", m.getPath());
             chat.put("getTitulo", p.getTitulo());
-            //chat.put("", p.getKey());
+            chat.put("getAdoptedBy", p.getAdoptedBy() == null ? false : true);
             //chat.put("", p.getKey());
             ja.put(chat);
             pets.put(p.getKey(), null);
@@ -814,6 +801,7 @@ public class PetmatchController {
                 chat.put("getIdOwner", p.getIdOwner().toString());
                 chat.put("getPath", m.getPath());
                 chat.put("getTitulo", p.getTitulo());
+                chat.put("getAdoptedBy", p.getAdoptedBy() == null ? false : true);
                 //chat.put("", p.getKey());
                 //chat.put("", p.getKey());
                 ja.put(chat);
@@ -825,5 +813,55 @@ public class PetmatchController {
         }
         js.put("petMessages", ja);
         return js;
+    }
+
+    public static final JSONObject setAdotped(HttpServletRequest req, HttpServletResponse res) throws JSONException {
+
+        //Request parameters
+        Long idPet = new Long(req.getParameter("idPet"));
+        Long idAdoptedBy = new Long(req.getParameter("idAdoptedBy"));
+
+        //JS return
+        JSONObject js = new JSONObject();
+
+        //Connect to the datastore
+        pm = PMF.get().getPersistenceManager();
+        pm.currentTransaction().begin();
+
+        Pet p = pm.getObjectById(Pet.class, idPet);
+
+        p.setAdoptedBy(idAdoptedBy);
+
+        pm.currentTransaction().commit();
+
+        //Set parameters
+        js.put("idPet", idPet);
+        js.put("idAdoptedBy", idAdoptedBy);
+
+        List<Chat> lChats = getChatsByPetId(pm, idPet);
+
+        JSONArray ja = new JSONArray();
+
+        String mensagem = p.getTitulo() + " foi adotado";
+        Set<Long> keys = new HashSet<>();
+        for (Chat c1 : lChats) {
+            if (keys.contains(c1.getFrom())) {
+                continue;
+            }
+            keys.add(c1.getFrom());
+            try {
+                PushDevice pd = pm.getObjectById(PushDevice.class, c1.getFrom());
+                //PushDevice pd1 = pm.getObjectById(PushDevice.class, p.getIdOwner());
+
+                ja.put(PushController.sendOneSignalPushToUser(pd.getOneSignalID(), "Adoção concluída", mensagem));
+            } catch (Exception e) {
+                Logger.getAnonymousLogger().log(Level.WARNING, e.getMessage());
+            }
+        }
+        js.put("devices", ja);
+
+        //Return to webservice
+        return js;
+
     }
 }
