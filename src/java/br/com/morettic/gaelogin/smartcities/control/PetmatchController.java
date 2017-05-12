@@ -129,7 +129,11 @@ public class PetmatchController {
             if (id != null) {
 
                 p1 = new Perfil();
-                p1.setKey(Long.parseLong(id));
+                try {
+                    p1.setKey(Long.parseLong(id));
+                } catch (NumberFormatException e) {
+                    //Error parsing id
+                }
                 p1.setEmail(email);
                 p1.setNome(req.getParameter("name"));
                 p1.setPassWd(java.util.UUID.randomUUID().toString());
@@ -137,7 +141,8 @@ public class PetmatchController {
                 p1.setEhPessoaFisica("true");
                 p1.setPais("BRASIL");
 
-                String imgPath = "http://graph.facebook.com/" + req.getParameter("id") + "/picture?type=large";
+                String gmail = req.getParameter("gmail");
+                String imgPath = gmail == null ? "http://graph.facebook.com/" + req.getParameter("id") + "/picture?type=large" : gmail;
 
                 //URL url = new URL(imgPath);
                 //InputStream input = url.openStream();
