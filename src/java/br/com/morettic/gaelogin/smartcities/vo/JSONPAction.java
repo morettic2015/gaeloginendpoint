@@ -9,8 +9,11 @@ package br.com.morettic.gaelogin.smartcities.vo;
  *
  * @author LuisAugusto
  */
-public enum PetmatchAction {
+public enum JSONPAction {
 
+    //Actions Genimo
+    LISTINGS_MAP,
+    //Actions Petmatch
     ADOPT_BY,
     CHAT_MSG,
     CHAT_AVATAR,

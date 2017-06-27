@@ -7,11 +7,12 @@ package br.com.morettic.gaelogin;
 
 import br.com.morettic.gaelogin.smartcities.control.AirbnbController;
 import br.com.morettic.gaelogin.smartcities.control.ConfigController;
+import br.com.morettic.gaelogin.smartcities.control.ImoveisController;
 import br.com.morettic.gaelogin.smartcities.control.ManguevivoController;
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
 import br.com.morettic.gaelogin.smartcities.control.PetmatchController;
 import br.com.morettic.gaelogin.smartcities.control.PushController;
-import br.com.morettic.gaelogin.smartcities.vo.PetmatchAction;
+import br.com.morettic.gaelogin.smartcities.vo.JSONPAction;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -51,7 +52,7 @@ public class InfoSegController extends HttpServlet {
             throws ServletException, IOException, JSONException {
         response.setContentType("application/json; charset=UTF-8");
         PrintWriter out = response.getWriter();
-        PetmatchAction pma = PetmatchAction.SIGNIN;
+        JSONPAction pma = JSONPAction.SIGNIN;
         int responseType = 0;
         try {
             JSONObject js = new JSONObject();
@@ -181,68 +182,74 @@ public class InfoSegController extends HttpServlet {
                 case 37://Login facebook normal
                     retJSon = PetmatchController.loginProfile(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.SIGNIN;
+                    pma = JSONPAction.SIGNIN;
                     break;
                 case 38://Update profile
                     retJSon = PetmatchController.updateProfile(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.UPDATE_PROFILE;
+                    pma = JSONPAction.UPDATE_PROFILE;
                     break;
                 case 39://register user devoxe
                     retJSon = PetmatchController.registerUserDevice(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.PUSH_REGISTER;
+                    pma = JSONPAction.PUSH_REGISTER;
                     break;
                 case 40://register user devoxe
                     retJSon = PerfilController.getUploadPath(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.UPLOAD_PATH;
+                    pma = JSONPAction.UPLOAD_PATH;
                     break;
                 case 41://register user devoxe
                     retJSon = PetmatchController.saveUpdatePet(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.UPDATE_PET;
+                    pma = JSONPAction.UPDATE_PET;
                     break;
                 case 42://register user devoxe
                     retJSon = PetmatchController.removePet(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.REMOVE;
+                    pma = JSONPAction.REMOVE;
                     break;
                 case 43://register user devoxe
                     retJSon = PetmatchController.findPetsNearBy(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.SEARCH;
+                    pma = JSONPAction.SEARCH;
                     break;
                 case 44://register user devoxe
                     retJSon = PetmatchController.getMyPets(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.MINE;
+                    pma = JSONPAction.MINE;
                     break;
                 case 45://register user devoxe
                     retJSon = PetmatchController.saveChat(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.CHAT;
+                    pma = JSONPAction.CHAT;
                     break;
                 case 46://register user devoxe
                     retJSon = PetmatchController.getPetMessages(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.CHAT_LIST;
+                    pma = JSONPAction.CHAT_LIST;
                     break;
                 case 47://register user devoxe
                     retJSon = PetmatchController.getChatAvatarToOwner(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.CHAT_AVATAR;
+                    pma = JSONPAction.CHAT_AVATAR;
                     break;
                 case 48://register user devoxe
                     retJSon = PetmatchController.getChatMessages(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.CHAT_MSG;
+                    pma = JSONPAction.CHAT_MSG;
                     break;
 
                 case 49://register user devoxe
                     retJSon = PetmatchController.setAdotped(request, response);
                     responseType = 1;
-                    pma = PetmatchAction.ADOPT_BY;
+                    pma = JSONPAction.ADOPT_BY;
+                    break;
+                case 50://register user devoxe
+                    String city = request.getParameter("city");
+                    retJSon = ImoveisController.getLocationsFromNeighohood(city);
+                    responseType = 1;
+                    pma = JSONPAction.LISTINGS_MAP;
                     break;
                 /* case 99:
                  //js.put("wList", URLReader.getWebhoseIoResults("Florianopolis"));

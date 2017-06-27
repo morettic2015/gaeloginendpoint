@@ -5,8 +5,11 @@
  */
 package br.com.morettic.gaelogin.smartcities.control;
 
+import static br.com.morettic.gaelogin.smartcities.control.PerfilController.getOpenStreeMapCollection;
+import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.labs.repackaged.org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,6 +35,50 @@ public class ImoveisController implements Search {
         distance = distance < 1000 ? 1000 : distance;//Distancia minima 1 km
         String url = "http://www.genimo.com.br/api/fcitywatch/news/" + latitude + "/" + longitude + "/" + distance;
         return url;
+    }
+
+    public static final JSONObject getLocationsFromNeighohood(String city) throws JSONException {
+        JSONArray jOpenStreetMap = new JSONArray();
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.INFRAESTRUTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO", TipoOcorrencia.INFRAESTRUTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "BANCO", TipoOcorrencia.INFRAESTRUTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUNDACAO", TipoOcorrencia.INFRAESTRUTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "SAUDE", TipoOcorrencia.SAUDE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "UPA", TipoOcorrencia.SAUDE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "FARMACIA", TipoOcorrencia.SAUDE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "TEATRO", TipoOcorrencia.CULTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "EVENTOS", TipoOcorrencia.CULTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "CINEMA", TipoOcorrencia.CULTURA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESPORTE", TipoOcorrencia.ESPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "FUTEBOL", TipoOcorrencia.ESPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "TENIS", TipoOcorrencia.ESPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "SURF", TipoOcorrencia.ESPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "SKATE", TipoOcorrencia.ESPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "GOLF", TipoOcorrencia.ESPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "TAXI", TipoOcorrencia.TRANSPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "TERMINAL", TipoOcorrencia.TRANSPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "PONTO DE ONIBUS", TipoOcorrencia.TRANSPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.TRANSPORTE.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "EDUCACAO", TipoOcorrencia.EDUCACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "UNIVERSIDADE", TipoOcorrencia.EDUCACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "FACULDADE", TipoOcorrencia.EDUCACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESCOLA", TipoOcorrencia.EDUCACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "CURSO", TipoOcorrencia.EDUCACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "BIBLIOTECA", TipoOcorrencia.EDUCACAO.toString()));
+
+        JSONArray openStreetFinal = new JSONArray();
+        for (int i = 0; i < jOpenStreetMap.length(); i++) {
+            JSONArray ja;
+            ja = jOpenStreetMap.getJSONArray(i);
+            for (int x = 0; x < ja.length(); x++) {
+                openStreetFinal.put(ja.getJSONObject(x));
+            }
+
+        }
+        JSONObject js = new JSONObject();
+        js.put("results", openStreetFinal);
+        return js;
+
     }
 
     public JSONArray doSearch() throws JSONException {

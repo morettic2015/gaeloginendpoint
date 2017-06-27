@@ -1452,7 +1452,7 @@ public class PerfilController {
     }
     private static HashMap<Long, JSONObject> cKey = new HashMap<Long, JSONObject>();
 
-    private static JSONArray getOpenStreeMapCollection(String city, String service, String type) {
+    public static JSONArray getOpenStreeMapCollection(String city, String service, String type) {
 
         JSONArray ja, ja2 = new JSONArray();
 
