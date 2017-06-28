@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.text.Normalizer;
 
 /**
  *
@@ -53,12 +54,14 @@ public class ImoveisController implements Search {
                 continue;
             }
             city = ja.getJSONObject(i).getString("long_name");
+            js.put("c0", city);
+            city = Normalizer.normalize(city, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
         }
         //City is null no administrative_area_level_2 found to search
         if (city == null) {
             return js;
         }
-
+        js.put("c1", city);
         JSONArray jOpenStreetMap = new JSONArray();
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.INFRAESTRUTURA.toString()));
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO", TipoOcorrencia.INFRAESTRUTURA.toString()));
