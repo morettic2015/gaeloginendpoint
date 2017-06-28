@@ -6,6 +6,7 @@
 package br.com.morettic.gaelogin.smartcities.control;
 
 import static br.com.morettic.gaelogin.smartcities.control.PerfilController.getOpenStreeMapCollection;
+import static br.com.morettic.gaelogin.smartcities.control.URLReader.readJSONUrl;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
 import com.google.appengine.labs.repackaged.org.json.JSONArray;
 import com.google.appengine.labs.repackaged.org.json.JSONException;
@@ -37,7 +38,27 @@ public class ImoveisController implements Search {
         return url;
     }
 
-    public static final JSONObject getLocationsFromNeighohood(String city) throws JSONException {
+    public static final JSONObject getLocationsFromNeighohood(String lat, String lon) throws JSONException {
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lon + "&sensor=true&key=AIzaSyCkJEjT73RmsOw1Ldy3S9RbWg_-PDRh8zE";
+        JSONObject address = readJSONUrl(url);
+        String city = null;
+        JSONObject js = new JSONObject();
+        js.put("address", address);
+        js.put("url", url);
+
+        JSONObject treee = address.getJSONArray("results").getJSONObject(0);
+        JSONArray ja = treee.getJSONArray("address_components");
+        for (int i = 0; i < ja.length(); i++) {
+            if (!ja.getJSONObject(i).getJSONArray("types").getString(0).equals("administrative_area_level_2")) {
+                continue;
+            }
+            city = ja.getJSONObject(i).getString("long_name");
+        }
+        //City is null no administrative_area_level_2 found to search
+        if (city == null) {
+            return js;
+        }
+
         JSONArray jOpenStreetMap = new JSONArray();
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "RODOVIARIA", TipoOcorrencia.INFRAESTRUTURA.toString()));
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "POSTO", TipoOcorrencia.INFRAESTRUTURA.toString()));
@@ -68,14 +89,13 @@ public class ImoveisController implements Search {
 
         JSONArray openStreetFinal = new JSONArray();
         for (int i = 0; i < jOpenStreetMap.length(); i++) {
-            JSONArray ja;
             ja = jOpenStreetMap.getJSONArray(i);
             for (int x = 0; x < ja.length(); x++) {
                 openStreetFinal.put(ja.getJSONObject(x));
             }
 
         }
-        JSONObject js = new JSONObject();
+
         js.put("results", openStreetFinal);
         return js;
 

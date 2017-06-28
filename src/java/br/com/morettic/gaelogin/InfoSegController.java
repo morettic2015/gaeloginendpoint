@@ -246,8 +246,7 @@ public class InfoSegController extends HttpServlet {
                     pma = JSONPAction.ADOPT_BY;
                     break;
                 case 50://register user devoxe
-                    String city = request.getParameter("city");
-                    retJSon = ImoveisController.getLocationsFromNeighohood(city);
+                    retJSon = ImoveisController.getLocationsFromNeighohood(request.getParameter("lat"), request.getParameter("lon"));
                     responseType = 1;
                     pma = JSONPAction.LISTINGS_MAP;
                     break;
