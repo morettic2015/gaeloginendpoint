@@ -89,6 +89,13 @@ public class ImoveisController implements Search {
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "ESCOLA", TipoOcorrencia.EDUCACAO.toString()));
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "CURSO", TipoOcorrencia.EDUCACAO.toString()));
         jOpenStreetMap.put(getOpenStreeMapCollection(city, "BIBLIOTECA", TipoOcorrencia.EDUCACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "BAR", TipoOcorrencia.ALIMENTACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "RESTAURANTE", TipoOcorrencia.ALIMENTACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "CAFE", TipoOcorrencia.ALIMENTACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "PADARIA", TipoOcorrencia.ALIMENTACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "LANCHONETE", TipoOcorrencia.ALIMENTACAO.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "POLICIA", TipoOcorrencia.SEGURANCA.toString()));
+        jOpenStreetMap.put(getOpenStreeMapCollection(city, "SEGURANCA", TipoOcorrencia.SEGURANCA.toString()));
 
         JSONArray openStreetFinal = new JSONArray();
         for (int i = 0; i < jOpenStreetMap.length(); i++) {

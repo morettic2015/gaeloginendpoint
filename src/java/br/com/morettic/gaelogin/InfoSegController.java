@@ -246,7 +246,18 @@ public class InfoSegController extends HttpServlet {
                     pma = JSONPAction.ADOPT_BY;
                     break;
                 case 50://register user devoxe
-                    retJSon = ImoveisController.getLocationsFromNeighohood(request.getParameter("lat"), request.getParameter("lon"));
+                    if (request.getSession(true).getAttribute("_" + request.getParameter("lat") + request.getParameter("lon")) != null) {
+                        String session = request.getSession(true).getAttribute("_" + request.getParameter("lat") + request.getParameter("lon")).toString();
+                        retJSon = new JSONObject(session);
+                        retJSon.append("ret", "session");
+                    } else {
+                        retJSon = ImoveisController.getLocationsFromNeighohood(request.getParameter("lat"), request.getParameter("lon"));
+                        request.getSession(true).setAttribute("_" + request.getParameter("lat") + request.getParameter("lon"), retJSon.toString());
+                        retJSon.append("ret", "request");
+                    }
+                    response.addHeader("Cache-Control", "public");
+                    response.setHeader("Pragma", "public"); //HTTP 1.0
+                    response.setDateHeader("Expires", 86400); //prevents caching at the proxy server
                     responseType = 1;
                     pma = JSONPAction.LISTINGS_MAP;
                     break;

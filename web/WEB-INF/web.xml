@@ -11,6 +11,7 @@
     <servlet>
         <servlet-name>InfoSegUploadController</servlet-name>
         <servlet-class>br.com.morettic.gaelogin.InfoSegUploadController</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet>
         <servlet-name>TaskQueueService</servlet-name>
