@@ -1534,10 +1534,10 @@ public class PerfilController {
             }
 
         } catch (Exception e) {
-            JSONObject js = new JSONObject();
-
-            js.put("500", e.toString());
-            ja2.put(js);
+            //JSONObject js = new JSONObject();
+            e.printStackTrace();
+            //js.put("500", e.toString());
+            // ja2.put(js);
         } finally {
             return ja2;
         }

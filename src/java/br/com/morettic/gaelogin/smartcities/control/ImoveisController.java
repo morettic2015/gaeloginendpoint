@@ -35,7 +35,7 @@ public class ImoveisController implements Search {
 
     public String getUrl() {
         distance = distance < 1000 ? 1000 : distance;//Distancia minima 1 km
-        String url = "http://www.genimo.com.br/api/fcitywatch/news/" + latitude + "/" + longitude + "/" + distance;
+        String url = "https://genimo.com.br/api/fcitywatch/news/" + latitude + "/" + longitude + "/" + distance;
         return url;
     }
 
