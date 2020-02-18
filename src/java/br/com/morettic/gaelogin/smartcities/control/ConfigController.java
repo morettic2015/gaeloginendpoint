@@ -7,9 +7,9 @@ package br.com.morettic.gaelogin.smartcities.control;
 
 import br.com.morettic.gaelogin.smartcities.vo.Configuracao;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import java.util.HashMap;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;

@@ -10,8 +10,8 @@ import static br.com.morettic.gaelogin.InfoSegController.log;
 import br.com.morettic.gaelogin.smartcities.vo.Imagem;
 import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import br.com.morettic.gaelogin.smartcities.vo.Perfil;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import java.util.Date;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +30,7 @@ import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 import static com.google.appengine.api.users.UserServiceFactory.getUserService;
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONArray;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -204,7 +204,7 @@ public class PerfilController {
      * @param request
      * @param response
      * @return JSONObject
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     * @throws com.google.appengine.repackaged.org.json.JSONException
      */
     public static JSONObject savePerfil(HttpServletRequest request, HttpServletResponse response) throws JSONException {
         JSONObject js = new JSONObject();

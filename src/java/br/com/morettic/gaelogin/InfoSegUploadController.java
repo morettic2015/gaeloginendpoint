@@ -6,8 +6,8 @@
 package br.com.morettic.gaelogin;
 
 import br.com.morettic.gaelogin.smartcities.control.PerfilController;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.logging.Level;

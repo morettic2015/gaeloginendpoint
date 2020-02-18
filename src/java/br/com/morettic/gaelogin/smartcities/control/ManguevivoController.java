@@ -5,8 +5,8 @@
  */
 package br.com.morettic.gaelogin.smartcities.control;
 
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
 import javax.jdo.PersistenceManager;
 
 /**

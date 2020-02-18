@@ -14,9 +14,9 @@ import br.com.morettic.gaelogin.smartcities.vo.Promocao;
 import br.com.morettic.gaelogin.smartcities.vo.PushDevice;
 import br.com.morettic.gaelogin.smartcities.vo.Registro;
 import br.com.morettic.gaelogin.smartcities.vo.TipoOcorrencia;
-import com.google.appengine.labs.repackaged.org.json.JSONArray;
-import com.google.appengine.labs.repackaged.org.json.JSONException;
-import com.google.appengine.labs.repackaged.org.json.JSONObject;
+import com.google.appengine.repackaged.org.json.JSONArray;
+import com.google.appengine.repackaged.org.json.JSONException;
+import com.google.appengine.repackaged.org.json.JSONObject;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -107,7 +107,7 @@ public class PushController {
      * @param request String tit, String msg, Long from, List<TipoOcorrencia>
      * canais
      * @return JSONObject
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     * @throws com.google.appengine.repackaged.org.json.JSONException
      * @Send message to the destiny
      */
     public static final JSONObject sendPromo(HttpServletRequest request) throws JSONException {
@@ -152,7 +152,7 @@ public class PushController {
      * request.getParameter("msg"), request.getParameter("from"),
      * request.getParameter("to"));
      * @return JSONObject
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     * @throws com.google.appengine.repackaged.org.json.JSONException
      * @Send message to the destiny
      */
     public static final JSONObject sendMessage(HttpServletRequest request) throws JSONException {
@@ -186,7 +186,7 @@ public class PushController {
     /**
      * @param request request.getParameter("idProfile")
      * @return JSONObject
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     * @throws com.google.appengine.repackaged.org.json.JSONException
      * @Send message to the destiny
      */
     public static final JSONObject getMessages(HttpServletRequest request) throws JSONException {
@@ -224,7 +224,7 @@ public class PushController {
     /**
      * @param request request.getParameter("idProfile")
      * @return JSONObject
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     * @throws com.google.appengine.repackaged.org.json.JSONException
      * @Send message to the destiny
      */
     public static final JSONObject getPromos(HttpServletRequest request) throws JSONException {
@@ -345,7 +345,7 @@ public class PushController {
      *
      * @param request
      * @return
-     * @throws com.google.appengine.labs.repackaged.org.json.JSONException
+     * @throws com.google.appengine.repackaged.org.json.JSONException
      */
     public static JSONObject createContact(HttpServletRequest request) throws JSONException {
         JSONObject js = new JSONObject();
